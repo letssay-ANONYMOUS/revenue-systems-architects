@@ -12,6 +12,9 @@ const navLinks = [
   { label: "About", path: "/about" },
 ];
 
+const SCROLL_THRESHOLD = 50;
+const TRANSITION_CSS = "all 700ms cubic-bezier(0.16, 1, 0.3, 1)";
+
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -23,7 +26,7 @@ const Navbar = () => {
   useMotionValueEvent(scrollY, "change", (latest) => {
     const direction = latest > lastScrollY.current ? "down" : "up";
     lastScrollY.current = latest;
-    setScrolled(latest > 60);
+    setScrolled(latest > SCROLL_THRESHOLD);
 
     if (latest < 80) {
       setHidden(false);
@@ -41,26 +44,26 @@ const Navbar = () => {
       <motion.nav
         animate={{ y: hidden && !mobileOpen ? "-140%" : "0%" }}
         transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-        className="fixed top-0 left-0 right-0 z-50"
-        style={{ padding: scrolled ? "8px 12px 0" : "0" }}
+        className="fixed top-0 left-0 right-0 z-50 transform-gpu"
+        style={{ padding: scrolled ? "10px 16px 0" : "0" }}
       >
-        <motion.div
-          layout="position"
-          transition={{ layout: { duration: 0.5, ease: [0.32, 0.72, 0, 1] } }}
-          className={`mx-auto ${
-            scrolled
-              ? "max-w-2xl rounded-full bg-background/50 backdrop-blur-2xl border border-border/40 shadow-[0_8px_32px_hsl(0_0%_0%/0.4)]"
-              : "max-w-full bg-transparent"
+        <div
+          className={`mx-auto transform-gpu ${
+            scrolled ? "nav-glass rounded-full" : "bg-transparent"
           }`}
-          style={{ transition: "max-width 0.5s cubic-bezier(0.32,0.72,0,1), border-radius 0.5s cubic-bezier(0.32,0.72,0,1), background-color 0.5s cubic-bezier(0.32,0.72,0,1), backdrop-filter 0.5s cubic-bezier(0.32,0.72,0,1), box-shadow 0.5s cubic-bezier(0.32,0.72,0,1), border-color 0.5s cubic-bezier(0.32,0.72,0,1)" }}
+          style={{
+            maxWidth: scrolled ? "1000px" : "100%",
+            borderRadius: scrolled ? "9999px" : "0px",
+            transition: TRANSITION_CSS,
+          }}
         >
           <div
-            className={`flex items-center justify-between ${
-              scrolled
-                ? "px-3 md:px-5 h-11 md:h-12"
-                : "max-w-7xl mx-auto px-4 md:px-8 h-14 md:h-16"
-            }`}
-            style={{ transition: "padding 0.5s cubic-bezier(0.32,0.72,0,1), height 0.5s cubic-bezier(0.32,0.72,0,1)" }}
+            className="flex items-center justify-between"
+            style={{
+              padding: scrolled ? "6px 20px" : "0 32px",
+              height: scrolled ? "52px" : "64px",
+              transition: TRANSITION_CSS,
+            }}
           >
             {/* Logo */}
             <Link to="/" className="font-display font-bold text-base md:text-lg tracking-tight shrink-0">
@@ -68,16 +71,16 @@ const Navbar = () => {
               <span className="text-foreground">AI</span>
             </Link>
 
-            {/* Desktop nav - center links */}
-            <div className="hidden lg:flex items-center gap-0.5">
+            {/* Desktop nav links */}
+            <div className="hidden lg:flex items-center gap-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`relative text-xs font-medium px-2.5 py-1 rounded-full transition-all duration-200 whitespace-nowrap ${
+                  className={`nav-link-underline text-xs font-medium px-3 py-1.5 rounded-full whitespace-nowrap transition-colors duration-200 ${
                     location.pathname === link.path
-                      ? "text-primary bg-primary/10"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {link.label}
@@ -89,9 +92,7 @@ const Navbar = () => {
             <div className="hidden lg:block shrink-0">
               <Link
                 to="/book-a-call"
-                className={`premium-btn transition-all duration-300 ${
-                  scrolled ? "text-[10px] px-3 py-1.5" : "text-xs"
-                }`}
+                className="premium-btn text-[11px] px-5 py-2 rounded-full"
               >
                 Book a Call
               </Link>
@@ -99,14 +100,14 @@ const Navbar = () => {
 
             {/* Mobile toggle */}
             <button
-              className="lg:hidden text-foreground p-1.5 -mr-1"
+              className="lg:hidden text-foreground p-1.5 -mr-1 transition-transform duration-200 hover:scale-110"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Toggle menu"
             >
               {mobileOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
           </div>
-        </motion.div>
+        </div>
       </motion.nav>
 
       {/* Mobile fullscreen menu */}
@@ -119,7 +120,7 @@ const Navbar = () => {
             transition={{ duration: 0.2 }}
             className="lg:hidden fixed inset-0 z-40 flex flex-col bg-background/95 backdrop-blur-2xl"
           >
-            <div className="h-14" />
+            <div className="h-16" />
             <div className="flex-1 flex flex-col justify-center px-8 gap-2">
               {navLinks.map((link, i) => (
                 <motion.div
@@ -138,7 +139,7 @@ const Navbar = () => {
                     }`}
                   >
                     <span className="font-display font-semibold text-xl">{link.label}</span>
-                    <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                    <ArrowRight className="w-4 h-4 text-muted-foreground transition-transform duration-200 hover:scale-110" />
                   </Link>
                 </motion.div>
               ))}
@@ -147,7 +148,7 @@ const Navbar = () => {
               <Link
                 to="/book-a-call"
                 onClick={() => setMobileOpen(false)}
-                className="premium-btn text-sm text-center w-full block py-4"
+                className="premium-btn text-sm text-center w-full block py-4 rounded-full"
               >
                 Book a Strategy Call
               </Link>

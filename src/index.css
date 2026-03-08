@@ -151,9 +151,24 @@
   }
 
   .nav-glass {
-    @apply backdrop-blur-xl border-b;
-    background: hsl(var(--background) / 0.8);
-    border-color: hsl(var(--border) / 0.5);
+    background: hsl(0 0% 100% / 0.50);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid hsl(0 0% 100% / 0.18);
+    box-shadow: inset 0 1px 0 0 hsl(0 0% 100% / 0.12), 0 8px 32px hsl(0 0% 0% / 0.25);
+  }
+
+  .nav-link-underline {
+    @apply relative;
+  }
+  .nav-link-underline::after {
+    content: '';
+    @apply absolute bottom-0 left-1/2 h-px w-0 bg-foreground;
+    transform: translateX(-50%);
+    transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .nav-link-underline:hover::after {
+    width: 100%;
   }
 }
 
