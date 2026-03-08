@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ArrowRight, Sparkles } from "lucide-react";
 import SectionReveal from "./SectionReveal";
 
 interface CTASectionProps {
@@ -8,26 +10,42 @@ interface CTASectionProps {
 
 const CTASection = ({
   headline = "Ready to Build Your Revenue System?",
-  subtext = "Stop losing leads to slow responses and disconnected tools. Let's design an AI-powered system built around your business."
+  subtext = "Stop losing leads to slow responses and disconnected tools."
 }: CTASectionProps) => (
-  <section className="relative py-32 overflow-hidden">
+  <section className="relative py-20 md:py-32 overflow-hidden">
     <div className="absolute inset-0 bg-glow opacity-50" />
-    <div className="max-w-4xl mx-auto section-padding text-center relative z-10">
+    {/* Decorative visual orbs */}
+    <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-32 h-32 md:w-64 md:h-64 rounded-full bg-primary/5 blur-[80px]" />
+    <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-32 h-32 md:w-64 md:h-64 rounded-full bg-accent/5 blur-[80px]" />
+    
+    <div className="max-w-4xl mx-auto px-5 md:section-padding text-center relative z-10">
       <SectionReveal>
-        <h2 className="font-display font-bold text-4xl md:text-5xl lg:text-6xl leading-tight mb-6">
-          {headline}
-        </h2>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-10">
-          {subtext}
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link to="/book-a-call" className="premium-btn">
-            Book a Strategy Call
-          </Link>
-          <Link to="/case-studies" className="btn-outline-premium">
-            See Our Work
-          </Link>
-        </div>
+        <motion.div
+          initial={{ scale: 0.9 }}
+          whileInView={{ scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 mb-5 md:mb-6">
+            <Sparkles className="w-3 h-3 text-primary" />
+            <span className="text-[10px] md:text-xs font-medium text-primary">Let's Talk</span>
+          </div>
+          <h2 className="font-display font-bold text-2xl md:text-5xl lg:text-6xl leading-tight mb-4 md:mb-6">
+            {headline}
+          </h2>
+          <p className="text-sm md:text-lg text-muted-foreground max-w-xl mx-auto mb-8 md:mb-10">
+            {subtext}
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link to="/book-a-call" className="premium-btn inline-flex items-center justify-center gap-2 py-4 px-8">
+              Book a Strategy Call
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link to="/case-studies" className="btn-outline-premium text-center py-4 px-8">
+              See Our Work
+            </Link>
+          </div>
+        </motion.div>
       </SectionReveal>
     </div>
   </section>

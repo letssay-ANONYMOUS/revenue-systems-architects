@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 
 const navLinks = [
   { label: "Home", path: "/" },
@@ -18,8 +18,8 @@ const Navbar = () => {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 nav-glass">
-      <div className="max-w-7xl mx-auto section-padding flex items-center justify-between h-20">
-        <Link to="/" className="font-display font-bold text-xl tracking-tight">
+      <div className="max-w-7xl mx-auto px-4 md:section-padding flex items-center justify-between h-16 md:h-20">
+        <Link to="/" className="font-display font-bold text-lg md:text-xl tracking-tight">
           <span className="gradient-text">Nexus</span>
           <span className="text-foreground">AI</span>
         </Link>
@@ -49,41 +49,53 @@ const Navbar = () => {
 
         {/* Mobile toggle */}
         <button
-          className="lg:hidden text-foreground"
+          className="lg:hidden text-foreground p-2 -mr-2"
           onClick={() => setMobileOpen(!mobileOpen)}
+          aria-label="Toggle menu"
         >
-          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile fullscreen menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden bg-background border-b border-border overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="lg:hidden fixed inset-0 top-16 z-40 flex flex-col"
+            style={{ background: "hsl(var(--background) / 0.98)", backdropFilter: "blur(20px)" }}
           >
-            <div className="section-padding py-6 flex flex-col gap-4">
-              {navLinks.map((link) => (
-                <Link
+            <div className="flex-1 flex flex-col justify-center px-8 gap-2">
+              {navLinks.map((link, i) => (
+                <motion.div
                   key={link.path}
-                  to={link.path}
-                  onClick={() => setMobileOpen(false)}
-                  className={`text-sm font-medium py-2 ${
-                    location.pathname === link.path
-                      ? "text-primary"
-                      : "text-muted-foreground"
-                  }`}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.05 }}
                 >
-                  {link.label}
-                </Link>
+                  <Link
+                    to={link.path}
+                    onClick={() => setMobileOpen(false)}
+                    className={`flex items-center justify-between py-4 border-b border-border/50 ${
+                      location.pathname === link.path
+                        ? "text-primary"
+                        : "text-foreground"
+                    }`}
+                  >
+                    <span className="font-display font-semibold text-xl">{link.label}</span>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                  </Link>
+                </motion.div>
               ))}
+            </div>
+            <div className="px-8 pb-10">
               <Link
                 to="/book-a-call"
                 onClick={() => setMobileOpen(false)}
-                className="premium-btn text-xs text-center mt-2"
+                className="premium-btn text-sm text-center w-full block py-4"
               >
                 Book a Strategy Call
               </Link>

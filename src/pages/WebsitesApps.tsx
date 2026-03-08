@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Globe, Smartphone, BarChart3, CalendarCheck, CreditCard, Target, Database, Code2, CheckCircle2, Layers, Gauge, Lock } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -6,34 +7,30 @@ import CTASection from "@/components/CTASection";
 import SectionReveal from "@/components/SectionReveal";
 
 const capabilities = [
-  { icon: Globe, title: "Company Websites", desc: "Premium, conversion-focused websites that establish authority and generate leads from day one." },
-  { icon: Target, title: "Landing Pages", desc: "High-converting campaign pages with clear CTAs, lead capture, and A/B testing readiness." },
-  { icon: CalendarCheck, title: "Booking Platforms", desc: "Integrated scheduling with payments, reminders, and calendar sync built in." },
-  { icon: BarChart3, title: "Analytics Dashboards", desc: "Internal tools and reporting interfaces that give you real-time operational visibility." },
-  { icon: Smartphone, title: "Customer Apps", desc: "Mobile-responsive applications for customer self-service, ordering, booking, and engagement." },
-  { icon: Database, title: "Backend Infrastructure", desc: "APIs, databases, authentication, and server logic that power your business systems." },
+  { icon: Globe, title: "Websites", desc: "Premium, conversion-focused sites." },
+  { icon: Target, title: "Landing Pages", desc: "High-converting campaign pages." },
+  { icon: CalendarCheck, title: "Booking Platforms", desc: "Scheduling with payments built in." },
+  { icon: BarChart3, title: "Dashboards", desc: "Real-time operational visibility." },
+  { icon: Smartphone, title: "Customer Apps", desc: "Mobile-responsive applications." },
+  { icon: Database, title: "Backend", desc: "APIs, databases, and server logic." },
 ];
 
 const techPrinciples = [
-  { icon: Gauge, title: "Performance First", desc: "Fast load times, optimized assets, and smooth interactions across every device." },
-  { icon: Lock, title: "Security Built In", desc: "Authentication, data encryption, and secure payment handling from the ground up." },
-  { icon: Layers, title: "Scalable Architecture", desc: "Systems designed to grow with your business — from launch to millions of users." },
-  { icon: Code2, title: "Clean Code", desc: "Maintainable, well-documented codebases that your team or future developers can extend." },
+  { icon: Gauge, title: "Performance First", desc: "Fast loads, smooth interactions." },
+  { icon: Lock, title: "Security Built In", desc: "Auth, encryption, secure payments." },
+  { icon: Layers, title: "Scalable", desc: "Grows with your business." },
+  { icon: Code2, title: "Clean Code", desc: "Maintainable, well-documented." },
 ];
 
 const deliverables = [
-  "Premium UI/UX design",
-  "Responsive across all devices",
-  "SEO-optimized structure",
-  "Lead capture forms and CTAs",
-  "Booking & scheduling integration",
-  "Payment processing capability",
-  "Analytics and tracking setup",
-  "CMS for content management",
-  "Custom backend logic",
-  "API integrations",
-  "Performance optimization",
-  "Post-launch support",
+  "Premium UI/UX",
+  "Fully responsive",
+  "SEO-optimized",
+  "Lead capture",
+  "Booking integration",
+  "Payment processing",
+  "Analytics setup",
+  "Custom backend",
 ];
 
 const WebsitesApps = () => {
@@ -41,42 +38,102 @@ const WebsitesApps = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <section className="relative pt-32 pb-20 overflow-hidden">
+      <section className="relative pt-24 md:pt-32 pb-14 md:pb-20 overflow-hidden">
         <div className="absolute inset-0 bg-glow opacity-30" />
-        <div className="max-w-7xl mx-auto section-padding relative z-10">
+        <div className="absolute top-1/4 left-0 w-[200px] h-[200px] md:w-[400px] md:h-[400px] rounded-full bg-primary/5 blur-[80px]" />
+        <div className="max-w-7xl mx-auto px-5 md:section-padding relative z-10">
           <SectionReveal>
-            <p className="text-xs uppercase tracking-[0.2em] text-primary mb-4">Websites & Apps</p>
-            <h1 className="font-display font-bold text-4xl md:text-6xl lg:text-7xl leading-[1.1] mb-6 max-w-4xl">
+            <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-3">Websites & Apps</p>
+            <h1 className="font-display font-bold text-2xl md:text-6xl lg:text-7xl leading-[1.1] mb-4 md:mb-6 max-w-4xl">
               Not Just Beautiful.{" "}
               <span className="gradient-text">Built to Perform.</span>
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mb-10 leading-relaxed">
-              We design and build premium websites and applications that convert visitors, automate operations, and scale with your business — not just look good on a portfolio.
+            <p className="text-sm md:text-lg text-muted-foreground max-w-2xl mb-6 md:mb-10 leading-relaxed">
+              Premium websites and apps that convert visitors, automate operations, and scale with your business.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link to="/book-a-call" className="premium-btn text-center">Book a Strategy Call</Link>
-              <Link to="/case-studies" className="btn-outline-premium text-center">See Our Work</Link>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link to="/book-a-call" className="premium-btn text-center text-sm py-3.5">Book a Strategy Call</Link>
+              <Link to="/case-studies" className="btn-outline-premium text-center text-sm py-3.5">See Our Work</Link>
             </div>
           </SectionReveal>
         </div>
       </section>
 
-      {/* What we build */}
-      <section className="py-32">
-        <div className="max-w-7xl mx-auto section-padding">
+      {/* Device mockup visual */}
+      <section className="py-10 md:py-20 border-b border-border">
+        <div className="max-w-7xl mx-auto px-5 md:section-padding">
           <SectionReveal>
-            <h2 className="font-display font-bold text-3xl md:text-5xl leading-tight mb-16 max-w-3xl">
-              Websites and Apps as Business Infrastructure
+            <div className="flex justify-center items-end gap-3 md:gap-8">
+              {/* Phone */}
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}
+                className="w-[80px] md:w-[180px] rounded-xl border-2 border-border overflow-hidden" style={{ background: "hsl(var(--card))" }}>
+                <div className="h-2.5 md:h-4 border-b border-border flex items-center justify-center"><div className="w-5 md:w-8 h-0.5 rounded-full bg-border" /></div>
+                <div className="p-1.5 md:p-2 space-y-1.5">
+                  <div className="h-7 md:h-14 rounded bg-primary/10" />
+                  <div className="h-1 md:h-1.5 rounded bg-foreground/10 w-3/4" />
+                  <div className="h-1 md:h-1.5 rounded bg-foreground/10 w-1/2" />
+                  <div className="h-3 md:h-8 rounded bg-primary/20" />
+                </div>
+              </motion.div>
+
+              {/* Desktop */}
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+                className="flex-1 max-w-[350px] md:max-w-[500px] rounded-lg md:rounded-xl border-2 border-border overflow-hidden" style={{ background: "hsl(var(--card))" }}>
+                <div className="h-3 md:h-6 border-b border-border flex items-center gap-1 px-2">
+                  <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-destructive/40" />
+                  <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-yellow-500/40" />
+                  <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500/40" />
+                </div>
+                <div className="p-2 md:p-4 space-y-2">
+                  <div className="flex gap-2">
+                    <div className="flex-1 space-y-1">
+                      <div className="h-1 md:h-2 rounded bg-foreground/10 w-2/3" />
+                      <div className="h-1 md:h-2 rounded bg-foreground/10 w-full" />
+                      <div className="h-3 md:h-8 rounded bg-primary/20 w-14 md:w-28 mt-1" />
+                    </div>
+                    <div className="w-14 md:w-40 h-12 md:h-28 rounded bg-primary/10" />
+                  </div>
+                  <div className="grid grid-cols-3 gap-1">
+                    <div className="h-6 md:h-16 rounded bg-accent/10" />
+                    <div className="h-6 md:h-16 rounded bg-primary/10" />
+                    <div className="h-6 md:h-16 rounded bg-accent/10" />
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Tablet - hidden on small mobile */}
+              <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.4 }}
+                className="hidden sm:block w-[100px] md:w-[140px] rounded-lg md:rounded-xl border-2 border-border overflow-hidden" style={{ background: "hsl(var(--card))" }}>
+                <div className="h-2.5 md:h-4 border-b border-border" />
+                <div className="p-1.5 md:p-2 space-y-1.5">
+                  <div className="h-8 md:h-12 rounded bg-primary/10" />
+                  <div className="grid grid-cols-2 gap-1"><div className="h-5 md:h-8 rounded bg-accent/10" /><div className="h-5 md:h-8 rounded bg-primary/10" /></div>
+                  <div className="h-1 rounded bg-foreground/10" />
+                </div>
+              </motion.div>
+            </div>
+          </SectionReveal>
+        </div>
+      </section>
+
+      {/* Capabilities */}
+      <section className="py-14 md:py-32">
+        <div className="max-w-7xl mx-auto px-5 md:section-padding">
+          <SectionReveal>
+            <h2 className="font-display font-bold text-xl md:text-5xl leading-tight mb-8 md:mb-16 max-w-3xl">
+              Business Infrastructure, Not Decoration
             </h2>
           </SectionReveal>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6">
             {capabilities.map((c, i) => (
-              <SectionReveal key={c.title} delay={i * 0.08}>
-                <div className="card-premium h-full">
-                  <c.icon className="w-8 h-8 text-primary mb-4" />
-                  <h3 className="font-display font-semibold text-base mb-2">{c.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{c.desc}</p>
-                </div>
+              <SectionReveal key={c.title} delay={i * 0.06}>
+                <motion.div whileHover={{ y: -3 }} className="card-premium p-4 md:p-6 h-full">
+                  <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-2.5 md:mb-4">
+                    <c.icon className="w-4 h-4 md:w-6 md:h-6 text-primary" />
+                  </div>
+                  <h3 className="font-display font-semibold text-xs md:text-base mb-1">{c.title}</h3>
+                  <p className="text-[10px] md:text-sm text-muted-foreground">{c.desc}</p>
+                </motion.div>
               </SectionReveal>
             ))}
           </div>
@@ -84,25 +141,25 @@ const WebsitesApps = () => {
       </section>
 
       {/* Tech principles */}
-      <section className="py-32 surface-elevated">
-        <div className="max-w-7xl mx-auto section-padding">
+      <section className="py-14 md:py-32 surface-elevated">
+        <div className="max-w-7xl mx-auto px-5 md:section-padding">
           <SectionReveal>
-            <h2 className="font-display font-bold text-3xl md:text-5xl leading-tight mb-16 max-w-3xl">
-              Engineering Principles That Matter
+            <h2 className="font-display font-bold text-xl md:text-5xl leading-tight mb-8 md:mb-16 max-w-3xl">
+              Engineering That Matters
             </h2>
           </SectionReveal>
-          <div className="grid sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-3 md:gap-6">
             {techPrinciples.map((p, i) => (
-              <SectionReveal key={p.title} delay={i * 0.08}>
-                <div className="card-premium h-full flex gap-5">
-                  <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                    <p.icon className="w-7 h-7 text-primary" />
+              <SectionReveal key={p.title} delay={i * 0.06}>
+                <motion.div whileHover={{ y: -3 }} className="card-premium p-4 md:p-6 h-full flex gap-3 md:gap-5">
+                  <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <p.icon className="w-4 h-4 md:w-7 md:h-7 text-primary" />
                   </div>
                   <div>
-                    <h3 className="font-display font-semibold text-lg mb-2">{p.title}</h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">{p.desc}</p>
+                    <h3 className="font-display font-semibold text-xs md:text-lg mb-0.5 md:mb-2">{p.title}</h3>
+                    <p className="text-[10px] md:text-sm text-muted-foreground">{p.desc}</p>
                   </div>
-                </div>
+                </motion.div>
               </SectionReveal>
             ))}
           </div>
@@ -110,22 +167,22 @@ const WebsitesApps = () => {
       </section>
 
       {/* Deliverables */}
-      <section className="py-32">
-        <div className="max-w-7xl mx-auto section-padding">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
+      <section className="py-14 md:py-32">
+        <div className="max-w-7xl mx-auto px-5 md:section-padding">
+          <div className="grid lg:grid-cols-2 gap-6 md:gap-16 items-center">
             <SectionReveal>
-              <h2 className="font-display font-bold text-3xl md:text-4xl leading-tight mb-6">
-                What's Included in Every Build
+              <h2 className="font-display font-bold text-xl md:text-4xl leading-tight mb-3 md:mb-6">
+                Included in Every Build
               </h2>
-              <p className="text-muted-foreground mb-8">
-                Whether it's a company website, a customer app, or an internal dashboard — every project includes the fundamentals that make it work for your business.
+              <p className="text-xs md:text-base text-muted-foreground hidden md:block">
+                Whether it's a company website, customer app, or internal dashboard — every project includes what makes it work for your business.
               </p>
             </SectionReveal>
             <SectionReveal delay={0.2}>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2 md:gap-3">
                 {deliverables.map((d) => (
-                  <div key={d} className="flex items-center gap-2 text-sm">
-                    <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                  <div key={d} className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-sm">
+                    <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 text-primary shrink-0" />
                     <span className="text-muted-foreground">{d}</span>
                   </div>
                 ))}
@@ -135,7 +192,7 @@ const WebsitesApps = () => {
         </div>
       </section>
 
-      <CTASection headline="Let's Build Something That Works" subtext="Premium websites and apps designed for conversion, built for scale, and made to last." />
+      <CTASection headline="Let's Build Something That Works" subtext="Premium websites and apps designed for conversion, built for scale." />
       <Footer />
     </div>
   );
