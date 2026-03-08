@@ -118,7 +118,7 @@ const ScrollShowcase = () => {
   const progressHeight = useTransform(scrollYProgress, [0, 1], ["12.5%", "100%"]);
 
   const transitionDuration = prefersReducedMotion ? 0 : 0.7;
-  const transitionEase = [0.25, 0.46, 0.45, 0.94];
+  const transitionEase: [number, number, number, number] = [0.25, 0.46, 0.45, 0.94];
 
   return (
     <div ref={containerRef} style={{ height: `${services.length * 100}vh` }} className="relative">
