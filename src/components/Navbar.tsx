@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
 import { Menu, X, ArrowRight } from "lucide-react";
+import agentforgeLogo from "@/assets/agentforge-logo.png";
 
 const navLinks = [
   { label: "Home", path: "/" },

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import agentforgeLogo from "@/assets/agentforge-logo.png";
 
 const Footer = () => {
   return (
