@@ -579,7 +579,7 @@ const Index = () => {
                         <Bot className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
                       </div>
                       <div>
-                        <p className="text-[10px] md:text-xs font-semibold">NexusAI Assistant</p>
+                        <p className="text-[10px] md:text-xs font-semibold">AgentForge Assistant</p>
                         <div className="flex items-center gap-1">
                           <motion.div
                             animate={{ scale: [1, 1.3, 1] }}

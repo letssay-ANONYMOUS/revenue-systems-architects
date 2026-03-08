@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
 import { Menu, X, ArrowRight } from "lucide-react";
+import agentforgeLogo from "@/assets/agentforge-logo.png";
 
 const navLinks = [
   { label: "Home", path: "/" },
@@ -58,9 +59,8 @@ const Navbar = () => {
               willChange: "padding, height",
             }}
           >
-            <Link to="/" className="font-display font-bold text-base md:text-lg tracking-tight shrink-0">
-              <span className={scrolled ? "nav-text-ink" : "gradient-text"} style={{ transition: "color 500ms cubic-bezier(0.16,1,0.3,1)" }}>Nexus</span>
-              <span className={scrolled ? "nav-text-ink" : "text-foreground"} style={{ transition: "color 500ms cubic-bezier(0.16,1,0.3,1)" }}>AI</span>
+            <Link to="/" className="shrink-0 flex items-center">
+              <img src={agentforgeLogo} alt="AgentForge" className="h-7 md:h-8 w-auto" />
             </Link>
 
             <div className="hidden lg:flex items-center gap-1">

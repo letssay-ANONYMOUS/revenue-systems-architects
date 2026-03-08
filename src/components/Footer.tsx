@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import agentforgeLogo from "@/assets/agentforge-logo.png";
 
 const Footer = () => {
   return (
@@ -6,9 +7,8 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-5 md:section-padding py-10 md:py-16">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
           <div className="col-span-2 lg:col-span-1">
-            <Link to="/" className="font-display font-bold text-xl tracking-tight">
-              <span className="gradient-text">Nexus</span>
-              <span className="text-foreground">AI</span>
+            <Link to="/" className="inline-block">
+              <img src={agentforgeLogo} alt="AgentForge" className="h-8 w-auto" />
             </Link>
             <p className="mt-3 text-xs md:text-sm text-muted-foreground leading-relaxed max-w-xs">
               AI systems, websites, and apps that capture leads, respond faster, and run your operations.
@@ -42,7 +42,7 @@ const Footer = () => {
         </div>
 
         <div className="mt-10 md:mt-16 pt-6 md:pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-3">
-          <p className="text-[10px] md:text-xs text-muted-foreground">© 2026 NexusAI. All rights reserved.</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground">© 2026 AgentForge. All rights reserved.</p>
           <div className="flex gap-6">
             <span className="text-[10px] md:text-xs text-muted-foreground hover:text-foreground cursor-pointer transition-colors">Privacy</span>
             <span className="text-[10px] md:text-xs text-muted-foreground hover:text-foreground cursor-pointer transition-colors">Terms</span>
