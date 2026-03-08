@@ -17,6 +17,7 @@ import AnimatedText from "@/components/AnimatedText";
 import Marquee from "@/components/Marquee";
 import TiltCard from "@/components/TiltCard";
 import CountUp from "@/components/CountUp";
+import ScrollShowcase from "@/components/ScrollShowcase";
 import heroDashboard from "@/assets/hero-dashboard.jpg";
 
 const stats = [
