@@ -42,8 +42,6 @@ const Navbar = () => {
   return (
     <>
       <motion.nav
-        animate={{ y: hidden && !mobileOpen ? "-140%" : "0%" }}
-        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         className="fixed top-0 left-0 right-0 z-50 transform-gpu"
         style={{ padding: scrolled ? "10px 16px 0" : "0" }}
       >
