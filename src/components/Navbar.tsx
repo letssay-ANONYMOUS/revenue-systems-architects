@@ -99,7 +99,7 @@ const Navbar = () => {
 
             {/* Mobile toggle */}
             <button
-              className="lg:hidden text-foreground p-1.5 -mr-1 transition-transform duration-200 hover:scale-110"
+              className={`lg:hidden p-1.5 -mr-1 transition-transform duration-200 hover:scale-110 ${scrolled ? "text-gray-900" : "text-foreground"}`}
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Toggle menu"
             >
