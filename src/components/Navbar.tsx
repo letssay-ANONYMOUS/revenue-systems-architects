@@ -42,8 +42,6 @@ const Navbar = () => {
   return (
     <>
       <motion.nav
-        animate={{ y: hidden && !mobileOpen ? "-140%" : "0%" }}
-        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         className="fixed top-0 left-0 right-0 z-50 transform-gpu"
         style={{ padding: scrolled ? "10px 16px 0" : "0" }}
       >
@@ -67,8 +65,8 @@ const Navbar = () => {
           >
             {/* Logo */}
             <Link to="/" className="font-display font-bold text-base md:text-lg tracking-tight shrink-0">
-              <span className="gradient-text">Nexus</span>
-              <span className="text-foreground">AI</span>
+              <span className={scrolled ? "text-gray-900" : "gradient-text"} style={{ transition: "color 500ms cubic-bezier(0.16,1,0.3,1)" }}>Nexus</span>
+              <span className={scrolled ? "text-gray-900" : "text-foreground"} style={{ transition: "color 500ms cubic-bezier(0.16,1,0.3,1)" }}>AI</span>
             </Link>
 
             {/* Desktop nav links */}
@@ -77,11 +75,12 @@ const Navbar = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`nav-link-underline text-xs font-medium px-3 py-1.5 rounded-full whitespace-nowrap transition-colors duration-200 ${
-                    location.pathname === link.path
-                      ? "text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
+                  className={`nav-link-underline text-xs font-medium px-3 py-1.5 rounded-full whitespace-nowrap ${
+                    scrolled
+                      ? location.pathname === link.path ? "text-gray-900" : "text-gray-500 hover:text-gray-900"
+                      : location.pathname === link.path ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                   }`}
+                  style={{ transition: "color 500ms cubic-bezier(0.16,1,0.3,1)" }}
                 >
                   {link.label}
                 </Link>
@@ -100,7 +99,7 @@ const Navbar = () => {
 
             {/* Mobile toggle */}
             <button
-              className="lg:hidden text-foreground p-1.5 -mr-1 transition-transform duration-200 hover:scale-110"
+              className={`lg:hidden p-1.5 -mr-1 transition-transform duration-200 hover:scale-110 ${scrolled ? "text-gray-900" : "text-foreground"}`}
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Toggle menu"
             >
