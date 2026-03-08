@@ -75,11 +75,12 @@ const Navbar = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`nav-link-underline text-xs font-medium px-3 py-1.5 rounded-full whitespace-nowrap transition-colors duration-200 ${
-                    location.pathname === link.path
-                      ? "text-foreground"
-                      : "text-muted-foreground hover:text-foreground"
+                  className={`nav-link-underline text-xs font-medium px-3 py-1.5 rounded-full whitespace-nowrap ${
+                    scrolled
+                      ? location.pathname === link.path ? "text-gray-900" : "text-gray-500 hover:text-gray-900"
+                      : location.pathname === link.path ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                   }`}
+                  style={{ transition: "color 500ms cubic-bezier(0.16,1,0.3,1)" }}
                 >
                   {link.label}
                 </Link>
