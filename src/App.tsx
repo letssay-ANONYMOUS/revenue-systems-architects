@@ -7,11 +7,8 @@ import { useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import PageTransition from "@/components/PageTransition";
 import Index from "./pages/Index";
-import AICallingAgents from "./pages/AICallingAgents";
-import ChatbotsAutomation from "./pages/ChatbotsAutomation";
-import WebsitesApps from "./pages/WebsitesApps";
-import CaseStudies from "./pages/CaseStudies";
 import About from "./pages/About";
+import CaseStudies from "./pages/CaseStudies";
 import BookACall from "./pages/BookACall";
 import NotFound from "./pages/NotFound";
 
@@ -31,12 +28,15 @@ function AnimatedRoutes() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageTransition><Index /></PageTransition>} />
-        <Route path="/ai-calling-agents" element={<PageTransition><AICallingAgents /></PageTransition>} />
-        <Route path="/chatbots-automation" element={<PageTransition><ChatbotsAutomation /></PageTransition>} />
-        <Route path="/websites-apps" element={<PageTransition><WebsitesApps /></PageTransition>} />
+        <Route path="/solutions" element={<PageTransition><Index /></PageTransition>} />
+        <Route path="/process" element={<PageTransition><Index /></PageTransition>} />
         <Route path="/case-studies" element={<PageTransition><CaseStudies /></PageTransition>} />
         <Route path="/about" element={<PageTransition><About /></PageTransition>} />
         <Route path="/book-a-call" element={<PageTransition><BookACall /></PageTransition>} />
+        {/* Legacy routes redirect to home */}
+        <Route path="/ai-calling-agents" element={<PageTransition><Index /></PageTransition>} />
+        <Route path="/chatbots-automation" element={<PageTransition><Index /></PageTransition>} />
+        <Route path="/websites-apps" element={<PageTransition><Index /></PageTransition>} />
         <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
       </Routes>
     </AnimatePresence>
