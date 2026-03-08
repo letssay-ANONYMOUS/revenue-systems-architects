@@ -81,6 +81,11 @@ const services = [
   },
 ];
 
+// Check for reduced motion preference
+const prefersReducedMotion = typeof window !== "undefined"
+  ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  : false;
+
 const ScrollShowcase = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isInView, setIsInView] = useState(false);
@@ -112,28 +117,40 @@ const ScrollShowcase = () => {
 
   const progressHeight = useTransform(scrollYProgress, [0, 1], ["12.5%", "100%"]);
 
+  const transitionDuration = prefersReducedMotion ? 0 : 0.7;
+  const transitionEase = [0.25, 0.46, 0.45, 0.94];
+
   return (
     <div ref={containerRef} style={{ height: `${services.length * 100}vh` }} className="relative">
       {/* Fixed overlay — only visible when scrolling through this section */}
       {isInView && (
         <div className="fixed inset-0 z-30 flex items-center" style={{ background: "hsl(var(--background))" }}>
-          <div className="max-w-7xl mx-auto px-5 md:section-padding w-full">
-            <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-center">
-              {/* Left: Image panel */}
-              <div className="relative aspect-[16/10] rounded-2xl overflow-hidden border border-border" style={{ background: "hsl(var(--card))" }}>
+          <div className="max-w-[1400px] mx-auto px-5 md:px-8 lg:px-12 w-full">
+            <div className="grid lg:grid-cols-[1.4fr_1fr] gap-6 lg:gap-16 items-center">
+              {/* Left: Large image panel */}
+              <div className="relative aspect-[16/10] lg:aspect-[16/9] rounded-2xl lg:rounded-3xl overflow-hidden border border-border" style={{ background: "hsl(var(--card))" }}>
                 {services.map((svc, i) => (
                   <motion.img
                     key={svc.title}
                     src={svc.image}
                     alt={svc.title}
                     className="absolute inset-0 w-full h-full object-cover"
+                    style={{ willChange: "opacity, transform" }}
+                    initial={false}
                     animate={{
                       opacity: i === activeIndex ? 1 : 0,
-                      scale: i === activeIndex ? 1 : 1.05,
+                      scale: i === activeIndex ? 1 : 1.08,
                     }}
-                    transition={{ duration: 0.5 }}
+                    transition={{
+                      opacity: { duration: transitionDuration, ease: transitionEase },
+                      scale: { duration: transitionDuration * 1.5, ease: transitionEase },
+                    }}
                   />
                 ))}
+
+                {/* Gradient overlay for depth */}
+                <div className="absolute inset-0 bg-gradient-to-t from-background/40 via-transparent to-transparent pointer-events-none" />
+
                 {/* Progress dots */}
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
                   {services.map((_, i) => (
@@ -151,33 +168,37 @@ const ScrollShowcase = () => {
               </div>
 
               {/* Right: Description panel */}
-              <div className="relative h-[280px] md:h-[340px] overflow-hidden">
+              <div className="relative h-[280px] md:h-[380px] lg:h-[420px] overflow-hidden">
                 {services.map((svc, i) => {
                   const Icon = svc.icon;
                   return (
                     <motion.div
                       key={svc.title}
                       className="absolute inset-0 flex flex-col justify-center"
+                      initial={false}
                       animate={{
                         opacity: i === activeIndex ? 1 : 0,
-                        y: i === activeIndex ? 0 : i > activeIndex ? 30 : -30,
+                        y: i === activeIndex ? 0 : i > activeIndex ? 40 : -40,
                       }}
-                      transition={{ duration: 0.4 }}
+                      transition={{
+                        opacity: { duration: transitionDuration * 0.6 },
+                        y: { duration: transitionDuration, ease: transitionEase },
+                      }}
                     >
-                      <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center mb-4 ${
+                      <div className={`w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-xl lg:rounded-2xl flex items-center justify-center mb-4 lg:mb-6 ${
                         svc.accent === "primary" ? "bg-primary/10" : "bg-accent/10"
                       }`}>
-                        <Icon className={`w-5 h-5 md:w-7 md:h-7 ${svc.accent === "primary" ? "text-primary" : "text-accent"}`} />
+                        <Icon className={`w-5 h-5 md:w-7 md:h-7 lg:w-8 lg:h-8 ${svc.accent === "primary" ? "text-primary" : "text-accent"}`} />
                       </div>
-                      <p className={`text-[10px] md:text-xs uppercase tracking-[0.2em] mb-2 ${
+                      <p className={`text-[10px] md:text-xs uppercase tracking-[0.2em] mb-2 lg:mb-3 ${
                         svc.accent === "primary" ? "text-primary" : "text-accent"
                       }`}>
                         {svc.title}
                       </p>
-                      <h3 className="font-display font-bold text-xl md:text-3xl lg:text-4xl leading-tight mb-3 md:mb-4">
+                      <h3 className="font-display font-bold text-xl md:text-3xl lg:text-4xl xl:text-5xl leading-tight mb-3 md:mb-4 lg:mb-5">
                         {svc.headline}
                       </h3>
-                      <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-md">
+                      <p className="text-sm md:text-base lg:text-lg text-muted-foreground leading-relaxed max-w-md">
                         {svc.description}
                       </p>
                     </motion.div>
@@ -189,7 +210,7 @@ const ScrollShowcase = () => {
 
           {/* Vertical scroll progress bar */}
           <div
-            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-1 h-32 rounded-full overflow-hidden"
+            className="absolute right-3 md:right-6 top-1/2 -translate-y-1/2 w-1 h-32 rounded-full overflow-hidden"
             style={{ background: "hsl(var(--border))" }}
           >
             <motion.div
