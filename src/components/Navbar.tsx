@@ -55,11 +55,12 @@ const Navbar = () => {
           style={{ transition: "max-width 0.5s cubic-bezier(0.32,0.72,0,1), border-radius 0.5s cubic-bezier(0.32,0.72,0,1), background-color 0.5s cubic-bezier(0.32,0.72,0,1), backdrop-filter 0.5s cubic-bezier(0.32,0.72,0,1), box-shadow 0.5s cubic-bezier(0.32,0.72,0,1), border-color 0.5s cubic-bezier(0.32,0.72,0,1)" }}
         >
           <div
-            className={`flex items-center justify-between transition-all duration-400 ${
+            className={`flex items-center justify-between ${
               scrolled
                 ? "px-3 md:px-5 h-11 md:h-12"
                 : "max-w-7xl mx-auto px-4 md:px-8 h-14 md:h-16"
             }`}
+            style={{ transition: "padding 0.5s cubic-bezier(0.32,0.72,0,1), height 0.5s cubic-bezier(0.32,0.72,0,1)" }}
           >
             {/* Logo */}
             <Link to="/" className="font-display font-bold text-base md:text-lg tracking-tight shrink-0">
