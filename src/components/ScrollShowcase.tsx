@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { useRef, useState, useEffect } from "react";
+import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import {
   PhoneIncoming, PhoneOutgoing, Bot, Target,
   CalendarCheck, Globe, Smartphone, Workflow
@@ -83,158 +83,126 @@ const services = [
 
 const ScrollShowcase = () => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isInView, setIsInView] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ["start start", "end end"],
   });
 
-  // Map scroll progress to active index (0–7)
-  const activeIndexRaw = useTransform(scrollYProgress, [0, 1], [0, services.length - 1]);
+  // Track whether we're in the scroll container
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const inView = rect.top <= 0 && rect.bottom >= window.innerHeight;
+      setIsInView(inView);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Track active index from scroll progress
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    const idx = Math.round(v * (services.length - 1));
+    setActiveIndex(Math.min(Math.max(idx, 0), services.length - 1));
+  });
+
+  const progressHeight = useTransform(scrollYProgress, [0, 1], ["12.5%", "100%"]);
 
   return (
     <div ref={containerRef} style={{ height: `${services.length * 100}vh` }} className="relative">
-      {/* Sticky container */}
-      <div className="sticky top-0 h-screen flex items-center overflow-hidden">
-        <div className="max-w-7xl mx-auto px-5 md:section-padding w-full">
-          <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-center">
-            {/* Left: Image panel */}
-            <div className="relative aspect-[16/10] rounded-2xl overflow-hidden border border-border" style={{ background: "hsl(var(--card))" }}>
-              {services.map((svc, i) => (
-                <ServiceImage key={svc.title} index={i} image={svc.image} title={svc.title} activeIndexRaw={activeIndexRaw} />
-              ))}
-              {/* Progress dots */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-                {services.map((_, i) => (
-                  <ProgressDot key={i} index={i} activeIndexRaw={activeIndexRaw} />
+      {/* Fixed overlay — only visible when scrolling through this section */}
+      {isInView && (
+        <div className="fixed inset-0 z-30 flex items-center" style={{ background: "hsl(var(--background))" }}>
+          <div className="max-w-7xl mx-auto px-5 md:section-padding w-full">
+            <div className="grid lg:grid-cols-2 gap-6 lg:gap-12 items-center">
+              {/* Left: Image panel */}
+              <div className="relative aspect-[16/10] rounded-2xl overflow-hidden border border-border" style={{ background: "hsl(var(--card))" }}>
+                {services.map((svc, i) => (
+                  <motion.img
+                    key={svc.title}
+                    src={svc.image}
+                    alt={svc.title}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    animate={{
+                      opacity: i === activeIndex ? 1 : 0,
+                      scale: i === activeIndex ? 1 : 1.05,
+                    }}
+                    transition={{ duration: 0.5 }}
+                  />
                 ))}
+                {/* Progress dots */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
+                  {services.map((_, i) => (
+                    <motion.div
+                      key={i}
+                      className="w-2 h-2 rounded-full"
+                      animate={{
+                        scale: i === activeIndex ? 1.4 : 1,
+                        backgroundColor: i === activeIndex ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.4)",
+                      }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Right: Description panel */}
+              <div className="relative h-[280px] md:h-[340px] overflow-hidden">
+                {services.map((svc, i) => {
+                  const Icon = svc.icon;
+                  return (
+                    <motion.div
+                      key={svc.title}
+                      className="absolute inset-0 flex flex-col justify-center"
+                      animate={{
+                        opacity: i === activeIndex ? 1 : 0,
+                        y: i === activeIndex ? 0 : i > activeIndex ? 30 : -30,
+                      }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center mb-4 ${
+                        svc.accent === "primary" ? "bg-primary/10" : "bg-accent/10"
+                      }`}>
+                        <Icon className={`w-5 h-5 md:w-7 md:h-7 ${svc.accent === "primary" ? "text-primary" : "text-accent"}`} />
+                      </div>
+                      <p className={`text-[10px] md:text-xs uppercase tracking-[0.2em] mb-2 ${
+                        svc.accent === "primary" ? "text-primary" : "text-accent"
+                      }`}>
+                        {svc.title}
+                      </p>
+                      <h3 className="font-display font-bold text-xl md:text-3xl lg:text-4xl leading-tight mb-3 md:mb-4">
+                        {svc.headline}
+                      </h3>
+                      <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-md">
+                        {svc.description}
+                      </p>
+                    </motion.div>
+                  );
+                })}
               </div>
             </div>
+          </div>
 
-            {/* Right: Description panel */}
-            <div className="relative h-[280px] md:h-[340px] overflow-hidden">
-              {services.map((svc, i) => (
-                <ServiceDescription key={svc.title} service={svc} index={i} activeIndexRaw={activeIndexRaw} />
-              ))}
-            </div>
+          {/* Vertical scroll progress bar */}
+          <div
+            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-1 h-32 rounded-full overflow-hidden"
+            style={{ background: "hsl(var(--border))" }}
+          >
+            <motion.div
+              className="w-full rounded-full"
+              style={{
+                background: "hsl(var(--primary))",
+                height: progressHeight,
+              }}
+            />
           </div>
         </div>
-
-        {/* Vertical scroll progress bar */}
-        <motion.div
-          className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 w-1 h-32 rounded-full overflow-hidden"
-          style={{ background: "hsl(var(--border))" }}
-        >
-          <motion.div
-            className="w-full rounded-full"
-            style={{
-              background: "hsl(var(--primary))",
-              height: useTransform(scrollYProgress, [0, 1], ["12.5%", "100%"]),
-            }}
-          />
-        </motion.div>
-      </div>
+      )}
     </div>
-  );
-};
-
-// Sub-component: crossfading image
-const ServiceImage = ({
-  index,
-  image,
-  title,
-  activeIndexRaw,
-}: {
-  index: number;
-  image: string;
-  title: string;
-  activeIndexRaw: ReturnType<typeof useTransform>;
-}) => {
-  const opacity = useTransform(activeIndexRaw, (v: number) => {
-    const dist = Math.abs(v - index);
-    return dist < 0.5 ? 1 : 0;
-  });
-  const scale = useTransform(activeIndexRaw, (v: number) => {
-    const dist = Math.abs(v - index);
-    return dist < 0.5 ? 1 : 1.05;
-  });
-
-  return (
-    <motion.img
-      src={image}
-      alt={title}
-      className="absolute inset-0 w-full h-full object-cover"
-      style={{ opacity, scale }}
-      transition={{ duration: 0.5 }}
-    />
-  );
-};
-
-// Sub-component: progress dot
-const ProgressDot = ({
-  index,
-  activeIndexRaw,
-}: {
-  index: number;
-  activeIndexRaw: ReturnType<typeof useTransform>;
-}) => {
-  const scale = useTransform(activeIndexRaw, (v: number) => {
-    return Math.abs(v - index) < 0.5 ? 1.4 : 1;
-  });
-  const bg = useTransform(activeIndexRaw, (v: number) => {
-    return Math.abs(v - index) < 0.5 ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.4)";
-  });
-
-  return (
-    <motion.div
-      className="w-2 h-2 rounded-full"
-      style={{ scale, backgroundColor: bg }}
-    />
-  );
-};
-
-// Sub-component: service description
-const ServiceDescription = ({
-  service,
-  index,
-  activeIndexRaw,
-}: {
-  service: (typeof services)[0];
-  index: number;
-  activeIndexRaw: ReturnType<typeof useTransform>;
-}) => {
-  const Icon = service.icon;
-  const opacity = useTransform(activeIndexRaw, (v: number) => {
-    const dist = Math.abs(v - index);
-    return dist < 0.5 ? 1 : 0;
-  });
-  const y = useTransform(activeIndexRaw, (v: number) => {
-    const dist = v - index;
-    if (Math.abs(dist) < 0.5) return 0;
-    return dist > 0 ? -30 : 30;
-  });
-
-  return (
-    <motion.div
-      className="absolute inset-0 flex flex-col justify-center"
-      style={{ opacity, y }}
-    >
-      <div className={`w-12 h-12 md:w-14 md:h-14 rounded-xl flex items-center justify-center mb-4 ${
-        service.accent === "primary" ? "bg-primary/10" : "bg-accent/10"
-      }`}>
-        <Icon className={`w-5 h-5 md:w-7 md:h-7 ${service.accent === "primary" ? "text-primary" : "text-accent"}`} />
-      </div>
-      <p className={`text-[10px] md:text-xs uppercase tracking-[0.2em] mb-2 ${
-        service.accent === "primary" ? "text-primary" : "text-accent"
-      }`}>
-        {service.title}
-      </p>
-      <h3 className="font-display font-bold text-xl md:text-3xl lg:text-4xl leading-tight mb-3 md:mb-4">
-        {service.headline}
-      </h3>
-      <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-md">
-        {service.description}
-      </p>
-    </motion.div>
   );
 };
 
