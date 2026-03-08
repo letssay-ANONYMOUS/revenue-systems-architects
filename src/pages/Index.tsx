@@ -89,7 +89,7 @@ const Index = () => {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   return (
-    <div className="min-h-screen bg-background overflow-x-hidden">
+    <div className="min-h-screen bg-background" style={{ overflowX: 'clip' }}>
       <Navbar />
 
       {/* HERO */}
