@@ -6,9 +6,8 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-5 md:section-padding py-10 md:py-16">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
           <div className="col-span-2 lg:col-span-1">
-            <Link to="/" className="font-display font-bold text-xl tracking-tight">
-              <span className="gradient-text">Nexus</span>
-              <span className="text-foreground">AI</span>
+            <Link to="/" className="inline-block">
+              <img src={agentforgeLogo} alt="AgentForge" className="h-8 w-auto" />
             </Link>
             <p className="mt-3 text-xs md:text-sm text-muted-foreground leading-relaxed max-w-xs">
               AI systems, websites, and apps that capture leads, respond faster, and run your operations.
