@@ -291,6 +291,7 @@ const Index = () => {
                     { icon: Bot, label: "Chatbot" },
                     { icon: Globe, label: "Website" },
                     { icon: CalendarCheck, label: "Booking" },
+                    { icon: CreditCard, label: "Payments" },
                     { icon: Database, label: "Backend" },
                     { icon: BarChart3, label: "Analytics" },
                   ].map((item, i) => (
