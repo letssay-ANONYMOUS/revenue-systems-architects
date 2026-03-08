@@ -264,8 +264,8 @@ const Index = () => {
         </Marquee>
       </section>
 
-      {/* WHAT WE BUILD — Bento Grid */}
-      <section className="py-14 md:py-32">
+      {/* WHAT WE BUILD — Scroll Showcase */}
+      <section className="pt-14 md:pt-32">
         <div className="max-w-7xl mx-auto px-5 md:section-padding">
           <SectionReveal>
             <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">What We Build</p>
@@ -276,8 +276,10 @@ const Index = () => {
               Every service connects. Your AI agent books appointments. Your chatbot captures leads. Your website converts. Your backend keeps it all running.
             </p>
           </SectionReveal>
+        </div>
+      </section>
 
-          <ScrollShowcase />
+      <ScrollShowcase />
 
           {/* System connection */}
           <SectionReveal delay={0.2}>
