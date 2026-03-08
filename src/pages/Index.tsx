@@ -281,6 +281,8 @@ const Index = () => {
 
       <ScrollShowcase />
 
+      <section className="pb-14 md:pb-32">
+        <div className="max-w-7xl mx-auto px-5 md:section-padding">
           {/* System connection */}
           <SectionReveal delay={0.2}>
             <div className="mt-8 md:mt-16 relative rounded-xl md:rounded-2xl border border-border p-5 md:p-10 overflow-hidden" style={{ background: "hsl(var(--card))" }}>
