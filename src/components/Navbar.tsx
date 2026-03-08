@@ -45,13 +45,14 @@ const Navbar = () => {
         style={{ padding: scrolled ? "8px 12px 0" : "0" }}
       >
         <motion.div
-          layout
-          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          className={`mx-auto transition-all duration-400 ${
+          layout="position"
+          transition={{ layout: { duration: 0.5, ease: [0.32, 0.72, 0, 1] } }}
+          className={`mx-auto ${
             scrolled
               ? "max-w-2xl rounded-full bg-background/50 backdrop-blur-2xl border border-border/40 shadow-[0_8px_32px_hsl(0_0%_0%/0.4)]"
               : "max-w-full bg-transparent"
           }`}
+          style={{ transition: "max-width 0.5s cubic-bezier(0.32,0.72,0,1), border-radius 0.5s cubic-bezier(0.32,0.72,0,1), background-color 0.5s cubic-bezier(0.32,0.72,0,1), backdrop-filter 0.5s cubic-bezier(0.32,0.72,0,1), box-shadow 0.5s cubic-bezier(0.32,0.72,0,1), border-color 0.5s cubic-bezier(0.32,0.72,0,1)" }}
         >
           <div
             className={`flex items-center justify-between transition-all duration-400 ${
