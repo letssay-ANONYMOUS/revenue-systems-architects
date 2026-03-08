@@ -5,7 +5,7 @@ import {
   PhoneIncoming, PhoneOutgoing, Bot, UserCheck, Clock, BarChart3,
   Zap, Target, Shield, ArrowRight, CheckCircle2, XCircle, TrendingUp,
   Layers, Code2, Database, LineChart, Sparkles, Activity, Bell,
-  Users, Star, Headphones, Send
+  Users, Star, Headphones, Send, CreditCard
 } from "lucide-react";
 import { useRef } from "react";
 import Navbar from "@/components/Navbar";
