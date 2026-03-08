@@ -5,7 +5,7 @@ import {
   PhoneIncoming, PhoneOutgoing, Bot, UserCheck, Clock, BarChart3,
   Zap, Target, Shield, ArrowRight, CheckCircle2, XCircle, TrendingUp,
   Layers, Code2, Database, LineChart, Sparkles, Activity, Bell,
-  Users, Star, Headphones, Send
+  Users, Star, Headphones, Send, CreditCard
 } from "lucide-react";
 import { useRef } from "react";
 import Navbar from "@/components/Navbar";
@@ -17,6 +17,7 @@ import AnimatedText from "@/components/AnimatedText";
 import Marquee from "@/components/Marquee";
 import TiltCard from "@/components/TiltCard";
 import CountUp from "@/components/CountUp";
+import ScrollShowcase from "@/components/ScrollShowcase";
 import heroDashboard from "@/assets/hero-dashboard.jpg";
 
 const stats = [
@@ -276,32 +277,7 @@ const Index = () => {
             </p>
           </SectionReveal>
 
-          {/* Bento Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[minmax(140px,auto)] md:auto-rows-[minmax(160px,auto)] gap-3 md:gap-4">
-            {services.map((svc, i) => (
-              <SectionReveal key={svc.title} delay={i * 0.04}>
-                <TiltCard className={`h-full ${svc.span}`}>
-                  <div
-                    className="group relative rounded-xl md:rounded-2xl border border-border p-4 md:p-8 h-full flex flex-col overflow-hidden transition-colors duration-500 hover:border-primary/20"
-                    style={{ background: "hsl(var(--card))" }}
-                  >
-                    <div className="relative z-10 flex flex-col h-full">
-                      <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center mb-3 md:mb-5 ${
-                        svc.accent === "primary" ? "bg-primary/10" : "bg-accent/10"
-                      }`}>
-                        <svc.icon className={`w-4 h-4 md:w-6 md:h-6 ${svc.accent === "primary" ? "text-primary" : "text-accent"}`} />
-                      </div>
-                      <h3 className="font-display font-semibold text-xs md:text-base mb-1 md:mb-2">{svc.title}</h3>
-                      <p className="text-[10px] md:text-sm text-muted-foreground leading-relaxed flex-1 hidden sm:block">{svc.desc}</p>
-                      <div className="mt-2 md:mt-4 pt-2 md:pt-4 border-t border-border">
-                        <span className={`text-[10px] md:text-xs font-medium ${svc.accent === "primary" ? "text-primary" : "text-accent"}`}>{svc.benefit}</span>
-                      </div>
-                    </div>
-                  </div>
-                </TiltCard>
-              </SectionReveal>
-            ))}
-          </div>
+          <ScrollShowcase />
 
           {/* System connection */}
           <SectionReveal delay={0.2}>
@@ -315,6 +291,7 @@ const Index = () => {
                     { icon: Bot, label: "Chatbot" },
                     { icon: Globe, label: "Website" },
                     { icon: CalendarCheck, label: "Booking" },
+                    { icon: CreditCard, label: "Payments" },
                     { icon: Database, label: "Backend" },
                     { icon: BarChart3, label: "Analytics" },
                   ].map((item, i) => (
