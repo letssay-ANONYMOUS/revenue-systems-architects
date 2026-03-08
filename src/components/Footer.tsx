@@ -41,7 +41,7 @@ const Footer = () => {
         </div>
 
         <div className="mt-10 md:mt-16 pt-6 md:pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-3">
-          <p className="text-[10px] md:text-xs text-muted-foreground">© 2026 NexusAI. All rights reserved.</p>
+          <p className="text-[10px] md:text-xs text-muted-foreground">© 2026 AgentForge. All rights reserved.</p>
           <div className="flex gap-6">
             <span className="text-[10px] md:text-xs text-muted-foreground hover:text-foreground cursor-pointer transition-colors">Privacy</span>
             <span className="text-[10px] md:text-xs text-muted-foreground hover:text-foreground cursor-pointer transition-colors">Terms</span>
