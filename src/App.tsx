@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { AnimatePresence } from "framer-motion";
+import PageTransition from "@/components/PageTransition";
 import Index from "./pages/Index";
 import AICallingAgents from "./pages/AICallingAgents";
 import ChatbotsAutomation from "./pages/ChatbotsAutomation";
@@ -23,6 +25,24 @@ function ScrollToTop() {
   return null;
 }
 
+function AnimatedRoutes() {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+        <Route path="/ai-calling-agents" element={<PageTransition><AICallingAgents /></PageTransition>} />
+        <Route path="/chatbots-automation" element={<PageTransition><ChatbotsAutomation /></PageTransition>} />
+        <Route path="/websites-apps" element={<PageTransition><WebsitesApps /></PageTransition>} />
+        <Route path="/case-studies" element={<PageTransition><CaseStudies /></PageTransition>} />
+        <Route path="/about" element={<PageTransition><About /></PageTransition>} />
+        <Route path="/book-a-call" element={<PageTransition><BookACall /></PageTransition>} />
+        <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+      </Routes>
+    </AnimatePresence>
+  );
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -30,16 +50,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <ScrollToTop />
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/ai-calling-agents" element={<AICallingAgents />} />
-          <Route path="/chatbots-automation" element={<ChatbotsAutomation />} />
-          <Route path="/websites-apps" element={<WebsitesApps />} />
-          <Route path="/case-studies" element={<CaseStudies />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/book-a-call" element={<BookACall />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AnimatedRoutes />
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

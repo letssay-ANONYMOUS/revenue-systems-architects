@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import {
   Phone, MessageSquare, CalendarCheck, Globe, Smartphone, Workflow,
   PhoneIncoming, PhoneOutgoing, Bot, UserCheck, Clock, BarChart3,
@@ -7,28 +7,34 @@ import {
   Layers, Code2, Database, LineChart, Sparkles, Activity, Bell,
   Users, Star, Headphones, Send
 } from "lucide-react";
+import { useRef } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CTASection from "@/components/CTASection";
 import SectionReveal from "@/components/SectionReveal";
+import GradientMesh from "@/components/GradientMesh";
+import AnimatedText from "@/components/AnimatedText";
+import Marquee from "@/components/Marquee";
+import TiltCard from "@/components/TiltCard";
+import CountUp from "@/components/CountUp";
 import heroDashboard from "@/assets/hero-dashboard.jpg";
 
 const stats = [
-  { value: "97%", label: "Calls Answered", icon: Phone },
-  { value: "3x", label: "More Bookings", icon: CalendarCheck },
-  { value: "60%", label: "Less Admin", icon: Zap },
-  { value: "24/7", label: "Always On", icon: Activity },
+  { value: 97, suffix: "%", label: "Calls Answered", icon: Phone },
+  { value: 3, suffix: "x", label: "More Bookings", icon: CalendarCheck },
+  { value: 60, suffix: "%", label: "Less Admin", icon: Zap },
+  { value: 24, suffix: "/7", label: "Always On", icon: Activity },
 ];
 
 const services = [
-  { icon: PhoneIncoming, title: "Inbound AI Agent", desc: "Answers, qualifies, books — 24/7.", benefit: "Capture every lead", accent: "primary" },
-  { icon: PhoneOutgoing, title: "Outbound AI Agent", desc: "Follow-ups, reminders, and outreach on autopilot.", benefit: "Reactivate leads", accent: "accent" },
-  { icon: Bot, title: "Support Chatbot", desc: "Instant website replies. Captures leads, handles FAQs.", benefit: "24/7 front desk", accent: "primary" },
-  { icon: Target, title: "Lead Qualification", desc: "Smart flows that qualify before reaching your team.", benefit: "Better prospects", accent: "accent" },
-  { icon: CalendarCheck, title: "Scheduling", desc: "Integrated booking that syncs and reduces no-shows.", benefit: "Auto bookings", accent: "primary" },
-  { icon: Globe, title: "Business Website", desc: "Premium sites built to convert, not just impress.", benefit: "Revenue-ready", accent: "accent" },
-  { icon: Smartphone, title: "Web & Mobile App", desc: "Custom apps that serve customers and streamline ops.", benefit: "Custom systems", accent: "primary" },
-  { icon: Workflow, title: "Workflow Automation", desc: "Connect tools, automate handoffs, eliminate busywork.", benefit: "Run smoother", accent: "accent" },
+  { icon: PhoneIncoming, title: "Inbound AI Agent", desc: "Answers, qualifies, books — 24/7.", benefit: "Capture every lead", accent: "primary", span: "col-span-1 md:col-span-2 md:row-span-2" },
+  { icon: PhoneOutgoing, title: "Outbound AI Agent", desc: "Follow-ups, reminders, and outreach on autopilot.", benefit: "Reactivate leads", accent: "accent", span: "col-span-1" },
+  { icon: Bot, title: "Support Chatbot", desc: "Instant website replies. Captures leads, handles FAQs.", benefit: "24/7 front desk", accent: "primary", span: "col-span-1" },
+  { icon: Target, title: "Lead Qualification", desc: "Smart flows that qualify before reaching your team.", benefit: "Better prospects", accent: "accent", span: "col-span-1 md:col-span-2" },
+  { icon: CalendarCheck, title: "Scheduling", desc: "Integrated booking that syncs and reduces no-shows.", benefit: "Auto bookings", accent: "primary", span: "col-span-1" },
+  { icon: Globe, title: "Business Website", desc: "Premium sites built to convert, not just impress.", benefit: "Revenue-ready", accent: "accent", span: "col-span-1" },
+  { icon: Smartphone, title: "Web & Mobile App", desc: "Custom apps that serve customers and streamline ops.", benefit: "Custom systems", accent: "primary", span: "col-span-1" },
+  { icon: Workflow, title: "Workflow Automation", desc: "Connect tools, automate handoffs, eliminate busywork.", benefit: "Run smoother", accent: "accent", span: "col-span-1" },
 ];
 
 const painPoints = [
@@ -73,55 +79,76 @@ const caseStudies = [
   },
 ];
 
+const trustNames = ["Meridian Group", "Vertex Capital", "Solara Health", "Atlas RE", "Prism Digital", "Arcadia Cafés", "Nova Systems", "Apex Ventures"];
+
 const Index = () => {
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const heroY = useTransform(scrollYProgress, [0, 1], [0, 150]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       <Navbar />
 
       {/* HERO */}
-      <section className="relative min-h-[85vh] md:min-h-screen flex items-center pt-16 md:pt-20 overflow-hidden">
-        <div className="absolute top-20 left-1/4 w-[250px] h-[250px] md:w-[600px] md:h-[600px] rounded-full bg-primary/5 blur-[80px] md:blur-[120px] animate-pulse" />
-        <div className="absolute bottom-20 right-1/4 w-[200px] h-[200px] md:w-[500px] md:h-[500px] rounded-full bg-accent/5 blur-[60px] md:blur-[100px] animate-pulse" style={{ animationDelay: "1s" }} />
-        
-        <div className="max-w-7xl mx-auto px-5 md:section-padding w-full relative z-10">
+      <section ref={heroRef} className="relative min-h-[85vh] md:min-h-screen flex items-center pt-16 md:pt-20 overflow-hidden">
+        <GradientMesh />
+
+        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="max-w-7xl mx-auto px-5 md:section-padding w-full relative z-10">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-            >
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-secondary/50 mb-5 md:mb-8">
+            <div>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-secondary/50 mb-5 md:mb-8"
+              >
                 <Sparkles className="w-3 h-3 text-primary" />
                 <span className="text-[10px] md:text-xs font-medium text-muted-foreground">AI-Powered Business Systems</span>
-              </div>
+              </motion.div>
               <h1 className="font-display font-bold text-[2rem] sm:text-5xl lg:text-6xl xl:text-7xl leading-[1.08] mb-4 md:mb-6">
-                Your Business,{" "}
-                <span className="gradient-text">Answered. Automated. Accelerated.</span>
+                <AnimatedText text="Your Business," delay={0.2} />
+                <br />
+                <AnimatedText text="Answered. Automated. Accelerated." delay={0.5} gradient />
               </h1>
-              <p className="text-sm md:text-lg text-muted-foreground max-w-xl mb-6 md:mb-10 leading-relaxed">
+              <motion.p
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 1 }}
+                className="text-sm md:text-lg text-muted-foreground max-w-xl mb-6 md:mb-10 leading-relaxed"
+              >
                 AI agents, chatbots, websites & automation that capture leads, book appointments, and run your operations.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Link to="/book-a-call" className="premium-btn text-center text-sm px-6 py-3.5 md:px-8 md:py-4">
-                  Book a Strategy Call
+              </motion.p>
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 1.2 }}
+                className="flex flex-col sm:flex-row gap-3"
+              >
+                <Link to="/book-a-call" className="premium-btn text-center text-sm px-6 py-3.5 md:px-8 md:py-4 group">
+                  <span className="relative z-10 flex items-center justify-center gap-2">
+                    Book a Strategy Call
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </span>
                 </Link>
                 <Link to="/case-studies" className="btn-outline-premium text-center text-sm px-6 py-3.5 md:px-8 md:py-4">
                   See Our Work
                 </Link>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
 
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.92 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1, delay: 0.3 }}
+              transition={{ duration: 1, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="relative mt-2 lg:mt-0"
             >
               {/* Main dashboard */}
               <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl">
                 <img src={heroDashboard} alt="AI-powered business dashboard" className="w-full h-auto" />
                 <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
-                
+
                 {/* Overlay mini stats */}
                 <div className="absolute bottom-3 left-3 right-3 md:bottom-4 md:left-4 md:right-4 flex gap-2">
                   {[
@@ -133,7 +160,7 @@ const Index = () => {
                       key={s.label}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 1 + i * 0.15 }}
+                      transition={{ delay: 1.4 + i * 0.15 }}
                       className="flex-1 rounded-lg border border-border/50 p-2 md:p-3 backdrop-blur-xl"
                       style={{ background: "hsl(var(--card) / 0.85)" }}
                     >
@@ -192,11 +219,11 @@ const Index = () => {
             </motion.div>
           </div>
 
-          {/* Stats strip — compact on mobile */}
+          {/* Stats strip with CountUp */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
+            transition={{ duration: 0.6, delay: 1.4 }}
             className="mt-10 md:mt-20 grid grid-cols-4 gap-2 md:gap-8 border-t border-border pt-6 md:pt-10"
           >
             {stats.map((stat, i) => (
@@ -204,34 +231,39 @@ const Index = () => {
                 key={stat.label}
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1 + i * 0.1 }}
+                transition={{ delay: 1.6 + i * 0.1 }}
                 className="text-center"
               >
-                <p className="font-display font-bold text-xl md:text-4xl gradient-text">{stat.value}</p>
+                <p className="font-display font-bold text-xl md:text-4xl gradient-text">
+                  <CountUp target={stat.value} suffix={stat.suffix} />
+                </p>
                 <p className="text-[9px] md:text-sm text-muted-foreground mt-0.5">{stat.label}</p>
               </motion.div>
             ))}
           </motion.div>
-        </div>
+        </motion.div>
       </section>
 
-      {/* TRUST STRIP */}
-      <section className="py-8 md:py-20 border-b border-border">
-        <div className="max-w-7xl mx-auto px-5 md:section-padding">
-          <SectionReveal>
-            <p className="text-center text-[9px] md:text-xs uppercase tracking-[0.2em] text-muted-foreground mb-5 md:mb-10">
-              Trusted by forward-thinking businesses
-            </p>
-            <div className="flex flex-wrap justify-center items-center gap-x-6 gap-y-3 md:gap-12 opacity-40">
-              {["Meridian Group", "Vertex Capital", "Solara Health", "Atlas RE", "Prism Digital", "Arcadia Cafés"].map((name) => (
-                <span key={name} className="font-display font-semibold text-xs md:text-lg text-foreground">{name}</span>
-              ))}
-            </div>
-          </SectionReveal>
-        </div>
+      {/* MARQUEE TRUST STRIP */}
+      <section className="py-8 md:py-16 border-b border-border overflow-hidden">
+        <SectionReveal>
+          <p className="text-center text-[9px] md:text-xs uppercase tracking-[0.2em] text-muted-foreground mb-5 md:mb-8">
+            Trusted by forward-thinking businesses
+          </p>
+        </SectionReveal>
+        <Marquee speed={35} className="opacity-30 mb-3">
+          {trustNames.map((name) => (
+            <span key={name} className="font-display font-semibold text-lg md:text-2xl text-foreground px-4">{name}</span>
+          ))}
+        </Marquee>
+        <Marquee speed={40} reverse className="opacity-20">
+          {trustNames.map((name) => (
+            <span key={`r-${name}`} className="font-display font-semibold text-sm md:text-lg text-foreground px-4">{name}</span>
+          ))}
+        </Marquee>
       </section>
 
-      {/* WHAT WE BUILD — visual icon grid on mobile */}
+      {/* WHAT WE BUILD — Bento Grid */}
       <section className="py-14 md:py-32">
         <div className="max-w-7xl mx-auto px-5 md:section-padding">
           <SectionReveal>
@@ -244,36 +276,34 @@ const Index = () => {
             </p>
           </SectionReveal>
 
-          {/* Mobile: compact visual cards. Desktop: full cards */}
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6">
+          {/* Bento Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[minmax(140px,auto)] md:auto-rows-[minmax(160px,auto)] gap-3 md:gap-4">
             {services.map((svc, i) => (
               <SectionReveal key={svc.title} delay={i * 0.04}>
-                <motion.div
-                  whileHover={{ y: -4, transition: { duration: 0.3 } }}
-                  className="group relative rounded-xl md:rounded-2xl border border-border p-4 md:p-8 h-full flex flex-col overflow-hidden transition-colors duration-500 hover:border-primary/20"
-                  style={{ background: "hsl(var(--card))" }}
-                >
-                  <div className="absolute -top-16 -right-16 w-32 h-32 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-[50px]"
-                    style={{ background: svc.accent === "primary" ? "hsl(var(--primary) / 0.08)" : "hsl(var(--accent) / 0.08)" }}
-                  />
-                  <div className="relative z-10 flex flex-col h-full">
-                    <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center mb-3 md:mb-5 ${
-                      svc.accent === "primary" ? "bg-primary/10" : "bg-accent/10"
-                    }`}>
-                      <svc.icon className={`w-4 h-4 md:w-6 md:h-6 ${svc.accent === "primary" ? "text-primary" : "text-accent"}`} />
-                    </div>
-                    <h3 className="font-display font-semibold text-xs md:text-base mb-1 md:mb-2">{svc.title}</h3>
-                    <p className="text-[10px] md:text-sm text-muted-foreground leading-relaxed flex-1 hidden sm:block">{svc.desc}</p>
-                    <div className="mt-2 md:mt-4 pt-2 md:pt-4 border-t border-border">
-                      <span className={`text-[10px] md:text-xs font-medium ${svc.accent === "primary" ? "text-primary" : "text-accent"}`}>{svc.benefit}</span>
+                <TiltCard className={`h-full ${svc.span}`}>
+                  <div
+                    className="group relative rounded-xl md:rounded-2xl border border-border p-4 md:p-8 h-full flex flex-col overflow-hidden transition-colors duration-500 hover:border-primary/20"
+                    style={{ background: "hsl(var(--card))" }}
+                  >
+                    <div className="relative z-10 flex flex-col h-full">
+                      <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center mb-3 md:mb-5 ${
+                        svc.accent === "primary" ? "bg-primary/10" : "bg-accent/10"
+                      }`}>
+                        <svc.icon className={`w-4 h-4 md:w-6 md:h-6 ${svc.accent === "primary" ? "text-primary" : "text-accent"}`} />
+                      </div>
+                      <h3 className="font-display font-semibold text-xs md:text-base mb-1 md:mb-2">{svc.title}</h3>
+                      <p className="text-[10px] md:text-sm text-muted-foreground leading-relaxed flex-1 hidden sm:block">{svc.desc}</p>
+                      <div className="mt-2 md:mt-4 pt-2 md:pt-4 border-t border-border">
+                        <span className={`text-[10px] md:text-xs font-medium ${svc.accent === "primary" ? "text-primary" : "text-accent"}`}>{svc.benefit}</span>
+                      </div>
                     </div>
                   </div>
-                </motion.div>
+                </TiltCard>
               </SectionReveal>
             ))}
           </div>
 
-          {/* System connection — simplified on mobile */}
+          {/* System connection */}
           <SectionReveal delay={0.2}>
             <div className="mt-8 md:mt-16 relative rounded-xl md:rounded-2xl border border-border p-5 md:p-10 overflow-hidden" style={{ background: "hsl(var(--card))" }}>
               <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 50% 50%, hsl(var(--primary) / 0.03), transparent 70%)" }} />
@@ -294,7 +324,8 @@ const Index = () => {
                       whileInView={{ opacity: 1, scale: 1 }}
                       viewport={{ once: true }}
                       transition={{ delay: i * 0.06 }}
-                      className="flex flex-col items-center gap-1.5 md:gap-2 p-2 md:p-4"
+                      whileHover={{ scale: 1.1, transition: { duration: 0.2 } }}
+                      className="flex flex-col items-center gap-1.5 md:gap-2 p-2 md:p-4 cursor-default"
                     >
                       <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
                         <item.icon className="w-4 h-4 md:w-6 md:h-6 text-primary" />
@@ -309,10 +340,9 @@ const Index = () => {
         </div>
       </section>
 
-      {/* BUSINESS PAIN — visual before/after */}
+      {/* BUSINESS PAIN */}
       <section className="py-14 md:py-32 surface-elevated relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[200px] h-[200px] rounded-full bg-destructive/3 blur-[80px]" />
-        <div className="absolute bottom-0 left-0 w-[200px] h-[200px] rounded-full bg-primary/3 blur-[80px]" />
+        <GradientMesh />
         <div className="max-w-7xl mx-auto px-5 md:section-padding relative z-10">
           <SectionReveal>
             <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Why It Matters</p>
@@ -323,27 +353,26 @@ const Index = () => {
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
             {painPoints.map((pp, i) => (
               <SectionReveal key={i} delay={i * 0.05}>
-                <motion.div
-                  whileHover={{ y: -3 }}
-                  className="group rounded-xl md:rounded-2xl border border-border p-3.5 md:p-6 h-full overflow-hidden transition-all duration-500 hover:border-primary/20"
-                  style={{ background: "hsl(var(--card))" }}
-                >
-                  {/* Pain */}
-                  <div className="flex items-center gap-2 mb-2 md:mb-4">
-                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-destructive/10 flex items-center justify-center shrink-0">
-                      <pp.icon className="w-3 h-3 md:w-4 md:h-4 text-destructive" />
+                <TiltCard>
+                  <div
+                    className="group rounded-xl md:rounded-2xl border border-border p-3.5 md:p-6 h-full overflow-hidden transition-all duration-500 hover:border-primary/20"
+                    style={{ background: "hsl(var(--card))" }}
+                  >
+                    <div className="flex items-center gap-2 mb-2 md:mb-4">
+                      <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-destructive/10 flex items-center justify-center shrink-0">
+                        <pp.icon className="w-3 h-3 md:w-4 md:h-4 text-destructive" />
+                      </div>
+                      <p className="text-[10px] md:text-sm text-muted-foreground line-through decoration-destructive/30">{pp.pain}</p>
                     </div>
-                    <p className="text-[10px] md:text-sm text-muted-foreground line-through decoration-destructive/30">{pp.pain}</p>
-                  </div>
-                  <div className="h-px w-full bg-gradient-to-r from-destructive/20 via-primary/20 to-primary/20 my-2 md:my-3" />
-                  {/* Solution */}
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                      <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 text-primary" />
+                    <div className="h-px w-full bg-gradient-to-r from-destructive/20 via-primary/20 to-primary/20 my-2 md:my-3" />
+                    <div className="flex items-center gap-2">
+                      <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                        <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 text-primary" />
+                      </div>
+                      <p className="text-[10px] md:text-sm font-medium text-foreground">{pp.solution}</p>
                     </div>
-                    <p className="text-[10px] md:text-sm font-medium text-foreground">{pp.solution}</p>
                   </div>
-                </motion.div>
+                </TiltCard>
               </SectionReveal>
             ))}
           </div>
@@ -369,108 +398,110 @@ const Index = () => {
           <div className="grid md:grid-cols-2 gap-4 md:gap-8">
             {/* Inbound */}
             <SectionReveal>
-              <div className="rounded-xl md:rounded-2xl border border-border p-4 md:p-8 h-full" style={{ background: "hsl(var(--card))" }}>
-                <div className="flex items-center gap-3 mb-4 md:mb-6">
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <PhoneIncoming className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-display font-semibold text-sm md:text-xl">Inbound Agent</h3>
-                    <p className="text-[10px] md:text-xs text-muted-foreground">Answers & Qualifies</p>
-                  </div>
-                </div>
-
-                {/* Conversation visual */}
-                <div className="rounded-lg md:rounded-xl border border-border p-3 md:p-4 mb-4 md:mb-5" style={{ background: "hsl(var(--background) / 0.5)" }}>
-                  <div className="space-y-2">
-                    {[
-                      { from: "ai", text: "Good morning! How can I help?" },
-                      { from: "user", text: "I need to book for Tuesday." },
-                      { from: "ai", text: "10 AM or 2 PM — which works?" },
-                    ].map((msg, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, x: msg.from === "ai" ? -8 : 8 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.2 + i * 0.15 }}
-                        className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}
-                      >
-                        <div className={`rounded-lg px-2.5 py-1.5 md:px-3 md:py-2 max-w-[80%] ${
-                          msg.from === "user" ? "bg-secondary" : "bg-primary/10"
-                        }`}>
-                          <p className="text-[10px] md:text-xs">{msg.text}</p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-1.5 md:gap-2">
-                  {["24/7 Answers", "Qualifies", "Books Live", "Routes Urgent", "Captures Leads", "Custom Scripts"].map((item) => (
-                    <div key={item} className="flex items-center gap-1.5 text-[10px] md:text-sm text-muted-foreground">
-                      <CheckCircle2 className="w-3 h-3 text-primary shrink-0" />
-                      {item}
+              <TiltCard>
+                <div className="rounded-xl md:rounded-2xl border border-border p-4 md:p-8 h-full" style={{ background: "hsl(var(--card))" }}>
+                  <div className="flex items-center gap-3 mb-4 md:mb-6">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-primary/10 flex items-center justify-center">
+                      <PhoneIncoming className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                     </div>
-                  ))}
-                </div>
-              </div>
-            </SectionReveal>
+                    <div>
+                      <h3 className="font-display font-semibold text-sm md:text-xl">Inbound Agent</h3>
+                      <p className="text-[10px] md:text-xs text-muted-foreground">Answers & Qualifies</p>
+                    </div>
+                  </div>
 
-            {/* Outbound */}
-            <SectionReveal delay={0.15}>
-              <div className="rounded-xl md:rounded-2xl border border-border p-4 md:p-8 h-full" style={{ background: "hsl(var(--card))" }}>
-                <div className="flex items-center gap-3 mb-4 md:mb-6">
-                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-accent/10 flex items-center justify-center">
-                    <PhoneOutgoing className="w-4 h-4 md:w-5 md:h-5 text-accent" />
+                  <div className="rounded-lg md:rounded-xl border border-border p-3 md:p-4 mb-4 md:mb-5" style={{ background: "hsl(var(--background) / 0.5)" }}>
+                    <div className="space-y-2">
+                      {[
+                        { from: "ai", text: "Good morning! How can I help?" },
+                        { from: "user", text: "I need to book for Tuesday." },
+                        { from: "ai", text: "10 AM or 2 PM — which works?" },
+                      ].map((msg, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ opacity: 0, x: msg.from === "ai" ? -8 : 8 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.2 + i * 0.15 }}
+                          className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}
+                        >
+                          <div className={`rounded-lg px-2.5 py-1.5 md:px-3 md:py-2 max-w-[80%] ${
+                            msg.from === "user" ? "bg-secondary" : "bg-primary/10"
+                          }`}>
+                            <p className="text-[10px] md:text-xs">{msg.text}</p>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-display font-semibold text-sm md:text-xl">Outbound Agent</h3>
-                    <p className="text-[10px] md:text-xs text-muted-foreground">Follows Up & Converts</p>
-                  </div>
-                </div>
 
-                {/* Analytics visual */}
-                <div className="rounded-lg md:rounded-xl border border-border p-3 md:p-4 mb-4 md:mb-5" style={{ background: "hsl(var(--background) / 0.5)" }}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-[9px] md:text-[10px] font-medium text-muted-foreground">Campaign Performance</span>
-                    <span className="text-[9px] md:text-[10px] text-primary font-medium">This Week</span>
-                  </div>
-                  <div className="flex items-end gap-1 h-14 md:h-20">
-                    {[40, 65, 45, 80, 55, 90, 70].map((h, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ height: 0 }}
-                        whileInView={{ height: `${h}%` }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.3 + i * 0.06, duration: 0.5 }}
-                        className="flex-1 rounded-t-sm bg-accent/30"
-                      />
-                    ))}
-                  </div>
-                  <div className="mt-2 grid grid-cols-3 gap-2 text-center">
-                    {[
-                      { label: "Calls", val: "342" },
-                      { label: "Connected", val: "89%" },
-                      { label: "Booked", val: "47" },
-                    ].map((m) => (
-                      <div key={m.label}>
-                        <p className="text-xs md:text-sm font-bold text-foreground">{m.val}</p>
-                        <p className="text-[8px] text-muted-foreground">{m.label}</p>
+                  <div className="grid grid-cols-2 gap-1.5 md:gap-2">
+                    {["24/7 Answers", "Qualifies", "Books Live", "Routes Urgent", "Captures Leads", "Custom Scripts"].map((item) => (
+                      <div key={item} className="flex items-center gap-1.5 text-[10px] md:text-sm text-muted-foreground">
+                        <CheckCircle2 className="w-3 h-3 text-primary shrink-0" />
+                        {item}
                       </div>
                     ))}
                   </div>
                 </div>
+              </TiltCard>
+            </SectionReveal>
 
-                <div className="grid grid-cols-2 gap-1.5 md:gap-2">
-                  {["Follow-ups", "Reminders", "Reactivation", "Callbacks", "Scale Outreach", "Triggers"].map((item) => (
-                    <div key={item} className="flex items-center gap-1.5 text-[10px] md:text-sm text-muted-foreground">
-                      <CheckCircle2 className="w-3 h-3 text-accent shrink-0" />
-                      {item}
+            {/* Outbound */}
+            <SectionReveal delay={0.15}>
+              <TiltCard>
+                <div className="rounded-xl md:rounded-2xl border border-border p-4 md:p-8 h-full" style={{ background: "hsl(var(--card))" }}>
+                  <div className="flex items-center gap-3 mb-4 md:mb-6">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-accent/10 flex items-center justify-center">
+                      <PhoneOutgoing className="w-4 h-4 md:w-5 md:h-5 text-accent" />
                     </div>
-                  ))}
+                    <div>
+                      <h3 className="font-display font-semibold text-sm md:text-xl">Outbound Agent</h3>
+                      <p className="text-[10px] md:text-xs text-muted-foreground">Follows Up & Converts</p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg md:rounded-xl border border-border p-3 md:p-4 mb-4 md:mb-5" style={{ background: "hsl(var(--background) / 0.5)" }}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[9px] md:text-[10px] font-medium text-muted-foreground">Campaign Performance</span>
+                      <span className="text-[9px] md:text-[10px] text-primary font-medium">This Week</span>
+                    </div>
+                    <div className="flex items-end gap-1 h-14 md:h-20">
+                      {[40, 65, 45, 80, 55, 90, 70].map((h, i) => (
+                        <motion.div
+                          key={i}
+                          initial={{ height: 0 }}
+                          whileInView={{ height: `${h}%` }}
+                          viewport={{ once: true }}
+                          transition={{ delay: 0.3 + i * 0.06, duration: 0.5 }}
+                          className="flex-1 rounded-t-sm bg-accent/30"
+                        />
+                      ))}
+                    </div>
+                    <div className="mt-2 grid grid-cols-3 gap-2 text-center">
+                      {[
+                        { label: "Calls", val: "342" },
+                        { label: "Connected", val: "89%" },
+                        { label: "Booked", val: "47" },
+                      ].map((m) => (
+                        <div key={m.label}>
+                          <p className="text-xs md:text-sm font-bold text-foreground">{m.val}</p>
+                          <p className="text-[8px] text-muted-foreground">{m.label}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-1.5 md:gap-2">
+                    {["Follow-ups", "Reminders", "Reactivation", "Callbacks", "Scale Outreach", "Triggers"].map((item) => (
+                      <div key={item} className="flex items-center gap-1.5 text-[10px] md:text-sm text-muted-foreground">
+                        <CheckCircle2 className="w-3 h-3 text-accent shrink-0" />
+                        {item}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              </TiltCard>
             </SectionReveal>
           </div>
 
@@ -493,7 +524,8 @@ const Index = () => {
                         whileInView={{ scale: 1, opacity: 1 }}
                         viewport={{ once: true }}
                         transition={{ delay: i * 0.1 }}
-                        className={`w-9 h-9 md:w-14 md:h-14 rounded-xl md:rounded-2xl border flex items-center justify-center ${
+                        whileHover={{ scale: 1.15, transition: { duration: 0.2 } }}
+                        className={`w-9 h-9 md:w-14 md:h-14 rounded-xl md:rounded-2xl border flex items-center justify-center cursor-default ${
                           step.color === "primary" ? "bg-primary/10 border-primary/20" : "bg-accent/10 border-accent/20"
                         }`}
                       >
@@ -501,7 +533,17 @@ const Index = () => {
                       </motion.div>
                       <p className="text-[8px] md:text-xs font-medium text-center">{step.label}</p>
                     </div>
-                    {i < 4 && <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-muted-foreground/30 shrink-0" />}
+                    {i < 4 && (
+                      <motion.div
+                        initial={{ scaleX: 0 }}
+                        whileInView={{ scaleX: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.3 + i * 0.1, duration: 0.4 }}
+                        className="origin-left"
+                      >
+                        <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-muted-foreground/30 shrink-0" />
+                      </motion.div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -509,8 +551,8 @@ const Index = () => {
           </SectionReveal>
 
           <div className="mt-4 md:mt-8 text-center">
-            <Link to="/ai-calling-agents" className="inline-flex items-center gap-2 text-xs md:text-sm font-medium text-primary hover:underline">
-              Explore AI Calling Agents <ArrowRight className="w-3.5 h-3.5" />
+            <Link to="/ai-calling-agents" className="inline-flex items-center gap-2 text-xs md:text-sm font-medium text-primary hover:underline group">
+              Explore AI Calling Agents <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
         </div>
@@ -536,65 +578,70 @@ const Index = () => {
                   </div>
                 ))}
               </div>
-              <Link to="/chatbots-automation" className="inline-flex items-center gap-2 mt-3 md:mt-8 text-xs md:text-sm font-medium text-primary hover:underline">
-                Learn more <ArrowRight className="w-3.5 h-3.5" />
+              <Link to="/chatbots-automation" className="inline-flex items-center gap-2 mt-3 md:mt-8 text-xs md:text-sm font-medium text-primary hover:underline group">
+                Learn more <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
               </Link>
             </SectionReveal>
 
             <SectionReveal delay={0.2}>
-              {/* Chat mockup */}
-              <div className="rounded-xl md:rounded-2xl border border-border overflow-hidden" style={{ background: "hsl(var(--card))", boxShadow: "0 20px 60px hsl(var(--primary) / 0.08)" }}>
-                <div className="px-3 py-2.5 md:px-4 md:py-3 border-b border-border flex items-center gap-2 md:gap-3">
-                  <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                    <Bot className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
+              <TiltCard>
+                <div className="rounded-xl md:rounded-2xl border border-border overflow-hidden" style={{ background: "hsl(var(--card))", boxShadow: "0 20px 60px hsl(var(--primary) / 0.08)" }}>
+                  <div className="px-3 py-2.5 md:px-4 md:py-3 border-b border-border flex items-center gap-2 md:gap-3">
+                    <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                      <Bot className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] md:text-xs font-semibold">NexusAI Assistant</p>
+                      <div className="flex items-center gap-1">
+                        <motion.div
+                          animate={{ scale: [1, 1.3, 1] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                          className="w-1.5 h-1.5 rounded-full bg-green-500"
+                        />
+                        <p className="text-[9px] md:text-[10px] text-muted-foreground">Online</p>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-[10px] md:text-xs font-semibold">NexusAI Assistant</p>
-                    <div className="flex items-center gap-1">
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                      <p className="text-[9px] md:text-[10px] text-muted-foreground">Online</p>
+                  <div className="p-3 md:p-4 space-y-2.5 md:space-y-3">
+                    {[
+                      { from: "bot", text: "Hi! 👋 How can I help?" },
+                      { from: "user", text: "I'd like to book an appointment." },
+                      { from: "bot", text: "What service are you looking for?" },
+                      { from: "user", text: "Digital presence for my restaurant." },
+                      { from: "bot", text: "Tuesday 10 AM or Thursday 2 PM?" },
+                    ].map((msg, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 6 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.15 + i * 0.12 }}
+                        className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}
+                      >
+                        <div className={`max-w-[80%] rounded-xl px-3 py-2 ${
+                          msg.from === "user" ? "bg-primary/10 rounded-br-sm" : "bg-secondary rounded-bl-sm"
+                        }`}>
+                          <p className="text-[10px] md:text-xs leading-relaxed">{msg.text}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                  <div className="px-3 py-2.5 md:px-4 md:py-3 border-t border-border flex items-center gap-2">
+                    <div className="flex-1 rounded-full border border-border px-3 py-1.5 md:py-2">
+                      <p className="text-[9px] md:text-[10px] text-muted-foreground">Type a message...</p>
+                    </div>
+                    <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-primary flex items-center justify-center">
+                      <Send className="w-3 h-3 md:w-3.5 md:h-3.5 text-primary-foreground" />
                     </div>
                   </div>
                 </div>
-                <div className="p-3 md:p-4 space-y-2.5 md:space-y-3">
-                  {[
-                    { from: "bot", text: "Hi! 👋 How can I help?" },
-                    { from: "user", text: "I'd like to book an appointment." },
-                    { from: "bot", text: "What service are you looking for?" },
-                    { from: "user", text: "Digital presence for my restaurant." },
-                    { from: "bot", text: "Tuesday 10 AM or Thursday 2 PM?" },
-                  ].map((msg, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, y: 6 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.15 + i * 0.12 }}
-                      className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}
-                    >
-                      <div className={`max-w-[80%] rounded-xl px-3 py-2 ${
-                        msg.from === "user" ? "bg-primary/10 rounded-br-sm" : "bg-secondary rounded-bl-sm"
-                      }`}>
-                        <p className="text-[10px] md:text-xs leading-relaxed">{msg.text}</p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-                <div className="px-3 py-2.5 md:px-4 md:py-3 border-t border-border flex items-center gap-2">
-                  <div className="flex-1 rounded-full border border-border px-3 py-1.5 md:py-2">
-                    <p className="text-[9px] md:text-[10px] text-muted-foreground">Type a message...</p>
-                  </div>
-                  <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-primary flex items-center justify-center">
-                    <Send className="w-3 h-3 md:w-3.5 md:h-3.5 text-primary-foreground" />
-                  </div>
-                </div>
-              </div>
+              </TiltCard>
             </SectionReveal>
           </div>
         </div>
       </section>
 
-      {/* WEBSITES & APPS — device mockups */}
+      {/* WEBSITES & APPS */}
       <section className="py-14 md:py-32 relative">
         <div className="max-w-7xl mx-auto px-5 md:section-padding">
           <SectionReveal>
@@ -604,7 +651,6 @@ const Index = () => {
             </h2>
           </SectionReveal>
 
-          {/* Device mockup — cleaner on mobile */}
           <SectionReveal delay={0.1}>
             <div className="mb-8 md:mb-16 flex justify-center items-end gap-3 md:gap-8">
               {/* Phone */}
@@ -671,26 +717,28 @@ const Index = () => {
               { icon: Database, title: "Backend", desc: "APIs & automation" },
             ].map((item, i) => (
               <SectionReveal key={item.title} delay={i * 0.05}>
-                <motion.div
-                  whileHover={{ y: -3 }}
-                  className="group rounded-xl md:rounded-2xl border border-border p-3.5 md:p-6 h-full hover:border-primary/20 transition-colors duration-500"
-                  style={{ background: "hsl(var(--card))" }}
-                >
-                  <div className="w-9 h-9 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-primary/10 flex items-center justify-center mb-2.5 md:mb-5">
-                    <item.icon className="w-4 h-4 md:w-6 md:h-6 text-primary" />
+                <TiltCard>
+                  <div
+                    className="group rounded-xl md:rounded-2xl border border-border p-3.5 md:p-6 h-full hover:border-primary/20 transition-colors duration-500"
+                    style={{ background: "hsl(var(--card))" }}
+                  >
+                    <div className="w-9 h-9 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-primary/10 flex items-center justify-center mb-2.5 md:mb-5">
+                      <item.icon className="w-4 h-4 md:w-6 md:h-6 text-primary" />
+                    </div>
+                    <h3 className="font-display font-semibold text-xs md:text-base mb-0.5 md:mb-2">{item.title}</h3>
+                    <p className="text-[9px] md:text-sm text-muted-foreground">{item.desc}</p>
                   </div>
-                  <h3 className="font-display font-semibold text-xs md:text-base mb-0.5 md:mb-2">{item.title}</h3>
-                  <p className="text-[9px] md:text-sm text-muted-foreground">{item.desc}</p>
-                </motion.div>
+                </TiltCard>
               </SectionReveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* PROCESS — compact mobile */}
-      <section className="py-14 md:py-32 surface-elevated">
-        <div className="max-w-7xl mx-auto px-5 md:section-padding">
+      {/* PROCESS */}
+      <section className="py-14 md:py-32 surface-elevated relative overflow-hidden">
+        <GradientMesh />
+        <div className="max-w-7xl mx-auto px-5 md:section-padding relative z-10">
           <SectionReveal>
             <div className="text-center mb-8 md:mb-16">
               <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Our Process</p>
@@ -702,17 +750,18 @@ const Index = () => {
           <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2.5 md:gap-6">
             {processSteps.map((s, i) => (
               <SectionReveal key={s.step} delay={i * 0.06}>
-                <motion.div
-                  whileHover={{ y: -4 }}
-                  className="group rounded-xl md:rounded-2xl border border-border p-3 md:p-6 text-center hover:border-primary/20 transition-colors duration-500"
-                  style={{ background: "hsl(var(--card))" }}
-                >
-                  <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-2 md:mb-3">
-                    <s.icon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                <TiltCard>
+                  <div
+                    className="group rounded-xl md:rounded-2xl border border-border p-3 md:p-6 text-center hover:border-primary/20 transition-colors duration-500"
+                    style={{ background: "hsl(var(--card))" }}
+                  >
+                    <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-2 md:mb-3">
+                      <s.icon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                    </div>
+                    <span className="font-display font-bold text-sm md:text-xl gradient-text">{s.step}</span>
+                    <h3 className="font-display font-semibold text-[10px] md:text-sm mt-0.5">{s.title}</h3>
                   </div>
-                  <span className="font-display font-bold text-sm md:text-xl gradient-text">{s.step}</span>
-                  <h3 className="font-display font-semibold text-[10px] md:text-sm mt-0.5">{s.title}</h3>
-                </motion.div>
+                </TiltCard>
               </SectionReveal>
             ))}
           </div>
@@ -731,36 +780,37 @@ const Index = () => {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-8">
             {caseStudies.map((cs, i) => (
               <SectionReveal key={cs.title} delay={i * 0.1}>
-                <motion.div
-                  whileHover={{ y: -4 }}
-                  className="group rounded-xl md:rounded-2xl border border-border h-full flex flex-col overflow-hidden hover:border-primary/20 transition-colors duration-500"
-                  style={{ background: "hsl(var(--card))" }}
-                >
-                  <div className="p-4 md:p-6 border-b border-border relative overflow-hidden">
-                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ background: "radial-gradient(circle at 50% 100%, hsl(var(--primary) / 0.05), transparent)" }} />
-                    <span className="text-[9px] md:text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">{cs.tag}</span>
-                    <div className="mt-3 flex items-baseline gap-1.5">
-                      <span className="font-display font-bold text-3xl md:text-5xl gradient-text">{cs.metric}</span>
-                      <span className="text-[10px] md:text-xs text-muted-foreground">{cs.metricLabel}</span>
+                <TiltCard>
+                  <div
+                    className="group rounded-xl md:rounded-2xl border border-border h-full flex flex-col overflow-hidden hover:border-primary/20 transition-colors duration-500"
+                    style={{ background: "hsl(var(--card))" }}
+                  >
+                    <div className="p-4 md:p-6 border-b border-border relative overflow-hidden">
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ background: "radial-gradient(circle at 50% 100%, hsl(var(--primary) / 0.05), transparent)" }} />
+                      <span className="text-[9px] md:text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">{cs.tag}</span>
+                      <div className="mt-3 flex items-baseline gap-1.5">
+                        <span className="font-display font-bold text-3xl md:text-5xl gradient-text">{cs.metric}</span>
+                        <span className="text-[10px] md:text-xs text-muted-foreground">{cs.metricLabel}</span>
+                      </div>
+                    </div>
+                    <div className="p-4 md:p-6 flex flex-col flex-1">
+                      <h3 className="font-display font-semibold text-sm md:text-xl mb-1.5 md:mb-3">{cs.title}</h3>
+                      <p className="text-[10px] md:text-sm text-muted-foreground flex-1">{cs.result}</p>
+                      <Link to="/case-studies" className="inline-flex items-center gap-1.5 mt-3 pt-3 border-t border-border text-[10px] md:text-sm font-medium text-primary hover:underline group/link">
+                        View case study <ArrowRight className="w-3 h-3 transition-transform group-hover/link:translate-x-1" />
+                      </Link>
                     </div>
                   </div>
-                  <div className="p-4 md:p-6 flex flex-col flex-1">
-                    <h3 className="font-display font-semibold text-sm md:text-xl mb-1.5 md:mb-3">{cs.title}</h3>
-                    <p className="text-[10px] md:text-sm text-muted-foreground flex-1">{cs.result}</p>
-                    <Link to="/case-studies" className="inline-flex items-center gap-1.5 mt-3 pt-3 border-t border-border text-[10px] md:text-sm font-medium text-primary hover:underline">
-                      View case study <ArrowRight className="w-3 h-3" />
-                    </Link>
-                  </div>
-                </motion.div>
+                </TiltCard>
               </SectionReveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* WHY US — visual grid */}
+      {/* WHY US */}
       <section className="py-14 md:py-32 surface-elevated relative overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[200px] rounded-full bg-accent/3 blur-[100px]" />
+        <GradientMesh />
         <div className="max-w-7xl mx-auto px-5 md:section-padding relative z-10">
           <div className="grid lg:grid-cols-2 gap-6 md:gap-16 items-center">
             <SectionReveal>
@@ -771,8 +821,8 @@ const Index = () => {
               <p className="text-xs md:text-base text-muted-foreground leading-relaxed mb-3 md:mb-6 hidden md:block">
                 We design revenue systems — where every piece connects, every workflow triggers the next, and your business runs tighter with every passing week.
               </p>
-              <Link to="/about" className="inline-flex items-center gap-2 text-xs md:text-sm font-medium text-primary hover:underline">
-                About us <ArrowRight className="w-3.5 h-3.5" />
+              <Link to="/about" className="inline-flex items-center gap-2 text-xs md:text-sm font-medium text-primary hover:underline group">
+                About us <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
               </Link>
             </SectionReveal>
             <SectionReveal delay={0.2}>
@@ -783,18 +833,18 @@ const Index = () => {
                   { icon: TrendingUp, label: "Growth", desc: "Measurable results" },
                   { icon: Zap, label: "Fast", desc: "Weeks, not months" },
                 ].map((item) => (
-                  <motion.div
-                    key={item.label}
-                    whileHover={{ y: -3 }}
-                    className="group rounded-xl md:rounded-2xl border border-border flex flex-col items-center text-center p-4 md:p-6 hover:border-primary/20 transition-colors duration-500"
-                    style={{ background: "hsl(var(--card))" }}
-                  >
-                    <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-2 md:mb-3 group-hover:bg-primary/15 transition-colors">
-                      <item.icon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                  <TiltCard key={item.label}>
+                    <div
+                      className="group rounded-xl md:rounded-2xl border border-border flex flex-col items-center text-center p-4 md:p-6 hover:border-primary/20 transition-colors duration-500"
+                      style={{ background: "hsl(var(--card))" }}
+                    >
+                      <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-2 md:mb-3 group-hover:bg-primary/15 transition-colors">
+                        <item.icon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                      </div>
+                      <p className="text-xs md:text-sm font-semibold">{item.label}</p>
+                      <p className="text-[9px] md:text-[10px] text-muted-foreground">{item.desc}</p>
                     </div>
-                    <p className="text-xs md:text-sm font-semibold">{item.label}</p>
-                    <p className="text-[9px] md:text-[10px] text-muted-foreground">{item.desc}</p>
-                  </motion.div>
+                  </TiltCard>
                 ))}
               </div>
             </SectionReveal>
