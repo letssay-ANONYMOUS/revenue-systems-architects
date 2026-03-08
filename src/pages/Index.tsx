@@ -1,858 +1,551 @@
 import { Link } from "react-router-dom";
 import { motion, useScroll, useTransform } from "framer-motion";
 import {
-  Phone, MessageSquare, CalendarCheck, Globe, Smartphone, Workflow,
-  PhoneIncoming, PhoneOutgoing, Bot, UserCheck, Clock, BarChart3,
-  Zap, Target, Shield, ArrowRight, CheckCircle2, XCircle, TrendingUp,
-  Layers, Code2, Database, LineChart, Sparkles, Activity, Bell,
-  Users, Star, Headphones, Send
+  Phone, Bot, CalendarCheck, Globe, ArrowRight, CheckCircle2,
+  PhoneIncoming, Zap, Target, BarChart3, MessageSquare,
+  Clock, Users, TrendingUp, Play, Shield, Headphones
 } from "lucide-react";
 import { useRef } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import CTASection from "@/components/CTASection";
+import SectionWrapper from "@/components/sections/SectionWrapper";
+import SectionHeading from "@/components/sections/SectionHeading";
+import MetricStrip from "@/components/sections/MetricStrip";
+import ProcessStep from "@/components/sections/ProcessStep";
+import TestimonialCard from "@/components/sections/TestimonialCard";
+import FAQSection from "@/components/sections/FAQSection";
+import CTABlock from "@/components/sections/CTABlock";
 import SectionReveal from "@/components/SectionReveal";
-import GradientMesh from "@/components/GradientMesh";
-import AnimatedText from "@/components/AnimatedText";
 import Marquee from "@/components/Marquee";
-import TiltCard from "@/components/TiltCard";
 import CountUp from "@/components/CountUp";
-import heroDashboard from "@/assets/hero-dashboard.jpg";
 
-const stats = [
-  { value: 97, suffix: "%", label: "Calls Answered", icon: Phone },
-  { value: 3, suffix: "x", label: "More Bookings", icon: CalendarCheck },
-  { value: 60, suffix: "%", label: "Less Admin", icon: Zap },
-  { value: 24, suffix: "/7", label: "Always On", icon: Activity },
+/* ─── DATA ─── */
+
+const proofMetrics = [
+  { value: 97, suffix: "%", label: "Calls answered" },
+  { value: 3, suffix: "x", label: "More bookings" },
+  { value: 60, suffix: "%", label: "Less admin work" },
+  { value: 40, suffix: "+", label: "Businesses automated" },
 ];
 
 const services = [
-  { icon: PhoneIncoming, title: "Inbound AI Agent", desc: "Answers, qualifies, books — 24/7.", benefit: "Capture every lead", accent: "primary", span: "col-span-1 md:col-span-2 md:row-span-2" },
-  { icon: PhoneOutgoing, title: "Outbound AI Agent", desc: "Follow-ups, reminders, and outreach on autopilot.", benefit: "Reactivate leads", accent: "accent", span: "col-span-1" },
-  { icon: Bot, title: "Support Chatbot", desc: "Instant website replies. Captures leads, handles FAQs.", benefit: "24/7 front desk", accent: "primary", span: "col-span-1" },
-  { icon: Target, title: "Lead Qualification", desc: "Smart flows that qualify before reaching your team.", benefit: "Better prospects", accent: "accent", span: "col-span-1 md:col-span-2" },
-  { icon: CalendarCheck, title: "Scheduling", desc: "Integrated booking that syncs and reduces no-shows.", benefit: "Auto bookings", accent: "primary", span: "col-span-1" },
-  { icon: Globe, title: "Business Website", desc: "Premium sites built to convert, not just impress.", benefit: "Revenue-ready", accent: "accent", span: "col-span-1" },
-  { icon: Smartphone, title: "Web & Mobile App", desc: "Custom apps that serve customers and streamline ops.", benefit: "Custom systems", accent: "primary", span: "col-span-1" },
-  { icon: Workflow, title: "Workflow Automation", desc: "Connect tools, automate handoffs, eliminate busywork.", benefit: "Run smoother", accent: "accent", span: "col-span-1" },
-];
-
-const painPoints = [
-  { icon: XCircle, pain: "Missed calls", solution: "AI answers every call" },
-  { icon: Clock, pain: "Slow responses", solution: "Instant voice & chat" },
-  { icon: XCircle, pain: "No-show chaos", solution: "Automated reminders" },
-  { icon: XCircle, pain: "Weak web presence", solution: "Premium conversion site" },
-  { icon: XCircle, pain: "Manual admin", solution: "Automated workflows" },
-  { icon: XCircle, pain: "Fragmented tools", solution: "One connected system" },
-];
-
-const processSteps = [
-  { step: "01", title: "Strategy", icon: Target },
-  { step: "02", title: "Design", icon: Layers },
-  { step: "03", title: "Build", icon: Code2 },
-  { step: "04", title: "Automate", icon: Workflow },
-  { step: "05", title: "Launch", icon: Zap },
-  { step: "06", title: "Optimize", icon: LineChart },
+  {
+    icon: PhoneIncoming,
+    title: "Never Miss a Call",
+    desc: "AI voice agents answer, qualify, and book — around the clock. No more lost leads after hours.",
+    tag: "AI Calling",
+  },
+  {
+    icon: Bot,
+    title: "Instant Customer Support",
+    desc: "Chatbots that resolve 80% of questions without staff. Customers get help in seconds, not hours.",
+    tag: "Chatbots",
+  },
+  {
+    icon: Target,
+    title: "Capture Every Lead",
+    desc: "Automated qualification and booking pipelines that turn website visitors into paying clients.",
+    tag: "Lead Systems",
+  },
+  {
+    icon: Globe,
+    title: "A Website That Converts",
+    desc: "Premium sites engineered for trust and conversion — not just aesthetics.",
+    tag: "Web & Apps",
+  },
 ];
 
 const caseStudies = [
   {
-    title: "Premium Café Chain",
-    tag: "Hospitality",
-    metric: "3x",
-    metricLabel: "More Bookings",
-    result: "95% call answer rate",
-  },
-  {
-    title: "Medical Clinic Network",
     tag: "Healthcare",
-    metric: "30s",
-    metricLabel: "Response Time",
-    result: "40% fewer missed appointments",
+    client: "Multi-Location Clinic",
+    metric: "3.2x",
+    metricLabel: "more booked appointments",
+    quote: "We went from missing 40% of after-hours calls to capturing every single one.",
   },
   {
-    title: "Real Estate Agency",
+    tag: "Hospitality",
+    client: "Premium Restaurant Group",
+    metric: "95%",
+    metricLabel: "call answer rate",
+    quote: "Our team stopped spending hours on the phone. The AI handles it better than we did.",
+  },
+  {
     tag: "Real Estate",
+    client: "Regional Brokerage",
     metric: "2x",
-    metricLabel: "Qualified Leads",
-    result: "50% faster follow-up",
+    metricLabel: "qualified leads per month",
+    quote: "Follow-ups used to fall through the cracks. Now every lead gets a response in under 30 seconds.",
   },
 ];
 
-const trustNames = ["Meridian Group", "Vertex Capital", "Solara Health", "Atlas RE", "Prism Digital", "Arcadia Cafés", "Nova Systems", "Apex Ventures"];
+const processSteps = [
+  { number: "01", title: "Strategy Call", desc: "We audit your operations and identify the highest-impact automation opportunities." },
+  { number: "02", title: "System Design", desc: "We architect the AI agents, workflows, and integrations tailored to your business." },
+  { number: "03", title: "Build & Integrate", desc: "We develop, test, and deploy your systems — integrated with your existing tools." },
+  { number: "04", title: "Optimize & Scale", desc: "We monitor performance, refine scripts, and expand as your business grows." },
+];
+
+const testimonials = [
+  { quote: "We replaced three part-time staff with one AI system. It pays for itself every week.", name: "Sarah M.", role: "Clinic Owner" },
+  { quote: "The website they built us generates more leads than our entire previous marketing stack.", name: "James K.", role: "Agency Director" },
+  { quote: "Our response time went from 4 hours to 12 seconds. Customers notice.", name: "Priya D.", role: "Operations Manager" },
+];
+
+const faqItems = [
+  { q: "How long does it take to set up an AI calling agent?", a: "Most businesses are live within 2–3 weeks. We handle everything from voice design to integration with your booking system, CRM, or calendar." },
+  { q: "Will the AI sound robotic or scripted?", a: "No. Our voice agents use natural language models that adapt to each caller. They sound professional, warm, and context-aware — not like a phone tree." },
+  { q: "What happens if the AI can't handle a call?", a: "It gracefully escalates to your team via SMS, email, or live transfer. You set the rules — the AI follows them." },
+  { q: "Do I need to change my existing systems?", a: "No. We integrate with your current CRM, calendar, and phone system. No rip-and-replace." },
+  { q: "What does pricing look like?", a: "We offer project-based pricing for builds and monthly retainers for managed AI systems. Book a strategy call for a custom quote based on your needs." },
+  { q: "Can I try before I commit?", a: "Yes. We offer a free strategy call where we audit your current operations and show you exactly where AI can save you time and revenue — with projected ROI." },
+];
+
+const trustLogos = ["Meridian Group", "Vertex Capital", "Solara Health", "Atlas RE", "Prism Digital", "Arcadia Cafés", "Nova Systems", "Apex Ventures"];
+
+const pricingTiers = [
+  {
+    name: "Starter",
+    desc: "One AI system to solve your biggest bottleneck",
+    price: "From $2,500",
+    features: ["1 AI calling agent or chatbot", "CRM & calendar integration", "Custom voice/script design", "30-day optimization"],
+    cta: "Get Started",
+    highlighted: false,
+  },
+  {
+    name: "Growth",
+    desc: "A connected automation stack for serious businesses",
+    price: "From $5,000",
+    features: ["AI calling + chatbot + booking", "Lead qualification workflows", "Premium website or landing page", "60-day managed optimization", "Priority support"],
+    cta: "Book a Call",
+    highlighted: true,
+  },
+  {
+    name: "Enterprise",
+    desc: "Full-stack AI infrastructure built around your operations",
+    price: "Custom",
+    features: ["Multi-agent AI system", "Custom web app or dashboard", "API integrations & backend", "Ongoing managed service", "Dedicated account manager"],
+    cta: "Talk to Us",
+    highlighted: false,
+  },
+];
+
+/* ─── PAGE ─── */
 
 const Index = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, 150]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
       <Navbar />
 
-      {/* HERO */}
-      <section ref={heroRef} className="relative min-h-[85vh] md:min-h-screen flex items-center pt-16 md:pt-20 overflow-hidden">
-        <GradientMesh />
+      {/* ═══════════════════════════════════════════
+          1. HERO
+          Job: Stop the scroll. Communicate value in <5s.
+      ═══════════════════════════════════════════ */}
+      <section
+        ref={heroRef}
+        className="relative min-h-[90vh] md:min-h-screen flex items-center pt-20 md:pt-0"
+      >
+        {/* Ambient glow */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[400px] rounded-full blur-[150px] opacity-20" style={{ background: "hsl(var(--primary) / 0.2)" }} />
 
-        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="max-w-7xl mx-auto px-5 md:section-padding w-full relative z-10">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-            <div>
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-secondary/50 mb-5 md:mb-8"
-              >
-                <Sparkles className="w-3 h-3 text-primary" />
-                <span className="text-[10px] md:text-xs font-medium text-muted-foreground">AI-Powered Business Systems</span>
-              </motion.div>
-              <h1 className="font-display font-bold text-[2rem] sm:text-5xl lg:text-6xl xl:text-7xl leading-[1.08] mb-4 md:mb-6">
-                <AnimatedText text="Your Business," delay={0.2} />
-                <br />
-                <AnimatedText text="Answered. Automated. Accelerated." delay={0.5} gradient />
-              </h1>
-              <motion.p
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 1 }}
-                className="text-sm md:text-lg text-muted-foreground max-w-xl mb-6 md:mb-10 leading-relaxed"
-              >
-                AI agents, chatbots, websites & automation that capture leads, book appointments, and run your operations.
-              </motion.p>
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 1.2 }}
-                className="flex flex-col sm:flex-row gap-3"
-              >
-                <Link to="/book-a-call" className="premium-btn text-center text-sm px-6 py-3.5 md:px-8 md:py-4 group">
-                  <span className="relative z-10 flex items-center justify-center gap-2">
-                    Book a Strategy Call
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </Link>
-                <Link to="/case-studies" className="btn-outline-premium text-center text-sm px-6 py-3.5 md:px-8 md:py-4">
-                  See Our Work
-                </Link>
-              </motion.div>
-            </div>
+        <motion.div
+          style={{ opacity: heroOpacity }}
+          className="max-w-6xl mx-auto section-padding w-full relative z-10"
+        >
+          <div className="max-w-3xl">
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="text-xs md:text-sm text-muted-foreground mb-4 md:mb-6 font-medium tracking-wide"
+            >
+              AI systems for service businesses
+            </motion.p>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.3 }}
+              className="font-display font-bold text-[2.25rem] sm:text-5xl md:text-6xl lg:text-7xl leading-[1.05] mb-5 md:mb-7"
+            >
+              Your business is losing revenue every hour
+              <br className="hidden md:block" />
+              {" "}
+              <span className="gradient-text">it's not automated.</span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.6 }}
+              className="text-base md:text-lg text-muted-foreground max-w-xl mb-8 md:mb-10 leading-relaxed"
+            >
+              We build AI systems that answer every call, capture every lead, and book every appointment — so you don't have to.
+            </motion.p>
 
             <motion.div
-              initial={{ opacity: 0, scale: 0.92 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="relative mt-2 lg:mt-0"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.8 }}
+              className="flex flex-col sm:flex-row gap-3"
             >
-              {/* Main dashboard */}
-              <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl">
-                <img src={heroDashboard} alt="AI-powered business dashboard" className="w-full h-auto" />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
-
-                {/* Overlay mini stats */}
-                <div className="absolute bottom-3 left-3 right-3 md:bottom-4 md:left-4 md:right-4 flex gap-2">
-                  {[
-                    { label: "Active Calls", val: "12" },
-                    { label: "Leads Today", val: "47" },
-                    { label: "Booked", val: "23" },
-                  ].map((s, i) => (
-                    <motion.div
-                      key={s.label}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 1.4 + i * 0.15 }}
-                      className="flex-1 rounded-lg border border-border/50 p-2 md:p-3 backdrop-blur-xl"
-                      style={{ background: "hsl(var(--card) / 0.85)" }}
-                    >
-                      <p className="font-display font-bold text-base md:text-xl text-foreground">{s.val}</p>
-                      <p className="text-[8px] md:text-[10px] text-muted-foreground truncate">{s.label}</p>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Floating call card */}
-              <motion.div
-                animate={{ y: [0, -6, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -left-1 md:-left-4 top-1/4 rounded-xl border border-border p-2.5 md:p-4 max-w-[150px] md:max-w-[200px] backdrop-blur-xl"
-                style={{ background: "hsl(var(--card) / 0.95)", boxShadow: "0 8px 32px hsl(var(--primary) / 0.15)" }}
+              <Link
+                to="/book-a-call"
+                className="premium-btn text-center group"
+                data-analytics="hero-cta-primary"
               >
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Phone className="w-3.5 h-3.5 md:w-5 md:h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] md:text-xs font-semibold">Incoming Call</p>
-                    <p className="text-[9px] md:text-xs text-muted-foreground">AI Answering...</p>
-                  </div>
-                </div>
-                <div className="flex items-end gap-0.5 mt-2 h-3 md:h-4">
-                  {[3, 5, 2, 6, 4, 3, 5, 7, 4, 3].map((h, i) => (
-                    <motion.div
-                      key={i}
-                      className="w-0.5 md:w-1 rounded-full bg-primary/60"
-                      animate={{ height: [h * 1.5, h * 3, h * 1.5] }}
-                      transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.08 }}
-                    />
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Floating booked card */}
-              <motion.div
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute -right-1 md:-right-4 bottom-1/3 rounded-xl border border-border p-2.5 md:p-4 backdrop-blur-xl"
-                style={{ background: "hsl(var(--card) / 0.95)", boxShadow: "0 8px 32px hsl(var(--accent) / 0.15)" }}
+                <span className="flex items-center justify-center gap-2">
+                  Book a Strategy Call
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </span>
+              </Link>
+              <a
+                href="#results"
+                className="btn-outline-premium text-center"
+                data-analytics="hero-cta-secondary"
               >
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-accent/10 flex items-center justify-center">
-                    <CalendarCheck className="w-3.5 h-3.5 md:w-5 md:h-5 text-accent" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] md:text-xs font-semibold">Booked ✓</p>
-                    <p className="text-[9px] md:text-xs text-muted-foreground">Tomorrow, 2 PM</p>
-                  </div>
-                </div>
-              </motion.div>
+                See Results
+              </a>
             </motion.div>
           </div>
-
-          {/* Stats strip with CountUp */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.4 }}
-            className="mt-10 md:mt-20 grid grid-cols-4 gap-2 md:gap-8 border-t border-border pt-6 md:pt-10"
-          >
-            {stats.map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.6 + i * 0.1 }}
-                className="text-center"
-              >
-                <p className="font-display font-bold text-xl md:text-4xl gradient-text">
-                  <CountUp target={stat.value} suffix={stat.suffix} />
-                </p>
-                <p className="text-[9px] md:text-sm text-muted-foreground mt-0.5">{stat.label}</p>
-              </motion.div>
-            ))}
-          </motion.div>
         </motion.div>
       </section>
 
-      {/* MARQUEE TRUST STRIP */}
-      <section className="py-8 md:py-16 border-b border-border overflow-hidden">
-        <SectionReveal>
-          <p className="text-center text-[9px] md:text-xs uppercase tracking-[0.2em] text-muted-foreground mb-5 md:mb-8">
-            Trusted by forward-thinking businesses
-          </p>
-        </SectionReveal>
-        <Marquee speed={35} className="opacity-30 mb-3">
-          {trustNames.map((name) => (
-            <span key={name} className="font-display font-semibold text-lg md:text-2xl text-foreground px-4">{name}</span>
-          ))}
-        </Marquee>
-        <Marquee speed={40} reverse className="opacity-20">
-          {trustNames.map((name) => (
-            <span key={`r-${name}`} className="font-display font-semibold text-sm md:text-lg text-foreground px-4">{name}</span>
-          ))}
-        </Marquee>
-      </section>
-
-      {/* WHAT WE BUILD — Bento Grid */}
-      <section className="py-14 md:py-32">
-        <div className="max-w-7xl mx-auto px-5 md:section-padding">
-          <SectionReveal>
-            <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">What We Build</p>
-            <h2 className="font-display font-bold text-xl md:text-5xl leading-tight max-w-3xl mb-3 md:mb-6">
-              A Complete System, <span className="gradient-text">Not Scattered Tools</span>
-            </h2>
-            <p className="text-xs md:text-lg text-muted-foreground max-w-2xl mb-8 md:mb-16 hidden md:block">
-              Every service connects. Your AI agent books appointments. Your chatbot captures leads. Your website converts. Your backend keeps it all running.
-            </p>
-          </SectionReveal>
-
-          {/* Bento Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 auto-rows-[minmax(140px,auto)] md:auto-rows-[minmax(160px,auto)] gap-3 md:gap-4">
-            {services.map((svc, i) => (
-              <SectionReveal key={svc.title} delay={i * 0.04}>
-                <TiltCard className={`h-full ${svc.span}`}>
-                  <div
-                    className="group relative rounded-xl md:rounded-2xl border border-border p-4 md:p-8 h-full flex flex-col overflow-hidden transition-colors duration-500 hover:border-primary/20"
-                    style={{ background: "hsl(var(--card))" }}
-                  >
-                    <div className="relative z-10 flex flex-col h-full">
-                      <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center mb-3 md:mb-5 ${
-                        svc.accent === "primary" ? "bg-primary/10" : "bg-accent/10"
-                      }`}>
-                        <svc.icon className={`w-4 h-4 md:w-6 md:h-6 ${svc.accent === "primary" ? "text-primary" : "text-accent"}`} />
-                      </div>
-                      <h3 className="font-display font-semibold text-xs md:text-base mb-1 md:mb-2">{svc.title}</h3>
-                      <p className="text-[10px] md:text-sm text-muted-foreground leading-relaxed flex-1 hidden sm:block">{svc.desc}</p>
-                      <div className="mt-2 md:mt-4 pt-2 md:pt-4 border-t border-border">
-                        <span className={`text-[10px] md:text-xs font-medium ${svc.accent === "primary" ? "text-primary" : "text-accent"}`}>{svc.benefit}</span>
-                      </div>
-                    </div>
-                  </div>
-                </TiltCard>
-              </SectionReveal>
-            ))}
-          </div>
-
-          {/* System connection */}
-          <SectionReveal delay={0.2}>
-            <div className="mt-8 md:mt-16 relative rounded-xl md:rounded-2xl border border-border p-5 md:p-10 overflow-hidden" style={{ background: "hsl(var(--card))" }}>
-              <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 50% 50%, hsl(var(--primary) / 0.03), transparent 70%)" }} />
-              <div className="relative z-10">
-                <h4 className="font-display font-semibold text-sm md:text-lg mb-4 md:mb-6 text-center">Everything Connects</h4>
-                <div className="grid grid-cols-3 md:flex md:flex-wrap md:justify-center gap-3 md:gap-4">
-                  {[
-                    { icon: Phone, label: "AI Calls" },
-                    { icon: Bot, label: "Chatbot" },
-                    { icon: Globe, label: "Website" },
-                    { icon: CalendarCheck, label: "Booking" },
-                    { icon: Database, label: "Backend" },
-                    { icon: BarChart3, label: "Analytics" },
-                  ].map((item, i) => (
-                    <motion.div
-                      key={item.label}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.06 }}
-                      whileHover={{ scale: 1.1, transition: { duration: 0.2 } }}
-                      className="flex flex-col items-center gap-1.5 md:gap-2 p-2 md:p-4 cursor-default"
-                    >
-                      <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-                        <item.icon className="w-4 h-4 md:w-6 md:h-6 text-primary" />
-                      </div>
-                      <span className="text-[9px] md:text-xs font-medium text-muted-foreground">{item.label}</span>
-                    </motion.div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </SectionReveal>
+      {/* ═══════════════════════════════════════════
+          2. PROOF / TRUST STRIP
+          Job: Establish credibility through numbers + logos.
+      ═══════════════════════════════════════════ */}
+      <section className="section-y-sm border-y border-border">
+        <div className="max-w-6xl mx-auto section-padding">
+          <MetricStrip metrics={proofMetrics} />
         </div>
       </section>
 
-      {/* BUSINESS PAIN */}
-      <section className="py-14 md:py-32 surface-elevated relative overflow-hidden">
-        <GradientMesh />
-        <div className="max-w-7xl mx-auto px-5 md:section-padding relative z-10">
-          <SectionReveal>
-            <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Why It Matters</p>
-            <h2 className="font-display font-bold text-xl md:text-5xl leading-tight max-w-3xl mb-8 md:mb-16">
-              Every Missed Call Is a <span className="text-destructive">Missed Sale</span>
-            </h2>
-          </SectionReveal>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
-            {painPoints.map((pp, i) => (
-              <SectionReveal key={i} delay={i * 0.05}>
-                <TiltCard>
-                  <div
-                    className="group rounded-xl md:rounded-2xl border border-border p-3.5 md:p-6 h-full overflow-hidden transition-all duration-500 hover:border-primary/20"
-                    style={{ background: "hsl(var(--card))" }}
-                  >
-                    <div className="flex items-center gap-2 mb-2 md:mb-4">
-                      <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-destructive/10 flex items-center justify-center shrink-0">
-                        <pp.icon className="w-3 h-3 md:w-4 md:h-4 text-destructive" />
-                      </div>
-                      <p className="text-[10px] md:text-sm text-muted-foreground line-through decoration-destructive/30">{pp.pain}</p>
-                    </div>
-                    <div className="h-px w-full bg-gradient-to-r from-destructive/20 via-primary/20 to-primary/20 my-2 md:my-3" />
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                        <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 text-primary" />
-                      </div>
-                      <p className="text-[10px] md:text-sm font-medium text-foreground">{pp.solution}</p>
-                    </div>
-                  </div>
-                </TiltCard>
-              </SectionReveal>
-            ))}
-          </div>
-        </div>
+      <section className="py-6 md:py-10 overflow-hidden">
+        <p className="text-center text-[10px] md:text-xs uppercase tracking-[0.2em] text-muted-foreground mb-5 md:mb-6 font-medium">
+          Trusted by forward-thinking businesses
+        </p>
+        <Marquee speed={30} className="opacity-25">
+          {trustLogos.map((name) => (
+            <span key={name} className="font-display font-semibold text-lg md:text-xl text-foreground px-6 md:px-8">{name}</span>
+          ))}
+        </Marquee>
       </section>
 
-      {/* AI CALLING AGENT SHOWCASE */}
-      <section className="py-14 md:py-32 relative">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[500px] md:h-[500px] rounded-full bg-primary/3 blur-[100px] md:blur-[150px]" />
-        <div className="max-w-7xl mx-auto px-5 md:section-padding relative z-10">
-          <SectionReveal>
-            <div className="text-center mb-8 md:mb-16">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 mb-4 md:mb-6">
-                <Headphones className="w-3 h-3 text-primary" />
-                <span className="text-[10px] md:text-xs font-medium text-primary">Featured Product</span>
-              </div>
-              <h2 className="font-display font-bold text-xl md:text-5xl leading-tight max-w-3xl mx-auto mb-3 md:mb-6">
-                AI Calling Agents That <span className="gradient-text">Work While You Sleep</span>
-              </h2>
-            </div>
-          </SectionReveal>
+      {/* ═══════════════════════════════════════════
+          3. OUTCOME-LED SERVICES GRID
+          Job: Show what you solve — framed as outcomes.
+      ═══════════════════════════════════════════ */}
+      <SectionWrapper>
+        <SectionHeading
+          overline="What We Build"
+          title="Systems that run your business,"
+          titleAccent="not just impress visitors."
+          subtitle="Every service connects. Your AI agent books appointments. Your chatbot captures leads. Your website converts. Your backend keeps it all running."
+        />
 
-          <div className="grid md:grid-cols-2 gap-4 md:gap-8">
-            {/* Inbound */}
-            <SectionReveal>
-              <TiltCard>
-                <div className="rounded-xl md:rounded-2xl border border-border p-4 md:p-8 h-full" style={{ background: "hsl(var(--card))" }}>
-                  <div className="flex items-center gap-3 mb-4 md:mb-6">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                      <PhoneIncoming className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-display font-semibold text-sm md:text-xl">Inbound Agent</h3>
-                      <p className="text-[10px] md:text-xs text-muted-foreground">Answers & Qualifies</p>
-                    </div>
+        <div className="grid md:grid-cols-2 gap-3 md:gap-4">
+          {services.map((svc, i) => (
+            <SectionReveal key={svc.title} delay={i * 0.08}>
+              <div className="card-premium p-6 md:p-8 h-full group">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-primary/8 border border-primary/10 flex items-center justify-center shrink-0">
+                    <svc.icon className="w-5 h-5 text-primary" />
                   </div>
-
-                  <div className="rounded-lg md:rounded-xl border border-border p-3 md:p-4 mb-4 md:mb-5" style={{ background: "hsl(var(--background) / 0.5)" }}>
-                    <div className="space-y-2">
-                      {[
-                        { from: "ai", text: "Good morning! How can I help?" },
-                        { from: "user", text: "I need to book for Tuesday." },
-                        { from: "ai", text: "10 AM or 2 PM — which works?" },
-                      ].map((msg, i) => (
-                        <motion.div
-                          key={i}
-                          initial={{ opacity: 0, x: msg.from === "ai" ? -8 : 8 }}
-                          whileInView={{ opacity: 1, x: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: 0.2 + i * 0.15 }}
-                          className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}
-                        >
-                          <div className={`rounded-lg px-2.5 py-1.5 md:px-3 md:py-2 max-w-[80%] ${
-                            msg.from === "user" ? "bg-secondary" : "bg-primary/10"
-                          }`}>
-                            <p className="text-[10px] md:text-xs">{msg.text}</p>
-                          </div>
-                        </motion.div>
-                      ))}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <h3 className="font-display font-semibold text-base md:text-lg">{svc.title}</h3>
+                      <span className="text-[10px] font-medium text-primary bg-primary/8 px-2 py-0.5 rounded-full hidden md:inline">{svc.tag}</span>
                     </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-1.5 md:gap-2">
-                    {["24/7 Answers", "Qualifies", "Books Live", "Routes Urgent", "Captures Leads", "Custom Scripts"].map((item) => (
-                      <div key={item} className="flex items-center gap-1.5 text-[10px] md:text-sm text-muted-foreground">
-                        <CheckCircle2 className="w-3 h-3 text-primary shrink-0" />
-                        {item}
-                      </div>
-                    ))}
+                    <p className="text-sm text-muted-foreground leading-relaxed">{svc.desc}</p>
                   </div>
                 </div>
-              </TiltCard>
-            </SectionReveal>
-
-            {/* Outbound */}
-            <SectionReveal delay={0.15}>
-              <TiltCard>
-                <div className="rounded-xl md:rounded-2xl border border-border p-4 md:p-8 h-full" style={{ background: "hsl(var(--card))" }}>
-                  <div className="flex items-center gap-3 mb-4 md:mb-6">
-                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-accent/10 flex items-center justify-center">
-                      <PhoneOutgoing className="w-4 h-4 md:w-5 md:h-5 text-accent" />
-                    </div>
-                    <div>
-                      <h3 className="font-display font-semibold text-sm md:text-xl">Outbound Agent</h3>
-                      <p className="text-[10px] md:text-xs text-muted-foreground">Follows Up & Converts</p>
-                    </div>
-                  </div>
-
-                  <div className="rounded-lg md:rounded-xl border border-border p-3 md:p-4 mb-4 md:mb-5" style={{ background: "hsl(var(--background) / 0.5)" }}>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[9px] md:text-[10px] font-medium text-muted-foreground">Campaign Performance</span>
-                      <span className="text-[9px] md:text-[10px] text-primary font-medium">This Week</span>
-                    </div>
-                    <div className="flex items-end gap-1 h-14 md:h-20">
-                      {[40, 65, 45, 80, 55, 90, 70].map((h, i) => (
-                        <motion.div
-                          key={i}
-                          initial={{ height: 0 }}
-                          whileInView={{ height: `${h}%` }}
-                          viewport={{ once: true }}
-                          transition={{ delay: 0.3 + i * 0.06, duration: 0.5 }}
-                          className="flex-1 rounded-t-sm bg-accent/30"
-                        />
-                      ))}
-                    </div>
-                    <div className="mt-2 grid grid-cols-3 gap-2 text-center">
-                      {[
-                        { label: "Calls", val: "342" },
-                        { label: "Connected", val: "89%" },
-                        { label: "Booked", val: "47" },
-                      ].map((m) => (
-                        <div key={m.label}>
-                          <p className="text-xs md:text-sm font-bold text-foreground">{m.val}</p>
-                          <p className="text-[8px] text-muted-foreground">{m.label}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-1.5 md:gap-2">
-                    {["Follow-ups", "Reminders", "Reactivation", "Callbacks", "Scale Outreach", "Triggers"].map((item) => (
-                      <div key={item} className="flex items-center gap-1.5 text-[10px] md:text-sm text-muted-foreground">
-                        <CheckCircle2 className="w-3 h-3 text-accent shrink-0" />
-                        {item}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </TiltCard>
-            </SectionReveal>
-          </div>
-
-          {/* Call flow pipeline */}
-          <SectionReveal delay={0.2}>
-            <div className="mt-6 md:mt-16 rounded-xl md:rounded-2xl border border-border p-4 md:p-10 overflow-hidden" style={{ background: "hsl(var(--card))" }}>
-              <h4 className="font-display font-semibold text-xs md:text-lg mb-4 md:mb-8 text-center">How a Call Flows</h4>
-              <div className="flex items-center justify-between gap-1 md:gap-0">
-                {[
-                  { label: "Call", icon: Phone, color: "primary" },
-                  { label: "AI Answers", icon: Bot, color: "primary" },
-                  { label: "Qualifies", icon: UserCheck, color: "accent" },
-                  { label: "Books", icon: CalendarCheck, color: "primary" },
-                  { label: "Confirms", icon: Send, color: "accent" },
-                ].map((step, i) => (
-                  <div key={step.label} className="flex items-center gap-1 md:gap-4">
-                    <div className="flex flex-col items-center gap-1">
-                      <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        whileInView={{ scale: 1, opacity: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: i * 0.1 }}
-                        whileHover={{ scale: 1.15, transition: { duration: 0.2 } }}
-                        className={`w-9 h-9 md:w-14 md:h-14 rounded-xl md:rounded-2xl border flex items-center justify-center cursor-default ${
-                          step.color === "primary" ? "bg-primary/10 border-primary/20" : "bg-accent/10 border-accent/20"
-                        }`}
-                      >
-                        <step.icon className={`w-3.5 h-3.5 md:w-5 md:h-5 ${step.color === "primary" ? "text-primary" : "text-accent"}`} />
-                      </motion.div>
-                      <p className="text-[8px] md:text-xs font-medium text-center">{step.label}</p>
-                    </div>
-                    {i < 4 && (
-                      <motion.div
-                        initial={{ scaleX: 0 }}
-                        whileInView={{ scaleX: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.3 + i * 0.1, duration: 0.4 }}
-                        className="origin-left"
-                      >
-                        <ArrowRight className="w-3 h-3 md:w-4 md:h-4 text-muted-foreground/30 shrink-0" />
-                      </motion.div>
-                    )}
-                  </div>
-                ))}
               </div>
-            </div>
-          </SectionReveal>
+            </SectionReveal>
+          ))}
+        </div>
+      </SectionWrapper>
 
-          <div className="mt-4 md:mt-8 text-center">
-            <Link to="/ai-calling-agents" className="inline-flex items-center gap-2 text-xs md:text-sm font-medium text-primary hover:underline group">
-              Explore AI Calling Agents <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+      {/* ═══════════════════════════════════════════
+          4. CASE STUDIES PREVIEW
+          Job: Prove it works with specific, measurable results.
+      ═══════════════════════════════════════════ */}
+      <SectionWrapper elevated id="results">
+        <SectionHeading
+          overline="Results"
+          title="Real systems."
+          titleAccent="Measurable impact."
+        />
+
+        <div className="space-y-4 md:space-y-6">
+          {caseStudies.map((cs, i) => (
+            <SectionReveal key={cs.client} delay={i * 0.1}>
+              <div className="card-premium p-6 md:p-10 grid md:grid-cols-[200px_1fr] gap-6 md:gap-10 items-center">
+                <div className="text-center md:text-left">
+                  <span className="text-[10px] md:text-xs font-medium text-primary bg-primary/8 px-2.5 py-1 rounded-full">{cs.tag}</span>
+                  <p className="font-display font-bold text-4xl md:text-5xl gradient-text mt-3">{cs.metric}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground mt-1">{cs.metricLabel}</p>
+                </div>
+                <div>
+                  <blockquote className="text-base md:text-lg text-foreground leading-relaxed mb-3 md:mb-4">
+                    "{cs.quote}"
+                  </blockquote>
+                  <p className="text-sm text-muted-foreground">— {cs.client}</p>
+                </div>
+              </div>
+            </SectionReveal>
+          ))}
+        </div>
+
+        <SectionReveal delay={0.2}>
+          <div className="mt-8 text-center">
+            <Link
+              to="/case-studies"
+              className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline group"
+              data-analytics="case-studies-link"
+            >
+              View all case studies
+              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
-        </div>
-      </section>
+        </SectionReveal>
+      </SectionWrapper>
 
-      {/* CHATBOTS & AUTOMATION */}
-      <section className="py-14 md:py-32 surface-elevated">
-        <div className="max-w-7xl mx-auto px-5 md:section-padding">
-          <div className="grid lg:grid-cols-2 gap-6 md:gap-16 items-center">
-            <SectionReveal>
-              <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Chatbots & Automation</p>
-              <h2 className="font-display font-bold text-xl md:text-4xl leading-tight mb-3 md:mb-6">
-                Instant Replies. <span className="gradient-text">Zero Wait Times.</span>
-              </h2>
-              <p className="text-xs md:text-base text-muted-foreground mb-4 md:mb-8 leading-relaxed hidden md:block">
-                Your chatbot handles FAQs, captures leads, qualifies prospects, and books appointments — while your team closes deals.
-              </p>
-              <div className="grid grid-cols-2 gap-2 md:gap-3 mb-4 md:mb-0">
-                {["24/7 replies", "Lead qualification", "Booking flow", "FAQ handling", "CRM sync", "Multi-channel"].map((item) => (
-                  <div key={item} className="flex items-center gap-1.5 text-[10px] md:text-sm">
-                    <CheckCircle2 className="w-3 h-3 text-primary shrink-0" />
-                    <span className="text-muted-foreground">{item}</span>
+      {/* ═══════════════════════════════════════════
+          5. PROCESS
+          Job: Reduce perceived complexity and risk.
+      ═══════════════════════════════════════════ */}
+      <SectionWrapper>
+        <SectionHeading
+          overline="How It Works"
+          title="Strategy to system"
+          titleAccent="in weeks, not months."
+          subtitle="A clear, repeatable process designed around your business goals — not ours."
+        />
+
+        <div className="grid md:grid-cols-2 gap-8 md:gap-x-16 md:gap-y-10">
+          {processSteps.map((s, i) => (
+            <ProcessStep
+              key={s.number}
+              number={s.number}
+              title={s.title}
+              description={s.desc}
+              index={i}
+            />
+          ))}
+        </div>
+      </SectionWrapper>
+
+      {/* ═══════════════════════════════════════════
+          6. AI DEMO / INTERACTIVE PREVIEW
+          Job: Make the product tangible. Show, don't tell.
+      ═══════════════════════════════════════════ */}
+      <SectionWrapper elevated>
+        <SectionHeading
+          overline="See It In Action"
+          title="Your AI agent, handling a real call"
+          align="center"
+        />
+
+        <SectionReveal>
+          <div className="max-w-2xl mx-auto">
+            <div className="card-premium p-5 md:p-8 overflow-hidden">
+              {/* Call header */}
+              <div className="flex items-center justify-between mb-5 md:mb-6 pb-4 border-b border-border">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                    <Headphones className="w-5 h-5 text-primary" />
                   </div>
-                ))}
+                  <div>
+                    <p className="text-sm font-semibold font-display">Inbound Call</p>
+                    <p className="text-xs text-muted-foreground">AI Agent Active</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <motion.div
+                    animate={{ scale: [1, 1.3, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="w-2 h-2 rounded-full bg-green-500"
+                  />
+                  <span className="text-xs text-muted-foreground">Live</span>
+                </div>
               </div>
-              <Link to="/chatbots-automation" className="inline-flex items-center gap-2 mt-3 md:mt-8 text-xs md:text-sm font-medium text-primary hover:underline group">
-                Learn more <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-              </Link>
-            </SectionReveal>
 
-            <SectionReveal delay={0.2}>
-              <TiltCard>
-                <div className="rounded-xl md:rounded-2xl border border-border overflow-hidden" style={{ background: "hsl(var(--card))", boxShadow: "0 20px 60px hsl(var(--primary) / 0.08)" }}>
-                  <div className="px-3 py-2.5 md:px-4 md:py-3 border-b border-border flex items-center gap-2 md:gap-3">
-                    <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                      <Bot className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-[10px] md:text-xs font-semibold">NexusAI Assistant</p>
-                      <div className="flex items-center gap-1">
-                        <motion.div
-                          animate={{ scale: [1, 1.3, 1] }}
-                          transition={{ duration: 2, repeat: Infinity }}
-                          className="w-1.5 h-1.5 rounded-full bg-green-500"
-                        />
-                        <p className="text-[9px] md:text-[10px] text-muted-foreground">Online</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="p-3 md:p-4 space-y-2.5 md:space-y-3">
-                    {[
-                      { from: "bot", text: "Hi! 👋 How can I help?" },
-                      { from: "user", text: "I'd like to book an appointment." },
-                      { from: "bot", text: "What service are you looking for?" },
-                      { from: "user", text: "Digital presence for my restaurant." },
-                      { from: "bot", text: "Tuesday 10 AM or Thursday 2 PM?" },
-                    ].map((msg, i) => (
-                      <motion.div
-                        key={i}
-                        initial={{ opacity: 0, y: 6 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.15 + i * 0.12 }}
-                        className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}
-                      >
-                        <div className={`max-w-[80%] rounded-xl px-3 py-2 ${
-                          msg.from === "user" ? "bg-primary/10 rounded-br-sm" : "bg-secondary rounded-bl-sm"
-                        }`}>
-                          <p className="text-[10px] md:text-xs leading-relaxed">{msg.text}</p>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                  <div className="px-3 py-2.5 md:px-4 md:py-3 border-t border-border flex items-center gap-2">
-                    <div className="flex-1 rounded-full border border-border px-3 py-1.5 md:py-2">
-                      <p className="text-[9px] md:text-[10px] text-muted-foreground">Type a message...</p>
-                    </div>
-                    <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-primary flex items-center justify-center">
-                      <Send className="w-3 h-3 md:w-3.5 md:h-3.5 text-primary-foreground" />
-                    </div>
-                  </div>
-                </div>
-              </TiltCard>
-            </SectionReveal>
-          </div>
-        </div>
-      </section>
-
-      {/* WEBSITES & APPS */}
-      <section className="py-14 md:py-32 relative">
-        <div className="max-w-7xl mx-auto px-5 md:section-padding">
-          <SectionReveal>
-            <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Websites & Apps</p>
-            <h2 className="font-display font-bold text-xl md:text-5xl leading-tight max-w-3xl mb-3 md:mb-6">
-              Built to <span className="gradient-text">Convert</span>
-            </h2>
-          </SectionReveal>
-
-          <SectionReveal delay={0.1}>
-            <div className="mb-8 md:mb-16 flex justify-center items-end gap-3 md:gap-8">
-              {/* Phone */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-                className="w-[90px] md:w-[180px] rounded-xl md:rounded-2xl border-2 border-border overflow-hidden"
-                style={{ background: "hsl(var(--card))" }}
-              >
-                <div className="h-2.5 md:h-4 border-b border-border flex items-center justify-center">
-                  <div className="w-6 md:w-8 h-0.5 md:h-1 rounded-full bg-border" />
-                </div>
-                <div className="p-1.5 md:p-2 space-y-1.5 md:space-y-2">
-                  <div className="h-8 md:h-14 rounded-md md:rounded-lg bg-primary/10" />
-                  <div className="space-y-0.5 md:space-y-1">
-                    <div className="h-1 md:h-1.5 rounded bg-foreground/10 w-3/4" />
-                    <div className="h-1 md:h-1.5 rounded bg-foreground/10 w-1/2" />
-                  </div>
-                  <div className="h-4 md:h-8 rounded bg-primary/20" />
-                </div>
-              </motion.div>
-
-              {/* Desktop */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="flex-1 max-w-[400px] md:max-w-[500px] rounded-lg md:rounded-xl border-2 border-border overflow-hidden"
-                style={{ background: "hsl(var(--card))" }}
-              >
-                <div className="h-3 md:h-6 border-b border-border flex items-center gap-1 px-2 md:px-3">
-                  <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-destructive/40" />
-                  <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-yellow-500/40" />
-                  <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500/40" />
-                </div>
-                <div className="p-2 md:p-4 space-y-2 md:space-y-3">
-                  <div className="flex gap-2 md:gap-3">
-                    <div className="flex-1 space-y-1 md:space-y-2">
-                      <div className="h-1 md:h-2 rounded bg-foreground/10 w-2/3" />
-                      <div className="h-1 md:h-2 rounded bg-foreground/10 w-full" />
-                      <div className="h-4 md:h-8 rounded bg-primary/20 w-16 md:w-28 mt-1 md:mt-2" />
-                    </div>
-                    <div className="w-16 md:w-40 h-14 md:h-28 rounded-md md:rounded-lg bg-primary/10" />
-                  </div>
-                  <div className="grid grid-cols-3 gap-1 md:gap-2">
-                    <div className="h-8 md:h-16 rounded bg-accent/10" />
-                    <div className="h-8 md:h-16 rounded bg-primary/10" />
-                    <div className="h-8 md:h-16 rounded bg-accent/10" />
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-          </SectionReveal>
-
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 md:gap-6">
-            {[
-              { icon: Globe, title: "Websites", desc: "Premium sites that convert" },
-              { icon: Target, title: "Landing Pages", desc: "Campaign-ready pages" },
-              { icon: CalendarCheck, title: "Booking", desc: "Scheduling with payments" },
-              { icon: BarChart3, title: "Dashboards", desc: "Real-time operations" },
-              { icon: Smartphone, title: "Apps", desc: "Customer-facing apps" },
-              { icon: Database, title: "Backend", desc: "APIs & automation" },
-            ].map((item, i) => (
-              <SectionReveal key={item.title} delay={i * 0.05}>
-                <TiltCard>
-                  <div
-                    className="group rounded-xl md:rounded-2xl border border-border p-3.5 md:p-6 h-full hover:border-primary/20 transition-colors duration-500"
-                    style={{ background: "hsl(var(--card))" }}
-                  >
-                    <div className="w-9 h-9 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-primary/10 flex items-center justify-center mb-2.5 md:mb-5">
-                      <item.icon className="w-4 h-4 md:w-6 md:h-6 text-primary" />
-                    </div>
-                    <h3 className="font-display font-semibold text-xs md:text-base mb-0.5 md:mb-2">{item.title}</h3>
-                    <p className="text-[9px] md:text-sm text-muted-foreground">{item.desc}</p>
-                  </div>
-                </TiltCard>
-              </SectionReveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* PROCESS */}
-      <section className="py-14 md:py-32 surface-elevated relative overflow-hidden">
-        <GradientMesh />
-        <div className="max-w-7xl mx-auto px-5 md:section-padding relative z-10">
-          <SectionReveal>
-            <div className="text-center mb-8 md:mb-16">
-              <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Our Process</p>
-              <h2 className="font-display font-bold text-xl md:text-5xl leading-tight max-w-3xl mx-auto">
-                Strategy to System <span className="gradient-text">in Weeks</span>
-              </h2>
-            </div>
-          </SectionReveal>
-          <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2.5 md:gap-6">
-            {processSteps.map((s, i) => (
-              <SectionReveal key={s.step} delay={i * 0.06}>
-                <TiltCard>
-                  <div
-                    className="group rounded-xl md:rounded-2xl border border-border p-3 md:p-6 text-center hover:border-primary/20 transition-colors duration-500"
-                    style={{ background: "hsl(var(--card))" }}
-                  >
-                    <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-2 md:mb-3">
-                      <s.icon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                    </div>
-                    <span className="font-display font-bold text-sm md:text-xl gradient-text">{s.step}</span>
-                    <h3 className="font-display font-semibold text-[10px] md:text-sm mt-0.5">{s.title}</h3>
-                  </div>
-                </TiltCard>
-              </SectionReveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CASE STUDIES */}
-      <section className="py-14 md:py-32">
-        <div className="max-w-7xl mx-auto px-5 md:section-padding">
-          <SectionReveal>
-            <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Results</p>
-            <h2 className="font-display font-bold text-xl md:text-5xl leading-tight max-w-3xl mb-8 md:mb-16">
-              Real Systems. <span className="gradient-text">Measurable Impact.</span>
-            </h2>
-          </SectionReveal>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-8">
-            {caseStudies.map((cs, i) => (
-              <SectionReveal key={cs.title} delay={i * 0.1}>
-                <TiltCard>
-                  <div
-                    className="group rounded-xl md:rounded-2xl border border-border h-full flex flex-col overflow-hidden hover:border-primary/20 transition-colors duration-500"
-                    style={{ background: "hsl(var(--card))" }}
-                  >
-                    <div className="p-4 md:p-6 border-b border-border relative overflow-hidden">
-                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ background: "radial-gradient(circle at 50% 100%, hsl(var(--primary) / 0.05), transparent)" }} />
-                      <span className="text-[9px] md:text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">{cs.tag}</span>
-                      <div className="mt-3 flex items-baseline gap-1.5">
-                        <span className="font-display font-bold text-3xl md:text-5xl gradient-text">{cs.metric}</span>
-                        <span className="text-[10px] md:text-xs text-muted-foreground">{cs.metricLabel}</span>
-                      </div>
-                    </div>
-                    <div className="p-4 md:p-6 flex flex-col flex-1">
-                      <h3 className="font-display font-semibold text-sm md:text-xl mb-1.5 md:mb-3">{cs.title}</h3>
-                      <p className="text-[10px] md:text-sm text-muted-foreground flex-1">{cs.result}</p>
-                      <Link to="/case-studies" className="inline-flex items-center gap-1.5 mt-3 pt-3 border-t border-border text-[10px] md:text-sm font-medium text-primary hover:underline group/link">
-                        View case study <ArrowRight className="w-3 h-3 transition-transform group-hover/link:translate-x-1" />
-                      </Link>
-                    </div>
-                  </div>
-                </TiltCard>
-              </SectionReveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* WHY US */}
-      <section className="py-14 md:py-32 surface-elevated relative overflow-hidden">
-        <GradientMesh />
-        <div className="max-w-7xl mx-auto px-5 md:section-padding relative z-10">
-          <div className="grid lg:grid-cols-2 gap-6 md:gap-16 items-center">
-            <SectionReveal>
-              <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Why Us</p>
-              <h2 className="font-display font-bold text-xl md:text-4xl leading-tight mb-3 md:mb-6">
-                Business Thinking. <span className="gradient-text">Engineering Execution.</span>
-              </h2>
-              <p className="text-xs md:text-base text-muted-foreground leading-relaxed mb-3 md:mb-6 hidden md:block">
-                We design revenue systems — where every piece connects, every workflow triggers the next, and your business runs tighter with every passing week.
-              </p>
-              <Link to="/about" className="inline-flex items-center gap-2 text-xs md:text-sm font-medium text-primary hover:underline group">
-                About us <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
-              </Link>
-            </SectionReveal>
-            <SectionReveal delay={0.2}>
-              <div className="grid grid-cols-2 gap-2.5 md:gap-4">
+              {/* Conversation */}
+              <div className="space-y-3">
                 {[
-                  { icon: Shield, label: "Strategic", desc: "Business-first" },
-                  { icon: Layers, label: "Full-Stack", desc: "Every layer" },
-                  { icon: TrendingUp, label: "Growth", desc: "Measurable results" },
-                  { icon: Zap, label: "Fast", desc: "Weeks, not months" },
-                ].map((item) => (
-                  <TiltCard key={item.label}>
-                    <div
-                      className="group rounded-xl md:rounded-2xl border border-border flex flex-col items-center text-center p-4 md:p-6 hover:border-primary/20 transition-colors duration-500"
-                      style={{ background: "hsl(var(--card))" }}
-                    >
-                      <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-2 md:mb-3 group-hover:bg-primary/15 transition-colors">
-                        <item.icon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                      </div>
-                      <p className="text-xs md:text-sm font-semibold">{item.label}</p>
-                      <p className="text-[9px] md:text-[10px] text-muted-foreground">{item.desc}</p>
+                  { from: "ai", text: "Good morning, thanks for calling. How can I help you today?" },
+                  { from: "caller", text: "Hi, I'd like to book an appointment for next week." },
+                  { from: "ai", text: "Of course. I have Tuesday at 10 AM or Thursday at 2 PM available. Which works better for you?" },
+                  { from: "caller", text: "Tuesday works." },
+                  { from: "ai", text: "Perfect — you're booked for Tuesday at 10 AM. I'll send a confirmation to your phone now. Anything else I can help with?" },
+                ].map((msg, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 8 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.3 + i * 0.15 }}
+                    className={`flex ${msg.from === "caller" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div className={`max-w-[85%] rounded-xl px-4 py-2.5 ${
+                      msg.from === "caller"
+                        ? "bg-secondary rounded-br-md"
+                        : "bg-primary/8 rounded-bl-md"
+                    }`}>
+                      <p className="text-xs md:text-sm leading-relaxed">{msg.text}</p>
                     </div>
-                  </TiltCard>
+                  </motion.div>
                 ))}
               </div>
-            </SectionReveal>
-          </div>
-        </div>
-      </section>
 
-      <CTASection />
+              {/* Result */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 1.2 }}
+                className="mt-5 pt-4 border-t border-border flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary" />
+                  <span className="text-xs md:text-sm font-medium">Appointment booked · Confirmation sent</span>
+                </div>
+                <span className="text-xs text-muted-foreground">Duration: 42s</span>
+              </motion.div>
+            </div>
+          </div>
+        </SectionReveal>
+      </SectionWrapper>
+
+      {/* ═══════════════════════════════════════════
+          7. OFFER / PRICING
+          Job: Make the next step tangible. Remove uncertainty.
+      ═══════════════════════════════════════════ */}
+      <SectionWrapper>
+        <SectionHeading
+          overline="Pricing"
+          title="Transparent pricing,"
+          titleAccent="no surprises."
+          subtitle="Choose a starting point. Every engagement begins with a free strategy call."
+          align="center"
+        />
+
+        <div className="grid md:grid-cols-3 gap-4 md:gap-5">
+          {pricingTiers.map((tier, i) => (
+            <SectionReveal key={tier.name} delay={i * 0.1}>
+              <div
+                className={`card-premium p-6 md:p-8 h-full flex flex-col ${
+                  tier.highlighted ? "border-primary/30 relative" : ""
+                }`}
+              >
+                {tier.highlighted && (
+                  <div className="absolute -top-px left-6 right-6 h-px bg-gradient-to-r from-transparent via-primary to-transparent" />
+                )}
+                <div className="mb-5">
+                  <h3 className="font-display font-semibold text-lg mb-1">{tier.name}</h3>
+                  <p className="text-xs text-muted-foreground">{tier.desc}</p>
+                </div>
+                <p className="font-display font-bold text-2xl md:text-3xl mb-5">{tier.price}</p>
+                <ul className="space-y-2.5 mb-7 flex-1">
+                  {tier.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-sm text-muted-foreground">
+                      <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  to="/book-a-call"
+                  className={tier.highlighted ? "premium-btn text-center" : "btn-outline-premium text-center"}
+                  data-analytics={`pricing-${tier.name.toLowerCase()}`}
+                >
+                  {tier.cta}
+                </Link>
+              </div>
+            </SectionReveal>
+          ))}
+        </div>
+      </SectionWrapper>
+
+      {/* ═══════════════════════════════════════════
+          8. TESTIMONIALS
+          Job: Social proof from real people.
+      ═══════════════════════════════════════════ */}
+      <SectionWrapper elevated>
+        <SectionHeading
+          overline="Testimonials"
+          title="What our clients say"
+          align="center"
+        />
+        <div className="grid md:grid-cols-3 gap-4 md:gap-5">
+          {testimonials.map((t, i) => (
+            <TestimonialCard
+              key={t.name}
+              quote={t.quote}
+              name={t.name}
+              role={t.role}
+              index={i}
+            />
+          ))}
+        </div>
+      </SectionWrapper>
+
+      {/* ═══════════════════════════════════════════
+          9. FAQ
+          Job: Remove objections. Answer before they ask.
+      ═══════════════════════════════════════════ */}
+      <FAQSection items={faqItems} />
+
+      {/* ═══════════════════════════════════════════
+          10. LEAD MAGNET / AUDIT CTA
+          Job: Capture leads not ready to book yet.
+      ═══════════════════════════════════════════ */}
+      <SectionWrapper elevated>
+        <SectionReveal>
+          <div className="card-premium p-8 md:p-12 grid md:grid-cols-2 gap-6 md:gap-10 items-center">
+            <div>
+              <p className="text-xs font-medium text-primary mb-3 uppercase tracking-[0.15em]">Free Resource</p>
+              <h3 className="font-display font-bold text-xl md:text-3xl leading-tight mb-3">
+                Get a free AI readiness audit for your business
+              </h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                We'll analyze your current operations and show you exactly where AI can save you time, reduce costs, and increase revenue — with projected ROI.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3">
+              <Link
+                to="/book-a-call"
+                className="premium-btn text-center group"
+                data-analytics="lead-magnet-cta"
+              >
+                <span className="flex items-center justify-center gap-2">
+                  Get Your Free Audit
+                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </span>
+              </Link>
+              <p className="text-xs text-muted-foreground text-center">No commitment. 15-minute call.</p>
+            </div>
+          </div>
+        </SectionReveal>
+      </SectionWrapper>
+
+      {/* ═══════════════════════════════════════════
+          11. FINAL CTA
+          Job: Close. One clear action.
+      ═══════════════════════════════════════════ */}
+      <CTABlock
+        headline="Ready to stop losing leads?"
+        subtitle="Book a free strategy call. We'll show you exactly where AI can save you time and make you money."
+        secondaryLabel="See Our Work"
+        secondaryHref="/case-studies"
+      />
+
+      {/* FOOTER */}
       <Footer />
     </div>
   );

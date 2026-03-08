@@ -4,11 +4,9 @@ import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-
 import { Menu, X, ArrowRight } from "lucide-react";
 
 const navLinks = [
-  { label: "Home", path: "/" },
-  { label: "AI Calling", path: "/ai-calling-agents" },
-  { label: "Automation", path: "/chatbots-automation" },
-  { label: "Web & Apps", path: "/websites-apps" },
+  { label: "Solutions", path: "/solutions" },
   { label: "Results", path: "/case-studies" },
+  { label: "Process", path: "/process" },
   { label: "About", path: "/about" },
 ];
 
@@ -42,14 +40,14 @@ const Navbar = () => {
         animate={{ y: hidden && !mobileOpen ? "-140%" : "0%" }}
         transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         className="fixed top-0 left-0 right-0 z-50"
-        style={{ padding: scrolled ? "8px 12px 0" : "0" }}
+        style={{ padding: scrolled ? "10px 16px 0" : "0" }}
       >
         <motion.div
           layout="position"
           transition={{ layout: { duration: 0.5, ease: [0.32, 0.72, 0, 1] } }}
           className={`mx-auto ${
             scrolled
-              ? "max-w-2xl rounded-full bg-background/50 backdrop-blur-2xl border border-border/40 shadow-[0_8px_32px_hsl(0_0%_0%/0.4)]"
+              ? "max-w-xl rounded-full bg-background/60 backdrop-blur-2xl border border-border/40 shadow-[0_8px_32px_hsl(0_0%_0%/0.35)]"
               : "max-w-full bg-transparent"
           }`}
           style={{ transition: "max-width 0.5s cubic-bezier(0.32,0.72,0,1), border-radius 0.5s cubic-bezier(0.32,0.72,0,1), background-color 0.5s cubic-bezier(0.32,0.72,0,1), backdrop-filter 0.5s cubic-bezier(0.32,0.72,0,1), box-shadow 0.5s cubic-bezier(0.32,0.72,0,1), border-color 0.5s cubic-bezier(0.32,0.72,0,1)" }}
@@ -57,27 +55,27 @@ const Navbar = () => {
           <div
             className={`flex items-center justify-between ${
               scrolled
-                ? "px-3 md:px-5 h-11 md:h-12"
-                : "max-w-7xl mx-auto px-4 md:px-8 h-14 md:h-16"
+                ? "px-4 md:px-5 h-11"
+                : "max-w-6xl mx-auto px-5 md:px-10 lg:px-16 xl:px-24 h-14 md:h-16"
             }`}
             style={{ transition: "padding 0.5s cubic-bezier(0.32,0.72,0,1), height 0.5s cubic-bezier(0.32,0.72,0,1)" }}
           >
             {/* Logo */}
-            <Link to="/" className="font-display font-bold text-base md:text-lg tracking-tight shrink-0">
+            <Link to="/" className="font-display font-bold text-base tracking-tight shrink-0">
               <span className="gradient-text">Nexus</span>
               <span className="text-foreground">AI</span>
             </Link>
 
-            {/* Desktop nav - center links */}
-            <div className="hidden lg:flex items-center gap-0.5">
+            {/* Desktop nav */}
+            <div className="hidden md:flex items-center gap-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`relative text-xs font-medium px-2.5 py-1 rounded-full transition-all duration-200 whitespace-nowrap ${
+                  className={`text-[13px] font-medium px-3 py-1.5 rounded-full transition-colors duration-200 ${
                     location.pathname === link.path
-                      ? "text-primary bg-primary/10"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      ? "text-primary bg-primary/8"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {link.label}
@@ -86,12 +84,11 @@ const Navbar = () => {
             </div>
 
             {/* CTA */}
-            <div className="hidden lg:block shrink-0">
+            <div className="hidden md:block shrink-0">
               <Link
                 to="/book-a-call"
-                className={`premium-btn transition-all duration-300 ${
-                  scrolled ? "text-[10px] px-3 py-1.5" : "text-xs"
-                }`}
+                className="premium-btn text-xs px-5 py-2"
+                data-analytics="nav-cta"
               >
                 Book a Call
               </Link>
@@ -99,7 +96,7 @@ const Navbar = () => {
 
             {/* Mobile toggle */}
             <button
-              className="lg:hidden text-foreground p-1.5 -mr-1"
+              className="md:hidden text-foreground p-1.5 -mr-1"
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Toggle menu"
             >
@@ -117,7 +114,7 @@ const Navbar = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden fixed inset-0 z-40 flex flex-col bg-background/95 backdrop-blur-2xl"
+            className="md:hidden fixed inset-0 z-40 flex flex-col bg-background/95 backdrop-blur-2xl"
           >
             <div className="h-14" />
             <div className="flex-1 flex flex-col justify-center px-8 gap-2">
@@ -148,6 +145,7 @@ const Navbar = () => {
                 to="/book-a-call"
                 onClick={() => setMobileOpen(false)}
                 className="premium-btn text-sm text-center w-full block py-4"
+                data-analytics="mobile-nav-cta"
               >
                 Book a Strategy Call
               </Link>
