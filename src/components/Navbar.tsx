@@ -65,8 +65,8 @@ const Navbar = () => {
           >
             {/* Logo */}
             <Link to="/" className="font-display font-bold text-base md:text-lg tracking-tight shrink-0">
-              <span className="gradient-text">Nexus</span>
-              <span className="text-foreground">AI</span>
+              <span className={scrolled ? "text-gray-900" : "gradient-text"} style={{ transition: "color 500ms cubic-bezier(0.16,1,0.3,1)" }}>Nexus</span>
+              <span className={scrolled ? "text-gray-900" : "text-foreground"} style={{ transition: "color 500ms cubic-bezier(0.16,1,0.3,1)" }}>AI</span>
             </Link>
 
             {/* Desktop nav links */}
