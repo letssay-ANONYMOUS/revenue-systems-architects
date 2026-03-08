@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
 import { Menu, X, ArrowRight } from "lucide-react";
@@ -12,27 +12,22 @@ const navLinks = [
   { label: "About", path: "/about" },
 ];
 
-const SCROLL_THRESHOLD = 50;
-const TRANSITION_CSS = "all 700ms cubic-bezier(0.16, 1, 0.3, 1)";
+const SCROLL_ENTER = 56;
+const SCROLL_EXIT = 28;
+const SHELL_TRANSITION = "max-width 700ms cubic-bezier(0.16, 1, 0.3, 1), border-radius 700ms cubic-bezier(0.16, 1, 0.3, 1), background-color 700ms cubic-bezier(0.16, 1, 0.3, 1), border-color 700ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 700ms cubic-bezier(0.16, 1, 0.3, 1)";
+const INNER_TRANSITION = "padding 700ms cubic-bezier(0.16, 1, 0.3, 1), height 700ms cubic-bezier(0.16, 1, 0.3, 1)";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [hidden, setHidden] = useState(false);
   const location = useLocation();
   const { scrollY } = useScroll();
-  const lastScrollY = useRef(0);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
-    const direction = latest > lastScrollY.current ? "down" : "up";
-    lastScrollY.current = latest;
-    setScrolled(latest > SCROLL_THRESHOLD);
-
-    if (latest < 80) {
-      setHidden(false);
-    } else {
-      setHidden(direction === "down");
-    }
+    setScrolled((prev) => {
+      const next = prev ? latest > SCROLL_EXIT : latest > SCROLL_ENTER;
+      return prev === next ? prev : next;
+    });
   });
 
   useEffect(() => {
@@ -43,16 +38,15 @@ const Navbar = () => {
     <>
       <motion.nav
         className="fixed top-0 left-0 right-0 z-50 transform-gpu"
-        style={{ padding: scrolled ? "10px 16px 0" : "0" }}
+        style={{ padding: scrolled ? "10px 16px 0" : "0", willChange: "padding" }}
       >
         <div
-          className={`mx-auto transform-gpu ${
-            scrolled ? "nav-glass rounded-full" : "bg-transparent"
-          }`}
+          className={`mx-auto transform-gpu ${scrolled ? "nav-glass rounded-full" : "bg-transparent"}`}
           style={{
             maxWidth: scrolled ? "1000px" : "100%",
             borderRadius: scrolled ? "9999px" : "0px",
-            transition: TRANSITION_CSS,
+            transition: SHELL_TRANSITION,
+            willChange: "max-width, border-radius, background-color, border-color, box-shadow",
           }}
         >
           <div
@@ -60,16 +54,15 @@ const Navbar = () => {
             style={{
               padding: scrolled ? "6px 20px" : "0 32px",
               height: scrolled ? "52px" : "64px",
-              transition: TRANSITION_CSS,
+              transition: INNER_TRANSITION,
+              willChange: "padding, height",
             }}
           >
-            {/* Logo */}
             <Link to="/" className="font-display font-bold text-base md:text-lg tracking-tight shrink-0">
-              <span className={scrolled ? "text-gray-900" : "gradient-text"} style={{ transition: "color 500ms cubic-bezier(0.16,1,0.3,1)" }}>Nexus</span>
-              <span className={scrolled ? "text-gray-900" : "text-foreground"} style={{ transition: "color 500ms cubic-bezier(0.16,1,0.3,1)" }}>AI</span>
+              <span className={scrolled ? "nav-text-ink" : "gradient-text"} style={{ transition: "color 500ms cubic-bezier(0.16,1,0.3,1)" }}>Nexus</span>
+              <span className={scrolled ? "nav-text-ink" : "text-foreground"} style={{ transition: "color 500ms cubic-bezier(0.16,1,0.3,1)" }}>AI</span>
             </Link>
 
-            {/* Desktop nav links */}
             <div className="hidden lg:flex items-center gap-1">
               {navLinks.map((link) => (
                 <Link
@@ -77,7 +70,7 @@ const Navbar = () => {
                   to={link.path}
                   className={`nav-link-underline text-xs font-medium px-3 py-1.5 rounded-full whitespace-nowrap ${
                     scrolled
-                      ? location.pathname === link.path ? "text-gray-900" : "text-gray-500 hover:text-gray-900"
+                      ? location.pathname === link.path ? "nav-text-ink" : "nav-text-muted-ink hover:nav-text-ink"
                       : location.pathname === link.path ? "text-foreground" : "text-muted-foreground hover:text-foreground"
                   }`}
                   style={{ transition: "color 500ms cubic-bezier(0.16,1,0.3,1)" }}
@@ -87,19 +80,14 @@ const Navbar = () => {
               ))}
             </div>
 
-            {/* CTA */}
             <div className="hidden lg:block shrink-0">
-              <Link
-                to="/book-a-call"
-                className="premium-btn text-[11px] px-5 py-2 rounded-full"
-              >
+              <Link to="/book-a-call" className="premium-btn text-[11px] px-5 py-2 rounded-full">
                 Book a Call
               </Link>
             </div>
 
-            {/* Mobile toggle */}
             <button
-              className={`lg:hidden p-1.5 -mr-1 transition-transform duration-200 hover:scale-110 ${scrolled ? "text-gray-900" : "text-foreground"}`}
+              className={`lg:hidden p-1.5 -mr-1 transition-transform duration-200 hover:scale-110 ${scrolled ? "nav-text-ink" : "text-foreground"}`}
               onClick={() => setMobileOpen(!mobileOpen)}
               aria-label="Toggle menu"
             >
@@ -109,7 +97,6 @@ const Navbar = () => {
         </div>
       </motion.nav>
 
-      {/* Mobile fullscreen menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -132,9 +119,7 @@ const Navbar = () => {
                     to={link.path}
                     onClick={() => setMobileOpen(false)}
                     className={`flex items-center justify-between py-4 border-b border-border/50 ${
-                      location.pathname === link.path
-                        ? "text-primary"
-                        : "text-foreground"
+                      location.pathname === link.path ? "text-primary" : "text-foreground"
                     }`}
                   >
                     <span className="font-display font-semibold text-xl">{link.label}</span>
@@ -160,3 +145,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
