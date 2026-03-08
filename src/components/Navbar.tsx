@@ -5,17 +5,17 @@ import { Menu, X, ArrowRight } from "lucide-react";
 
 const navLinks = [
   { label: "Home", path: "/" },
-  { label: "AI Calling Agents", path: "/ai-calling-agents" },
+  { label: "AI Calling", path: "/ai-calling-agents" },
   { label: "Automation", path: "/chatbots-automation" },
-  { label: "Websites & Apps", path: "/websites-apps" },
+  { label: "Web & Apps", path: "/websites-apps" },
   { label: "Results", path: "/case-studies" },
   { label: "About", path: "/about" },
 ];
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const location = useLocation();
   const { scrollY } = useScroll();
   const lastScrollY = useRef(0);
@@ -23,73 +23,89 @@ const Navbar = () => {
   useMotionValueEvent(scrollY, "change", (latest) => {
     const direction = latest > lastScrollY.current ? "down" : "up";
     lastScrollY.current = latest;
+    setScrolled(latest > 60);
 
-    setScrolled(latest > 20);
-
-    if (latest < 50) {
+    if (latest < 80) {
       setHidden(false);
     } else {
       setHidden(direction === "down");
     }
   });
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
 
   return (
-    <motion.nav
-      animate={{ y: hidden && !mobileOpen ? "-100%" : "0%" }}
-      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed top-0 left-0 right-0 z-50"
-    >
-      <div
-        className={`transition-all duration-300 ${
-          scrolled
-            ? "bg-background/60 backdrop-blur-xl border-b border-border/40 shadow-[0_4px_30px_hsl(0_0%_0%/0.2)]"
-            : "bg-transparent"
-        }`}
+    <>
+      <motion.nav
+        animate={{ y: hidden && !mobileOpen ? "-140%" : "0%" }}
+        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+        className="fixed top-0 left-0 right-0 z-50"
+        style={{ padding: scrolled ? "8px 12px 0" : "0" }}
       >
-        <div className="max-w-7xl mx-auto px-4 md:px-8 flex items-center justify-between h-14 md:h-16">
-          <Link to="/" className="font-display font-bold text-lg md:text-xl tracking-tight">
-            <span className="gradient-text">Nexus</span>
-            <span className="text-foreground">AI</span>
-          </Link>
+        <motion.div
+          layout
+          transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className={`mx-auto transition-all duration-400 ${
+            scrolled
+              ? "max-w-2xl rounded-full bg-background/50 backdrop-blur-2xl border border-border/40 shadow-[0_8px_32px_hsl(0_0%_0%/0.4)]"
+              : "max-w-full bg-transparent"
+          }`}
+        >
+          <div
+            className={`flex items-center justify-between transition-all duration-400 ${
+              scrolled
+                ? "px-3 md:px-5 h-11 md:h-12"
+                : "max-w-7xl mx-auto px-4 md:px-8 h-14 md:h-16"
+            }`}
+          >
+            {/* Logo */}
+            <Link to="/" className="font-display font-bold text-base md:text-lg tracking-tight shrink-0">
+              <span className="gradient-text">Nexus</span>
+              <span className="text-foreground">AI</span>
+            </Link>
 
-          {/* Desktop nav */}
-          <div className="hidden lg:flex items-center gap-1">
-            {navLinks.map((link) => (
+            {/* Desktop nav - center links */}
+            <div className="hidden lg:flex items-center gap-0.5">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`relative text-xs font-medium px-2.5 py-1 rounded-full transition-all duration-200 whitespace-nowrap ${
+                    location.pathname === link.path
+                      ? "text-primary bg-primary/10"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+
+            {/* CTA */}
+            <div className="hidden lg:block shrink-0">
               <Link
-                key={link.path}
-                to={link.path}
-                className={`relative text-sm font-medium px-3 py-1.5 rounded-full transition-all duration-200 ${
-                  location.pathname === link.path
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                to="/book-a-call"
+                className={`premium-btn transition-all duration-300 ${
+                  scrolled ? "text-[10px] px-3 py-1.5" : "text-xs"
                 }`}
               >
-                {link.label}
+                Book a Call
               </Link>
-            ))}
-          </div>
+            </div>
 
-          <div className="hidden lg:block">
-            <Link to="/book-a-call" className="premium-btn text-xs">
-              Book a Strategy Call
-            </Link>
+            {/* Mobile toggle */}
+            <button
+              className="lg:hidden text-foreground p-1.5 -mr-1"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
-
-          {/* Mobile toggle */}
-          <button
-            className="lg:hidden text-foreground p-2 -mr-2"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Toggle menu"
-          >
-            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
-        </div>
-      </div>
+        </motion.div>
+      </motion.nav>
 
       {/* Mobile fullscreen menu */}
       <AnimatePresence>
@@ -99,8 +115,9 @@ const Navbar = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden fixed inset-0 top-14 z-40 flex flex-col bg-background/95 backdrop-blur-2xl"
+            className="lg:hidden fixed inset-0 z-40 flex flex-col bg-background/95 backdrop-blur-2xl"
           >
+            <div className="h-14" />
             <div className="flex-1 flex flex-col justify-center px-8 gap-2">
               {navLinks.map((link, i) => (
                 <motion.div
@@ -136,7 +153,7 @@ const Navbar = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.nav>
+    </>
   );
 };
 
