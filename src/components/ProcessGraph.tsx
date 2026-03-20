@@ -7,8 +7,8 @@ const steps = [
   { step: "02", title: "Design", desc: "Wireframes, UI systems, interaction patterns", icon: Layers },
   { step: "03", title: "Build", desc: "Development, integrations, AI agent training", icon: Code2 },
   { step: "04", title: "Automate", desc: "Workflows, triggers, handoffs between systems", icon: Workflow },
-  { step: "05", title: "Launch", desc: "Deploy, monitor, iterate based on real data", icon: Zap },
-  { step: "06", title: "Optimize", desc: "Refine performance, scale what works", icon: LineChart },
+  { step: "05", title: "Optimize", desc: "Refine performance, scale what works", icon: LineChart },
+  { step: "06", title: "Launch", desc: "Deploy, monitor, iterate based on real data", icon: Zap },
 ];
 
 const ProcessGraph = () => {
