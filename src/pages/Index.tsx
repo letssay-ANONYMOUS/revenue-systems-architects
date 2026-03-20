@@ -728,37 +728,7 @@ const Index = () => {
 
       {/* PROCESS — lazy loaded */}
       <LazySection rootMargin="300px" minHeight="300px">
-        <section className="py-14 md:py-32 surface-elevated relative overflow-hidden">
-          <GradientMesh />
-          <div className="max-w-7xl mx-auto px-5 md:section-padding relative z-10">
-            <SectionReveal>
-              <div className="text-center mb-8 md:mb-16">
-                <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Our Process</p>
-                <h2 className="font-display font-bold text-xl md:text-5xl leading-tight max-w-3xl mx-auto">
-                  Strategy to System <span className="gradient-text">in Weeks</span>
-                </h2>
-              </div>
-            </SectionReveal>
-            <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-6 gap-2.5 md:gap-6">
-              {processSteps.map((s, i) => (
-                <SectionReveal key={s.step} delay={i * 0.06}>
-                  <TiltCard>
-                    <div
-                      className="group rounded-xl md:rounded-2xl border border-border p-3 md:p-6 text-center hover:border-primary/20 transition-colors duration-500"
-                      style={{ background: "hsl(var(--card))" }}
-                    >
-                      <div className="w-9 h-9 md:w-12 md:h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center mx-auto mb-2 md:mb-3">
-                        <s.icon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                      </div>
-                      <span className="font-display font-bold text-sm md:text-xl gradient-text">{s.step}</span>
-                      <h3 className="font-display font-semibold text-[10px] md:text-sm mt-0.5">{s.title}</h3>
-                    </div>
-                  </TiltCard>
-                </SectionReveal>
-              ))}
-            </div>
-          </div>
-        </section>
+        <ProcessGraph />
       </LazySection>
 
       {/* CASE STUDIES — lazy loaded */}
