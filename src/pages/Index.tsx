@@ -19,6 +19,7 @@ import TiltCard from "@/components/TiltCard";
 import CountUp from "@/components/CountUp";
 import ScrollShowcase from "@/components/ScrollShowcase";
 import LazySection from "@/components/LazySection";
+import ProcessGraph from "@/components/ProcessGraph";
 import heroDashboard from "@/assets/hero-dashboard.jpg";
 
 const stats = [
