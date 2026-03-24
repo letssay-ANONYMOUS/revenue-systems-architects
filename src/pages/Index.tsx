@@ -20,6 +20,7 @@ import CountUp from "@/components/CountUp";
 import ScrollShowcase from "@/components/ScrollShowcase";
 import LazySection from "@/components/LazySection";
 import ProcessGraph from "@/components/ProcessGraph";
+import MagneticButton from "@/components/MagneticButton";
 import heroDashboard from "@/assets/hero-dashboard.jpg";
 
 const stats = [
