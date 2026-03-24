@@ -56,8 +56,9 @@ const Navbar = () => {
             style={{
               padding: scrolled ? "6px 20px" : "6px 8px",
               borderRadius: scrolled ? "9999px" : "12px",
+              transform: scrolled ? "translateY(6px)" : "translateY(0px)",
               transition: SHELL_TRANSITION,
-              willChange: "background-color, border-color, box-shadow, border-radius",
+              willChange: "background-color, border-color, box-shadow, border-radius, transform",
             }}
           >
             {navLinks.map((link) => (
