@@ -355,7 +355,7 @@ const Index = () => {
                         </div>
                         <p className="text-[10px] md:text-sm text-muted-foreground line-through decoration-red-400/30">{pp.pain}</p>
                       </div>
-                      <div className="h-px w-full bg-gradient-to-r from-destructive/20 via-primary/20 to-primary/20 my-2 md:my-3" />
+                      <div className="h-px w-full bg-gradient-to-r from-red-400/20 via-primary/20 to-primary/20 my-2 md:my-3" />
                       <div className="flex items-center gap-2">
                         <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                           <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 text-primary" />
