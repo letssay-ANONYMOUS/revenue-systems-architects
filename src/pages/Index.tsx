@@ -92,7 +92,8 @@ const Index = () => {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <div className="aurora-bg" />
       <Navbar />
 
       {/* HERO — immediate, no lazy loading */}
