@@ -15,7 +15,7 @@ const navLinks = [
 
 const SCROLL_ENTER = 56;
 const SCROLL_EXIT = 28;
-const SHELL_TRANSITION = "max-width 700ms cubic-bezier(0.16, 1, 0.3, 1), border-radius 700ms cubic-bezier(0.16, 1, 0.3, 1), background-color 700ms cubic-bezier(0.16, 1, 0.3, 1), border-color 700ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 700ms cubic-bezier(0.16, 1, 0.3, 1)";
+const SHELL_TRANSITION = "max-width 700ms cubic-bezier(0.16, 1, 0.3, 1), border-radius 700ms cubic-bezier(0.16, 1, 0.3, 1), background-color 700ms cubic-bezier(0.16, 1, 0.3, 1), border-color 700ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 700ms cubic-bezier(0.16, 1, 0.3, 1), transform 700ms cubic-bezier(0.16, 1, 0.3, 1), padding 700ms cubic-bezier(0.16, 1, 0.3, 1)";
 const INNER_TRANSITION = "padding 700ms cubic-bezier(0.16, 1, 0.3, 1), height 700ms cubic-bezier(0.16, 1, 0.3, 1)";
 
 const Navbar = () => {
@@ -56,8 +56,9 @@ const Navbar = () => {
             style={{
               padding: scrolled ? "6px 20px" : "6px 8px",
               borderRadius: scrolled ? "9999px" : "12px",
+              transform: scrolled ? "translateY(6px)" : "translateY(0px)",
               transition: SHELL_TRANSITION,
-              willChange: "background-color, border-color, box-shadow, border-radius",
+              willChange: "background-color, border-color, box-shadow, border-radius, transform",
             }}
           >
             {navLinks.map((link) => (
