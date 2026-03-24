@@ -338,7 +338,7 @@ const Index = () => {
             <SectionReveal>
               <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Why It Matters</p>
               <h2 className="font-display font-bold text-xl md:text-5xl leading-tight max-w-3xl mb-8 md:mb-16">
-                Every Missed Call Is a <span className="text-destructive">Missed Sale</span>
+                Every Missed Call Is a <span className="text-red-400/70">Missed Sale</span>
               </h2>
             </SectionReveal>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
