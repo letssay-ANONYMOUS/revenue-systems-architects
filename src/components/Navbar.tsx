@@ -39,61 +39,57 @@ const Navbar = () => {
     <>
       <motion.nav
         className="fixed top-0 left-0 right-0 z-50 transform-gpu"
-        style={{ padding: scrolled ? "10px 16px 0" : "0", willChange: "padding" }}
+        style={{ padding: "0 32px", willChange: "contents" }}
       >
         <div
-          className={`mx-auto transform-gpu ${scrolled ? "nav-glass rounded-full" : "bg-transparent"}`}
-          style={{
-            maxWidth: scrolled ? "1000px" : "100%",
-            borderRadius: scrolled ? "9999px" : "0px",
-            transition: SHELL_TRANSITION,
-            willChange: "max-width, border-radius, background-color, border-color, box-shadow",
-          }}
+          className="mx-auto flex items-center justify-between"
+          style={{ height: "64px", maxWidth: "1400px" }}
         >
+          {/* Logo — far left, never morphs */}
+          <Link to="/" className="shrink-0 flex items-center">
+            <img src={agentforgeLogo} alt="AgentForge" className="h-7 md:h-8 w-auto" />
+          </Link>
+
+          {/* Center links — only this morphs into frosted pill */}
           <div
-            className="flex items-center justify-between"
+            className={`hidden lg:flex items-center gap-1 transform-gpu ${scrolled ? "nav-glass" : "bg-transparent"}`}
             style={{
-              padding: scrolled ? "6px 20px" : "0 32px",
-              height: scrolled ? "52px" : "64px",
-              transition: INNER_TRANSITION,
-              willChange: "padding, height",
+              padding: scrolled ? "6px 20px" : "6px 8px",
+              borderRadius: scrolled ? "9999px" : "12px",
+              transition: SHELL_TRANSITION,
+              willChange: "background-color, border-color, box-shadow, border-radius",
             }}
           >
-            <Link to="/" className="shrink-0 flex items-center">
-              <img src={agentforgeLogo} alt="AgentForge" className="h-7 md:h-8 w-auto" />
-            </Link>
-
-            <div className="hidden lg:flex items-center gap-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`nav-link-underline text-xs font-medium px-3 py-1.5 rounded-full whitespace-nowrap ${
-                    scrolled
-                      ? location.pathname === link.path ? "nav-text-ink" : "nav-text-muted-ink hover:nav-text-ink"
-                      : location.pathname === link.path ? "text-foreground" : "text-muted-foreground hover:text-foreground"
-                  }`}
-                  style={{ transition: "color 500ms cubic-bezier(0.16,1,0.3,1)" }}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-
-            <div className="hidden lg:block shrink-0">
-              <Link to="/book-a-call" className="premium-btn text-[11px] px-5 py-2 rounded-full">
-                Book a Call
+            {navLinks.map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`nav-link-underline text-xs font-medium px-3 py-1.5 rounded-full whitespace-nowrap ${
+                  scrolled
+                    ? location.pathname === link.path ? "nav-text-ink" : "nav-text-muted-ink hover:nav-text-ink"
+                    : location.pathname === link.path ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                }`}
+                style={{ transition: "color 500ms cubic-bezier(0.16,1,0.3,1)" }}
+              >
+                {link.label}
               </Link>
-            </div>
-
-            <button
-              className={`lg:hidden p-1.5 -mr-1 transition-transform duration-200 hover:scale-110 ${scrolled ? "nav-text-ink" : "text-foreground"}`}
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label="Toggle menu"
-            >
-              {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
+            ))}
           </div>
+
+          {/* Book a Call — far right, never morphs */}
+          <div className="hidden lg:block shrink-0">
+            <Link to="/book-a-call" className="premium-btn text-[11px] px-5 py-2 rounded-full">
+              Book a Call
+            </Link>
+          </div>
+
+          <button
+            className={`lg:hidden p-1.5 -mr-1 transition-transform duration-200 hover:scale-110 text-foreground`}
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Toggle menu"
+          >
+            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
         </div>
       </motion.nav>
 
