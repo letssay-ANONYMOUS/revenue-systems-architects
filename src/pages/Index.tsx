@@ -20,6 +20,7 @@ import CountUp from "@/components/CountUp";
 import ScrollShowcase from "@/components/ScrollShowcase";
 import LazySection from "@/components/LazySection";
 import ProcessGraph from "@/components/ProcessGraph";
+import MagneticButton from "@/components/MagneticButton";
 import heroDashboard from "@/assets/hero-dashboard.jpg";
 
 const stats = [
@@ -91,7 +92,8 @@ const Index = () => {
   const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <div className="aurora-bg" />
       <Navbar />
 
       {/* HERO — immediate, no lazy loading */}
@@ -129,15 +131,19 @@ const Index = () => {
                 transition={{ duration: 0.6, delay: 1.2 }}
                 className="flex flex-col sm:flex-row gap-3"
               >
-                <Link to="/book-a-call" className="premium-btn text-center text-sm px-6 py-3.5 md:px-8 md:py-4 group">
-                  <span className="relative z-10 flex items-center justify-center gap-2">
-                    Book a Strategy Call
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </Link>
-                <Link to="/case-studies" className="btn-outline-premium text-center text-sm px-6 py-3.5 md:px-8 md:py-4">
-                  See Our Work
-                </Link>
+                <MagneticButton>
+                  <Link to="/book-a-call" className="premium-btn text-center text-sm px-6 py-3.5 md:px-8 md:py-4 group inline-flex">
+                    <span className="relative z-10 flex items-center justify-center gap-2">
+                      Book a Strategy Call
+                      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </Link>
+                </MagneticButton>
+                <MagneticButton>
+                  <Link to="/case-studies" className="btn-outline-premium text-center text-sm px-6 py-3.5 md:px-8 md:py-4 inline-flex items-center justify-center">
+                    See Our Work
+                  </Link>
+                </MagneticButton>
               </motion.div>
             </div>
 
