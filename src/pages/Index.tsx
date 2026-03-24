@@ -338,7 +338,7 @@ const Index = () => {
             <SectionReveal>
               <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Why It Matters</p>
               <h2 className="font-display font-bold text-xl md:text-5xl leading-tight max-w-3xl mb-8 md:mb-16">
-                Every Missed Call Is a <span className="text-destructive">Missed Sale</span>
+                Every Missed Call Is a <span className="text-red-400/70">Missed Sale</span>
               </h2>
             </SectionReveal>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
@@ -350,12 +350,12 @@ const Index = () => {
                       style={{ background: "hsl(var(--card))" }}
                     >
                       <div className="flex items-center gap-2 mb-2 md:mb-4">
-                        <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-destructive/10 flex items-center justify-center shrink-0">
-                          <pp.icon className="w-3 h-3 md:w-4 md:h-4 text-destructive" />
+                        <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-red-400/10 flex items-center justify-center shrink-0">
+                          <pp.icon className="w-3 h-3 md:w-4 md:h-4 text-red-400/70" />
                         </div>
-                        <p className="text-[10px] md:text-sm text-muted-foreground line-through decoration-destructive/30">{pp.pain}</p>
+                        <p className="text-[10px] md:text-sm text-muted-foreground line-through decoration-red-400/30">{pp.pain}</p>
                       </div>
-                      <div className="h-px w-full bg-gradient-to-r from-destructive/20 via-primary/20 to-primary/20 my-2 md:my-3" />
+                      <div className="h-px w-full bg-gradient-to-r from-red-400/20 via-primary/20 to-primary/20 my-2 md:my-3" />
                       <div className="flex items-center gap-2">
                         <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                           <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 text-primary" />
