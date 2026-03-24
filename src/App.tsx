@@ -51,6 +51,9 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <SmoothScroll />
+      <FilmGrain />
+      <CustomCursor />
       <BrowserRouter>
         <ScrollToTop />
         <AnimatedRoutes />
