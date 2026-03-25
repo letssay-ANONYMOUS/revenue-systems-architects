@@ -51,11 +51,10 @@ const ProcessGraph = () => {
             <div className="w-full h-full bg-border/40" />
             {/* Animated fill */}
             <motion.div
-              className="absolute top-0 left-0 w-full origin-top"
+              className="absolute top-0 left-0 w-full origin-top zap-line"
               style={{
                 height: lineHeight,
-                background: "linear-gradient(180deg, hsl(var(--primary)), hsl(var(--accent)))",
-                boxShadow: "0 0 12px hsl(var(--primary) / 0.4)",
+                background: "linear-gradient(180deg, hsl(45 100% 55%), hsl(38 90% 45%))",
               }}
             />
           </div>
