@@ -122,7 +122,7 @@ const StepNode = ({ step, index, isLeft, scrollYProgress, stepStart, stepEnd }: 
           <div
             className="w-3 h-3 md:w-4 md:h-4 rounded-full border-2"
             style={{
-              borderColor: "hsl(var(--primary))",
+              borderColor: "hsl(45 100% 55%)",
               background: "hsl(var(--background))",
             }}
           />
