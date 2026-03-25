@@ -215,4 +215,15 @@
 
 @media (prefers-reduced-motion: reduce) {
   .aurora-bg { animation: none; }
+  .zap-line { animation: none; }
+}
+
+/* Zap pulse for timeline */
+@keyframes zap-pulse {
+  0%, 100% { box-shadow: 0 0 8px hsl(45 100% 55% / 0.4); }
+  50% { box-shadow: 0 0 20px hsl(45 100% 55% / 0.8), 0 0 40px hsl(45 100% 55% / 0.3); }
+}
+
+.zap-line {
+  animation: zap-pulse 1.5s ease-in-out infinite;
 }

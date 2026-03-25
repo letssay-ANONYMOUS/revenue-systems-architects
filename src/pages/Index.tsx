@@ -690,14 +690,14 @@ const Index = () => {
                       <div className="flex-1 space-y-1 md:space-y-2">
                         <div className="h-1 md:h-2 rounded bg-foreground/10 w-2/3" />
                         <div className="h-1 md:h-2 rounded bg-foreground/10 w-full" />
-                        <div className="h-4 md:h-8 rounded bg-primary/20 w-16 md:w-28 mt-1 md:mt-2" />
+                        <div className="h-4 md:h-8 rounded bg-accent/25 w-16 md:w-28 mt-1 md:mt-2" />
                       </div>
-                      <div className="w-16 md:w-40 h-14 md:h-28 rounded-md md:rounded-lg bg-primary/10" />
+                      <div className="w-16 md:w-40 h-14 md:h-28 rounded-md md:rounded-lg bg-primary/15" />
                     </div>
                     <div className="grid grid-cols-3 gap-1 md:gap-2">
-                      <div className="h-8 md:h-16 rounded bg-accent/10" />
-                      <div className="h-8 md:h-16 rounded bg-primary/10" />
-                      <div className="h-8 md:h-16 rounded bg-accent/10" />
+                      <div className="h-8 md:h-16 rounded bg-accent/15" />
+                      <div className="h-8 md:h-16 rounded bg-primary/15" />
+                      <div className="h-8 md:h-16 rounded bg-accent/15" />
                     </div>
                   </div>
                 </motion.div>

@@ -116,7 +116,7 @@ const StepNode = ({ step, index, isLeft, scrollYProgress, stepStart, stepEnd }: 
           >
             <div
               className="w-full h-full rounded-full"
-              style={{ background: "radial-gradient(circle, hsl(var(--primary) / 0.4), transparent 70%)" }}
+              style={{ background: "radial-gradient(circle, hsl(45 100% 55% / 0.5), transparent 70%)" }}
             />
           </motion.div>
           <div
