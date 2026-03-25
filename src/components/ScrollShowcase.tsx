@@ -145,11 +145,13 @@ const ScrollShowcase = () => {
                 const wasPrev = di < i - 1;
                 const isUpcoming = di > i;
                 if (isActive) {
-                  gsap.set(dot, { scale: 1.5, backgroundColor: "hsl(var(--primary))" });
+                  dot.style.transform = "scale(1.5)";
+                  dot.style.backgroundColor = primaryHSL;
                 } else if (!wasPrev && !isUpcoming) {
                   // Don't touch dots outside this transition
                 } else {
-                  gsap.set(dot, { scale: 1, backgroundColor: "hsl(var(--muted-foreground) / 0.3)" });
+                  dot.style.transform = "scale(1)";
+                  dot.style.backgroundColor = mutedHSL;
                 }
               });
             }
