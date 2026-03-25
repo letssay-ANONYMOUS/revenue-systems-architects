@@ -167,13 +167,11 @@ const ScrollShowcase = () => {
         scrub: 0.6,
         onUpdate: (self) => {
           const activeIdx = Math.round(self.progress * (totalSlides - 1));
-          dotRefs.current.forEach((dot, i) => {
-            if (!dot) return;
-            gsap.set(dot, {
-              scale: i === activeIdx ? 1.5 : 1,
-              backgroundColor: i === activeIdx ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.3)",
+            dotRefs.current.forEach((dot, i) => {
+              if (!dot) return;
+              dot.style.transform = i === activeIdx ? "scale(1.5)" : "scale(1)";
+              dot.style.backgroundColor = i === activeIdx ? primaryHSL : mutedHSL;
             });
-          });
         },
       });
     }, containerRef);
