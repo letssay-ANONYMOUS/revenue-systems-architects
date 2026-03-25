@@ -69,12 +69,15 @@ const ScrollShowcase = () => {
         if (!txt) return;
         gsap.set(txt, { opacity: i === 0 ? 1 : 0, y: i === 0 ? 0 : 24 });
       });
+      const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+      const mutedColor = getComputedStyle(document.documentElement).getPropertyValue('--muted-foreground').trim();
+      const primaryHSL = `hsl(${primaryColor})`;
+      const mutedHSL = `hsla(${mutedColor}, 0.3)`;
+
       dotRefs.current.forEach((dot, i) => {
         if (!dot) return;
-        gsap.set(dot, {
-          scale: i === 0 ? 1.5 : 1,
-          backgroundColor: i === 0 ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.3)",
-        });
+        dot.style.backgroundColor = i === 0 ? primaryHSL : mutedHSL;
+        dot.style.transform = i === 0 ? "scale(1.5)" : "scale(1)";
       });
 
       // Main pinning trigger
@@ -142,11 +145,13 @@ const ScrollShowcase = () => {
                 const wasPrev = di < i - 1;
                 const isUpcoming = di > i;
                 if (isActive) {
-                  gsap.set(dot, { scale: 1.5, backgroundColor: "hsl(var(--primary))" });
+                  dot.style.transform = "scale(1.5)";
+                  dot.style.backgroundColor = primaryHSL;
                 } else if (!wasPrev && !isUpcoming) {
                   // Don't touch dots outside this transition
                 } else {
-                  gsap.set(dot, { scale: 1, backgroundColor: "hsl(var(--muted-foreground) / 0.3)" });
+                  dot.style.transform = "scale(1)";
+                  dot.style.backgroundColor = mutedHSL;
                 }
               });
             }
@@ -162,13 +167,11 @@ const ScrollShowcase = () => {
         scrub: 0.6,
         onUpdate: (self) => {
           const activeIdx = Math.round(self.progress * (totalSlides - 1));
-          dotRefs.current.forEach((dot, i) => {
-            if (!dot) return;
-            gsap.set(dot, {
-              scale: i === activeIdx ? 1.5 : 1,
-              backgroundColor: i === activeIdx ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.3)",
+            dotRefs.current.forEach((dot, i) => {
+              if (!dot) return;
+              dot.style.transform = i === activeIdx ? "scale(1.5)" : "scale(1)";
+              dot.style.backgroundColor = i === activeIdx ? primaryHSL : mutedHSL;
             });
-          });
         },
       });
     }, containerRef);
