@@ -211,40 +211,8 @@ const ScrollShowcase = () => {
         style={{ background: "hsl(var(--background))" }}
       >
         <div className="max-w-[1500px] mx-auto px-6 lg:px-12 w-full">
-          <div className="grid lg:grid-cols-[1.5fr_1fr] gap-10 items-center">
-            {/* Image panel */}
-            <div
-              className="relative rounded-2xl overflow-hidden border border-border"
-              style={{ background: "hsl(var(--card))", aspectRatio: "16 / 10" }}
-            >
-              {services.map((svc, i) => (
-                <img
-                  key={svc.title}
-                  ref={(el) => { imageRefs.current[i] = el; }}
-                  src={svc.image}
-                  alt={svc.title}
-                  loading="eager"
-                  decoding="async"
-                  className="absolute inset-0 w-full h-full object-cover"
-                  style={{ willChange: "opacity, transform" }}
-                />
-              ))}
-              <div className="absolute inset-0 bg-gradient-to-t from-background/20 via-transparent to-transparent pointer-events-none" />
-
-              {/* Dots */}
-              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
-                {services.map((_, i) => (
-                  <div
-                    key={i}
-                    ref={(el) => { dotRefs.current[i] = el; }}
-                    className="w-1.5 h-1.5 rounded-full"
-                    style={{ willChange: "transform, background-color" }}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Text panel */}
+          <div className="grid lg:grid-cols-[1fr_1.5fr] gap-10 items-center">
+            {/* Text panel — LEFT */}
             <div className="relative h-[320px] lg:h-[380px] overflow-hidden">
               {services.map((svc, i) => {
                 const Icon = svc.icon;
@@ -274,6 +242,38 @@ const ScrollShowcase = () => {
                   </div>
                 );
               })}
+            </div>
+
+            {/* Image panel — RIGHT */}
+            <div
+              className="relative rounded-2xl overflow-hidden border border-border"
+              style={{ background: "hsl(var(--card))", aspectRatio: "16 / 10" }}
+            >
+              {services.map((svc, i) => (
+                <img
+                  key={svc.title}
+                  ref={(el) => { imageRefs.current[i] = el; }}
+                  src={svc.image}
+                  alt={svc.title}
+                  loading="eager"
+                  decoding="async"
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ willChange: "opacity, transform" }}
+                />
+              ))}
+              <div className="absolute inset-0 bg-gradient-to-t from-background/20 via-transparent to-transparent pointer-events-none" />
+
+              {/* Dots */}
+              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 z-20">
+                {services.map((_, i) => (
+                  <div
+                    key={i}
+                    ref={(el) => { dotRefs.current[i] = el; }}
+                    className="w-1.5 h-1.5 rounded-full"
+                    style={{ willChange: "transform, background-color" }}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
