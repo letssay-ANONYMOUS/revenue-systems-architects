@@ -706,21 +706,21 @@ const Index = () => {
 
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 md:gap-6">
               {[
-                { icon: Globe, title: "Websites", desc: "Premium sites that convert" },
-                { icon: Target, title: "Landing Pages", desc: "Campaign-ready pages" },
-                { icon: CalendarCheck, title: "Booking", desc: "Scheduling with payments" },
-                { icon: BarChart3, title: "Dashboards", desc: "Real-time operations" },
-                { icon: Smartphone, title: "Apps", desc: "Customer-facing apps" },
-                { icon: Database, title: "Backend", desc: "APIs & automation" },
+                { icon: Globe, title: "Websites", desc: "Premium sites that convert", color: "primary" },
+                { icon: Target, title: "Landing Pages", desc: "Campaign-ready pages", color: "accent" },
+                { icon: CalendarCheck, title: "Booking", desc: "Scheduling with payments", color: "primary" },
+                { icon: BarChart3, title: "Dashboards", desc: "Real-time operations", color: "accent" },
+                { icon: Smartphone, title: "Apps", desc: "Customer-facing apps", color: "primary" },
+                { icon: Database, title: "Backend", desc: "APIs & automation", color: "accent" },
               ].map((item, i) => (
                 <SectionReveal key={item.title} delay={i * 0.05}>
                   <TiltCard>
                     <div
-                      className="group rounded-xl md:rounded-2xl border border-border p-3.5 md:p-6 h-full hover:border-primary/20 transition-colors duration-500"
+                      className={`group rounded-xl md:rounded-2xl border border-border p-3.5 md:p-6 h-full transition-colors duration-500 ${item.color === "accent" ? "hover:border-accent/30" : "hover:border-primary/30"}`}
                       style={{ background: "hsl(var(--card))" }}
                     >
-                      <div className="w-9 h-9 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-primary/10 flex items-center justify-center mb-2.5 md:mb-5">
-                        <item.icon className="w-4 h-4 md:w-6 md:h-6 text-primary" />
+                      <div className={`w-9 h-9 md:w-12 md:h-12 rounded-lg md:rounded-xl flex items-center justify-center mb-2.5 md:mb-5 ${item.color === "accent" ? "bg-accent/15 group-hover:bg-accent/25" : "bg-primary/10 group-hover:bg-primary/20"} transition-colors`}>
+                        <item.icon className={`w-4 h-4 md:w-6 md:h-6 ${item.color === "accent" ? "text-accent" : "text-primary"}`} />
                       </div>
                       <h3 className="font-display font-semibold text-xs md:text-base mb-0.5 md:mb-2">{item.title}</h3>
                       <p className="text-[9px] md:text-sm text-muted-foreground">{item.desc}</p>
