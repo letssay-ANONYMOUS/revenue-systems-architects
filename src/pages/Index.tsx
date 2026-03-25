@@ -663,12 +663,12 @@ const Index = () => {
                     <div className="w-6 md:w-8 h-0.5 md:h-1 rounded-full bg-border" />
                   </div>
                   <div className="p-1.5 md:p-2 space-y-1.5 md:space-y-2">
-                    <div className="h-8 md:h-14 rounded-md md:rounded-lg bg-primary/10" />
+                    <div className="h-8 md:h-14 rounded-md md:rounded-lg bg-accent/20" />
                     <div className="space-y-0.5 md:space-y-1">
                       <div className="h-1 md:h-1.5 rounded bg-foreground/10 w-3/4" />
                       <div className="h-1 md:h-1.5 rounded bg-foreground/10 w-1/2" />
                     </div>
-                    <div className="h-4 md:h-8 rounded bg-primary/20" />
+                    <div className="h-4 md:h-8 rounded bg-primary/25" />
                   </div>
                 </motion.div>
 
