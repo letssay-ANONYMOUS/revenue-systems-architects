@@ -69,12 +69,15 @@ const ScrollShowcase = () => {
         if (!txt) return;
         gsap.set(txt, { opacity: i === 0 ? 1 : 0, y: i === 0 ? 0 : 24 });
       });
+      const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
+      const mutedColor = getComputedStyle(document.documentElement).getPropertyValue('--muted-foreground').trim();
+      const primaryHSL = `hsl(${primaryColor})`;
+      const mutedHSL = `hsla(${mutedColor}, 0.3)`;
+
       dotRefs.current.forEach((dot, i) => {
         if (!dot) return;
-        gsap.set(dot, {
-          scale: i === 0 ? 1.5 : 1,
-          backgroundColor: i === 0 ? "hsl(var(--primary))" : "hsl(var(--muted-foreground) / 0.3)",
-        });
+        dot.style.backgroundColor = i === 0 ? primaryHSL : mutedHSL;
+        dot.style.transform = i === 0 ? "scale(1.5)" : "scale(1)";
       });
 
       // Main pinning trigger
