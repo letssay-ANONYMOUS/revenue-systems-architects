@@ -51,11 +51,10 @@ const ProcessGraph = () => {
             <div className="w-full h-full bg-border/40" />
             {/* Animated fill */}
             <motion.div
-              className="absolute top-0 left-0 w-full origin-top"
+              className="absolute top-0 left-0 w-full origin-top zap-line"
               style={{
                 height: lineHeight,
-                background: "linear-gradient(180deg, hsl(var(--primary)), hsl(var(--accent)))",
-                boxShadow: "0 0 12px hsl(var(--primary) / 0.4)",
+                background: "linear-gradient(180deg, hsl(45 100% 55%), hsl(38 90% 45%))",
               }}
             />
           </div>
@@ -117,13 +116,13 @@ const StepNode = ({ step, index, isLeft, scrollYProgress, stepStart, stepEnd }: 
           >
             <div
               className="w-full h-full rounded-full"
-              style={{ background: "radial-gradient(circle, hsl(var(--primary) / 0.4), transparent 70%)" }}
+              style={{ background: "radial-gradient(circle, hsl(45 100% 55% / 0.5), transparent 70%)" }}
             />
           </motion.div>
           <div
             className="w-3 h-3 md:w-4 md:h-4 rounded-full border-2"
             style={{
-              borderColor: "hsl(var(--primary))",
+              borderColor: "hsl(45 100% 55%)",
               background: "hsl(var(--background))",
             }}
           />
