@@ -19,6 +19,8 @@ import TiltCard from "@/components/TiltCard";
 import ScrollShowcase from "@/components/ScrollShowcase";
 import LazySection from "@/components/LazySection";
 import ProcessGraph from "@/components/ProcessGraph";
+import InboundCallingConsole from "@/components/calling/InboundCallingConsole";
+import OutboundAnalyticsPanel from "@/components/calling/OutboundAnalyticsPanel";
 
 const services = [
   { icon: PhoneIncoming, title: "Inbound AI Agent", desc: "Answers, qualifies, books — 24/7.", benefit: "Capture every lead", accent: "primary", span: "col-span-1 md:col-span-2 md:row-span-2" },
