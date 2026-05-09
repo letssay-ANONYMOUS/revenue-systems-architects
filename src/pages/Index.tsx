@@ -324,49 +324,7 @@ const Index = () => {
               <SectionReveal>
                 <TiltCard>
                   <div className="rounded-xl md:rounded-2xl border border-border p-4 md:p-8 h-full" style={{ background: "hsl(var(--card))" }}>
-                    <div className="flex items-center gap-3 mb-4 md:mb-6">
-                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-primary/10 flex items-center justify-center">
-                        <PhoneIncoming className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-display font-semibold text-sm md:text-xl">Inbound Agent</h3>
-                        <p className="text-[10px] md:text-xs text-muted-foreground">Answers & Qualifies</p>
-                      </div>
-                    </div>
-
-                    <div className="rounded-lg md:rounded-xl border border-border p-3 md:p-4 mb-4 md:mb-5" style={{ background: "hsl(var(--background) / 0.5)" }}>
-                      <div className="space-y-2">
-                        {[
-                          { from: "ai", text: "Good morning! How can I help?" },
-                          { from: "user", text: "I need to book for Tuesday." },
-                          { from: "ai", text: "10 AM or 2 PM — which works?" },
-                        ].map((msg, i) => (
-                          <motion.div
-                            key={i}
-                            initial={{ opacity: 0, x: msg.from === "ai" ? -8 : 8 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.2 + i * 0.15 }}
-                            className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}
-                          >
-                            <div className={`rounded-lg px-2.5 py-1.5 md:px-3 md:py-2 max-w-[80%] ${
-                              msg.from === "user" ? "bg-secondary" : "bg-primary/10"
-                            }`}>
-                              <p className="text-[10px] md:text-xs">{msg.text}</p>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-1.5 md:gap-2">
-                      {["24/7 Answers", "Qualifies", "Books Live", "Routes Urgent", "Captures Leads", "Custom Scripts"].map((item) => (
-                        <div key={item} className="flex items-center gap-1.5 text-[10px] md:text-sm text-muted-foreground">
-                          <CheckCircle2 className="w-3 h-3 text-primary shrink-0" />
-                          {item}
-                        </div>
-                      ))}
-                    </div>
+                    <InboundCallingConsole />
                   </div>
                 </TiltCard>
               </SectionReveal>
@@ -375,55 +333,7 @@ const Index = () => {
               <SectionReveal delay={0.15}>
                 <TiltCard>
                   <div className="rounded-xl md:rounded-2xl border border-border p-4 md:p-8 h-full" style={{ background: "hsl(var(--card))" }}>
-                    <div className="flex items-center gap-3 mb-4 md:mb-6">
-                      <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-accent/10 flex items-center justify-center">
-                        <PhoneOutgoing className="w-4 h-4 md:w-5 md:h-5 text-accent" />
-                      </div>
-                      <div>
-                        <h3 className="font-display font-semibold text-sm md:text-xl">Outbound Agent</h3>
-                        <p className="text-[10px] md:text-xs text-muted-foreground">Follows Up & Converts</p>
-                      </div>
-                    </div>
-
-                    <div className="rounded-lg md:rounded-xl border border-border p-3 md:p-4 mb-4 md:mb-5" style={{ background: "hsl(var(--background) / 0.5)" }}>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-[9px] md:text-[10px] font-medium text-muted-foreground">Campaign Performance</span>
-                        <span className="text-[9px] md:text-[10px] text-primary font-medium">This Week</span>
-                      </div>
-                      <div className="flex items-end gap-1 h-14 md:h-20">
-                        {[40, 65, 45, 80, 55, 90, 70].map((h, i) => (
-                          <motion.div
-                            key={i}
-                            initial={{ height: 0 }}
-                            whileInView={{ height: `${h}%` }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.3 + i * 0.06, duration: 0.5 }}
-                            className="flex-1 rounded-t-sm bg-accent/30"
-                          />
-                        ))}
-                      </div>
-                      <div className="mt-2 grid grid-cols-3 gap-2 text-center">
-                        {[
-                          { label: "Calls", val: "342" },
-                          { label: "Connected", val: "89%" },
-                          { label: "Booked", val: "47" },
-                        ].map((m) => (
-                          <div key={m.label}>
-                            <p className="text-xs md:text-sm font-bold text-foreground">{m.val}</p>
-                            <p className="text-[8px] text-muted-foreground">{m.label}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-1.5 md:gap-2">
-                      {["Follow-ups", "Reminders", "Reactivation", "Callbacks", "Scale Outreach", "Triggers"].map((item) => (
-                        <div key={item} className="flex items-center gap-1.5 text-[10px] md:text-sm text-muted-foreground">
-                          <CheckCircle2 className="w-3 h-3 text-accent shrink-0" />
-                          {item}
-                        </div>
-                      ))}
-                    </div>
+                    <OutboundAnalyticsPanel />
                   </div>
                 </TiltCard>
               </SectionReveal>
