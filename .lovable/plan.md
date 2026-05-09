@@ -1,58 +1,97 @@
+# Rich UI Refresh — AI Calling Agents Section
 
+Replaces the two placeholder card interiors in the "AI Calling Agents That Work While You Sleep" section with cinematic, on-brand mini-UIs. Everything outside the two cards stays exactly as it is (header, "How a Call Flows" pipeline, CTA link, surrounding sections).
 
-## Plan: Fix Missing Chatbot Section Content, Add Colors to Websites & Apps, Electrify Timeline Line
+## Scope
 
-### What's Wrong
+**Touched:** `src/pages/Index.tsx` (AI Calling section, ~lines 320–428 only) and two new components.
+**Untouched:** Hero, Marquee, What We Build, Pain Points, Chatbots, Websites & Apps, Process, Footer, all routing, all copy outside the two cards, "How a Call Flows" row, the CTA link below.
 
-1. **Chatbot section left side missing**: The screenshot shows the left column (title, description, feature list) of the "Chatbots & Automation" section is not visible. The content exists in code (lines 560-578 of Index.tsx) but is likely not rendering visually — possibly due to the `SectionReveal` animation not triggering when the section loads via `LazySection`. The combination of `LazySection` (which defers rendering) + `SectionReveal` (which uses `whileInView`) can cause the content to never animate in if the viewport intersection timing conflicts.
+## What Replaces What
 
-2. **Websites & Apps section needs color**: The section (lines 640-734) is mostly monochrome — needs accent colors on the mockup elements and service cards.
+### Left card — Inbound Agent
+**Today:** Static header + 3 chat bubbles + 6 checkmark items.
+**New:** A live calling console mockup.
 
-3. **Timeline line needs yellow/zap effect**: The ProcessGraph vertical line currently uses a `primary → accent` gradient. User wants it more yellow and with a flashing/pulsing "zap" effect.
+- Header strip: caller avatar circle, caller name ("Incoming · +1 (415) ···"), live "00:42" call timer that ticks up while in view, small green pulsing "LIVE" dot.
+- Center: animated voice waveform — 28 vertical bars in primary blue, each with its own sine-driven height loop (CSS keyframes, GPU-friendly, 2s loop, staggered phase per bar).
+- Below waveform: streaming transcript that adds one line every ~1.4s (loops): caller line in muted gray on the left, AI line in primary-tinted on the right. Max 4 lines visible, oldest fades out as new arrives.
+- Footer chips row: animated status chips that light up sequentially — "Listening" → "Qualifying ✓" → "Booking…" → "Confirmed ✓".
+- Keeps the existing 6 feature checkmarks below as a compact 2-col grid (smaller, tighter — they become supporting context, not the main visual).
 
----
+### Right card — Outbound Agent
+**Today:** Static header + 7 flat tinted bars + 3 stat numbers + 6 checkmark items.
+**New:** A real animated analytics panel.
 
-### Changes
+- Header strip: "Campaign · Q4 Reactivation" title, small badge "Running" with pulsing dot, week selector pill ("This Week ▾" — visual only).
+- Main chart: SVG line chart, 7 data points, gradient stroke (primary → accent), area fill underneath at 8% opacity, dotted gridlines. Line draws itself on scroll-in using `stroke-dasharray` + `stroke-dashoffset` transition (1.2s ease-out). Hovering data points reveals a tooltip with the day + value.
+- KPI row (3 tiles): each tile has an icon, a number that counts up using the existing `CountUp` component, and a delta chip (e.g. "+12% vs last wk"). Tiles: Calls 342, Connect Rate 89%, Booked 47.
+- Mini donut: small 40px donut showing connect rate 89% with animated stroke fill, sits inside the connect-rate KPI tile.
+- Keeps the existing 6 feature checkmarks below as a compact 2-col grid.
 
-#### 1. Fix Chatbot Section — Ensure Left Content Renders
+## Style & Color Rules
 
-**File: `src/pages/Index.tsx`** (lines 555-638)
+- Cards keep their current outer shell: `rounded-2xl`, `border-border`, `hsl(var(--card))` background, existing `TiltCard` wrapper, existing padding.
+- Inset panels (waveform container, transcript container, chart container, KPI tiles) use `hsl(var(--background) / 0.6)` with hairline `border-border` — nested glass-pane feel.
+- Inbound accents: `hsl(var(--primary))` (the blue `#1447d4`).
+- Outbound accents: `hsl(var(--accent))`.
+- Typography: existing `font-display` for titles, `text-muted-foreground` for labels, ink charcoal for numbers.
+- No dark mode flip, no neon, no glassmorphism. Stays inside the premium light luxury system.
 
-- Wrap the left-side content (`SectionReveal` around lines 560-578) with a fallback that doesn't depend on intersection timing. Either:
-  - Remove the outer `SectionReveal` on the left column and use a simpler fade-in, OR
-  - Add `amount: 0.1` to the `SectionReveal` viewport config to make it trigger earlier
-- Most likely fix: the `lg:grid-cols-2` grid's left column isn't intersecting because the chatbot card on the right is taller and the left content scrolls past. Add `items-center` if missing, and ensure the `SectionReveal` triggers with a lower threshold.
+## Animation Rules
 
-#### 2. Add Colors to Websites & Apps Section
+- Waveform: pure CSS `@keyframes` animating `transform: scaleY()` per bar with staggered `animation-delay`. Pauses when out of view via `prefers-reduced-motion` check.
+- Transcript stream: `setInterval` inside the component, capped at 4 visible lines, AnimatePresence fade+slide for entry/exit. Cleared on unmount.
+- Status chips: `setInterval` advancing the active index every ~1.6s, looping.
+- Call timer: `setInterval` ticking the seconds; only runs when component is in view (uses IntersectionObserver via Framer Motion's `useInView`).
+- Line chart: draws once when first in view (Framer Motion `whileInView`, `once: true`).
+- KPI counters: existing `CountUp` component, triggered on in-view.
+- All loops respect `prefers-reduced-motion: reduce` — fall back to a static frame.
 
-**File: `src/pages/Index.tsx`** (lines 640-734)
+## Mobile Behavior
 
-- Add color accents to the phone/desktop mockup wireframes — use `bg-primary/20`, `bg-accent/20` for placeholder blocks
-- Add subtle colored borders or icon tints to the 6 service cards (alternate between `primary` and `accent` colors for icons and hover states)
-- Add a subtle gradient glow behind the mockups section
+- Waveform reduces to 16 bars instead of 28.
+- Transcript shows max 3 lines instead of 4.
+- KPI row stays 3 columns but smaller numbers; donut hidden on the smallest breakpoint.
+- Chart height scales down (140px mobile → 200px desktop).
+- All existing mobile spacing/padding from the current cards is preserved.
 
-#### 3. Make Timeline Line Yellow & Flashing
+## File Plan
 
-**File: `src/components/ProcessGraph.tsx`**
+```text
+src/pages/Index.tsx
+  - Replace inner content of the Inbound TiltCard (~lines 322-369) with <InboundCallingConsole />
+  - Replace inner content of the Outbound TiltCard (~lines 373-426) with <OutboundAnalyticsPanel />
+  - Keep card shells, headers, surrounding section unchanged
 
-- Change the animated fill gradient from `primary → accent` to a warm yellow/gold: `hsl(45, 100%, 55%)` to `hsl(38, 90%, 45%)`
-- Add a CSS `@keyframes` pulsing glow animation on the line — a box-shadow that pulses between bright and dim yellow
-- Add the animation class to the `motion.div` fill element
-- Update dot border color to match the yellow/gold
+src/components/calling/InboundCallingConsole.tsx   (new)
+  - Header strip (caller info, live timer, LIVE dot)
+  - Waveform (28 CSS-animated bars)
+  - Streaming transcript (interval-driven, AnimatePresence)
+  - Sequencing status chips
+  - Compact 6-item feature grid below
 
-**File: `src/index.css`**
+src/components/calling/OutboundAnalyticsPanel.tsx  (new)
+  - Header strip (campaign name, Running badge, week pill)
+  - SVG line chart (gradient stroke, area fill, draw-on-scroll)
+  - 3 KPI tiles with CountUp + mini donut on connect-rate tile
+  - Compact 6-item feature grid below
+```
 
-- Add a `@keyframes zap-pulse` animation:
-  ```css
-  @keyframes zap-pulse {
-    0%, 100% { box-shadow: 0 0 8px hsl(45 100% 55% / 0.4); }
-    50% { box-shadow: 0 0 20px hsl(45 100% 55% / 0.8), 0 0 40px hsl(45 100% 55% / 0.3); }
-  }
-  ```
+No new dependencies. Uses existing Framer Motion, Tailwind tokens, `CountUp`, and the existing `TiltCard` wrapper.
 
-### Technical Details
+## Verification
 
-- The chatbot section fix targets the `SectionReveal` / `LazySection` interaction — the left column's animation likely never fires because by the time `LazySection` mounts it, it's already in view and `whileInView` with `once: true` + negative margin misses it
-- Timeline color changes use inline styles to avoid conflicts with CSS variable system
-- The zap pulse uses CSS animation (not framer-motion) for performance
+1. Read both new component files back to confirm structure.
+2. Open the preview at `/`, scroll to the AI Calling section.
+3. Screenshot both cards in desktop viewport, verify waveform animates, transcript streams, line chart draws, KPIs count.
+4. Screenshot in mobile viewport (390px), verify spacing and that nothing overflows.
+5. Confirm no regressions in surrounding sections (visual diff via screenshot).
 
+## Out of Scope (separate future passes)
+
+- Pain Points / Missed Call section redesign
+- Websites & Apps mockup replacement
+- Trust marquee logo upgrade
+- Section rhythm / dark band breaks
+- Pushing to GitHub (will not push automatically per your request)
