@@ -16,6 +16,13 @@ const CustomCursor = () => {
 
     setVisible(true);
 
+    // Inject cursor:none style imperatively to avoid React reconciliation
+    // issues with rendering <style> inside the component tree.
+    const styleEl = document.createElement("style");
+    styleEl.setAttribute("data-custom-cursor", "");
+    styleEl.textContent = `* { cursor: none !important; }`;
+    document.head.appendChild(styleEl);
+
     const onMove = (e: MouseEvent) => {
       cursorX.set(e.clientX);
       cursorY.set(e.clientY);
@@ -41,6 +48,7 @@ const CustomCursor = () => {
     return () => {
       window.removeEventListener("mousemove", onMove);
       observer.disconnect();
+      styleEl.remove();
     };
   }, [cursorX, cursorY]);
 
@@ -78,7 +86,6 @@ const CustomCursor = () => {
           filter: "blur(8px)",
         }}
       />
-      <style>{`* { cursor: none !important; }`}</style>
     </>
   );
 };
