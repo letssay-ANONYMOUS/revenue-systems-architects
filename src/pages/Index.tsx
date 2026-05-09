@@ -21,6 +21,13 @@ import LazySection from "@/components/LazySection";
 import ProcessGraph from "@/components/ProcessGraph";
 import InboundCallingConsole from "@/components/calling/InboundCallingConsole";
 import OutboundAnalyticsPanel from "@/components/calling/OutboundAnalyticsPanel";
+import PainPointCard from "@/components/painpoints/PainPointCard";
+import MissedCallVisual from "@/components/painpoints/visuals/MissedCallVisual";
+import InstantReplyVisual from "@/components/painpoints/visuals/InstantReplyVisual";
+import RemindersVisual from "@/components/painpoints/visuals/RemindersVisual";
+import LighthouseVisual from "@/components/painpoints/visuals/LighthouseVisual";
+import WorkflowNodesVisual from "@/components/painpoints/visuals/WorkflowNodesVisual";
+import ConnectedToolsVisual from "@/components/painpoints/visuals/ConnectedToolsVisual";
 
 const services = [
   { icon: PhoneIncoming, title: "Inbound AI Agent", desc: "Answers, qualifies, books — 24/7.", benefit: "Capture every lead", accent: "primary", span: "col-span-1 md:col-span-2 md:row-span-2" },
@@ -34,12 +41,12 @@ const services = [
 ];
 
 const painPoints = [
-  { icon: XCircle, pain: "Missed calls", solution: "AI answers every call" },
-  { icon: Clock, pain: "Slow responses", solution: "Instant voice & chat" },
-  { icon: XCircle, pain: "No-show chaos", solution: "Automated reminders" },
-  { icon: XCircle, pain: "Weak web presence", solution: "Premium conversion site" },
-  { icon: XCircle, pain: "Manual admin", solution: "Automated workflows" },
-  { icon: XCircle, pain: "Fragmented tools", solution: "One connected system" },
+  { icon: XCircle, pain: "Missed calls", solution: "AI answers every call", Visual: MissedCallVisual },
+  { icon: Clock, pain: "Slow responses", solution: "Instant voice & chat", Visual: InstantReplyVisual },
+  { icon: XCircle, pain: "No-show chaos", solution: "Automated reminders", Visual: RemindersVisual },
+  { icon: XCircle, pain: "Weak web presence", solution: "Premium conversion site", Visual: LighthouseVisual },
+  { icon: XCircle, pain: "Manual admin", solution: "Automated workflows", Visual: WorkflowNodesVisual },
+  { icon: XCircle, pain: "Fragmented tools", solution: "One connected system", Visual: ConnectedToolsVisual },
 ];
 
 const processSteps = [
