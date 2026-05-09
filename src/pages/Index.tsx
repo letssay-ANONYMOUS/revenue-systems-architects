@@ -21,6 +21,13 @@ import LazySection from "@/components/LazySection";
 import ProcessGraph from "@/components/ProcessGraph";
 import InboundCallingConsole from "@/components/calling/InboundCallingConsole";
 import OutboundAnalyticsPanel from "@/components/calling/OutboundAnalyticsPanel";
+import PainPointCard from "@/components/painpoints/PainPointCard";
+import MissedCallVisual from "@/components/painpoints/visuals/MissedCallVisual";
+import InstantReplyVisual from "@/components/painpoints/visuals/InstantReplyVisual";
+import RemindersVisual from "@/components/painpoints/visuals/RemindersVisual";
+import LighthouseVisual from "@/components/painpoints/visuals/LighthouseVisual";
+import WorkflowNodesVisual from "@/components/painpoints/visuals/WorkflowNodesVisual";
+import ConnectedToolsVisual from "@/components/painpoints/visuals/ConnectedToolsVisual";
 
 const services = [
   { icon: PhoneIncoming, title: "Inbound AI Agent", desc: "Answers, qualifies, books — 24/7.", benefit: "Capture every lead", accent: "primary", span: "col-span-1 md:col-span-2 md:row-span-2" },
@@ -34,12 +41,12 @@ const services = [
 ];
 
 const painPoints = [
-  { icon: XCircle, pain: "Missed calls", solution: "AI answers every call" },
-  { icon: Clock, pain: "Slow responses", solution: "Instant voice & chat" },
-  { icon: XCircle, pain: "No-show chaos", solution: "Automated reminders" },
-  { icon: XCircle, pain: "Weak web presence", solution: "Premium conversion site" },
-  { icon: XCircle, pain: "Manual admin", solution: "Automated workflows" },
-  { icon: XCircle, pain: "Fragmented tools", solution: "One connected system" },
+  { icon: XCircle, pain: "Missed calls", solution: "AI answers every call", Visual: MissedCallVisual },
+  { icon: Clock, pain: "Slow responses", solution: "Instant voice & chat", Visual: InstantReplyVisual },
+  { icon: XCircle, pain: "No-show chaos", solution: "Automated reminders", Visual: RemindersVisual },
+  { icon: XCircle, pain: "Weak web presence", solution: "Premium conversion site", Visual: LighthouseVisual },
+  { icon: XCircle, pain: "Manual admin", solution: "Automated workflows", Visual: WorkflowNodesVisual },
+  { icon: XCircle, pain: "Fragmented tools", solution: "One connected system", Visual: ConnectedToolsVisual },
 ];
 
 const processSteps = [
@@ -275,26 +282,12 @@ const Index = () => {
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
               {painPoints.map((pp, i) => (
                 <SectionReveal key={i} delay={i * 0.05}>
-                  <TiltCard>
-                    <div
-                      className="group rounded-xl md:rounded-2xl border border-border p-3.5 md:p-6 h-full overflow-hidden transition-all duration-500 hover:border-primary/20"
-                      style={{ background: "hsl(var(--card))" }}
-                    >
-                      <div className="flex items-center gap-2 mb-2 md:mb-4">
-                        <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-destructive/10 flex items-center justify-center shrink-0">
-                          <pp.icon className="w-3 h-3 md:w-4 md:h-4 text-destructive" />
-                        </div>
-                        <p className="text-[10px] md:text-sm text-muted-foreground line-through decoration-destructive/30">{pp.pain}</p>
-                      </div>
-                      <div className="h-px w-full bg-gradient-to-r from-destructive/20 via-primary/20 to-primary/20 my-2 md:my-3" />
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 md:w-8 md:h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-                          <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 text-primary" />
-                        </div>
-                        <p className="text-[10px] md:text-sm font-medium text-foreground">{pp.solution}</p>
-                      </div>
-                    </div>
-                  </TiltCard>
+                  <PainPointCard
+                    icon={pp.icon}
+                    pain={pp.pain}
+                    solution={pp.solution}
+                    visual={<pp.Visual />}
+                  />
                 </SectionReveal>
               ))}
             </div>
