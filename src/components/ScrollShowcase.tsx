@@ -43,7 +43,9 @@ const ScrollShowcase = () => {
   const textRefs = useRef<(HTMLDivElement | null)[]>([]);
   const progressRef = useRef<HTMLDivElement>(null);
   const dotRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth < 1024 : false
+  );
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 1024);
