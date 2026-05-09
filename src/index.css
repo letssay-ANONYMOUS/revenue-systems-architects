@@ -292,3 +292,13 @@
 .zap-line {
   animation: zap-pulse 1.5s ease-in-out infinite;
 }
+
+/* Calling console waveform */
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [style*="animation: wave"] { animation: none !important; transform: scaleY(0.6); }
+}
