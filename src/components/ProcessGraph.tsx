@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import { Target, Layers, Code2, Workflow, Zap, LineChart } from "lucide-react";
 
 const steps = [
@@ -11,6 +11,10 @@ const steps = [
   { step: "06", title: "Launch", desc: "Deploy, monitor, iterate based on real data", icon: Zap },
 ];
 
+const timelineBlue = "#1447d4";
+const timelineDeepBlue = "#082a96";
+const timelineSoftBlue = "rgba(20, 71, 212, 0.18)";
+
 const ProcessGraph = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -18,8 +22,7 @@ const ProcessGraph = () => {
     offset: ["start 0.8", "end 0.3"],
   });
 
-  // Progress line grows from 0 to 100%
-  const lineHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+  const lineScaleY = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
   return (
     <section ref={containerRef} className="py-14 md:py-32 surface-elevated relative overflow-hidden">
@@ -40,7 +43,7 @@ const ProcessGraph = () => {
         >
           <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Our Process</p>
           <h2 className="font-display font-bold text-xl md:text-5xl leading-tight max-w-3xl mx-auto">
-            Strategy to System <span className="gradient-text">in Weeks</span>
+            Strategy to System <span className="text-primary">in Weeks</span>
           </h2>
         </motion.div>
 
@@ -51,10 +54,11 @@ const ProcessGraph = () => {
             <div className="w-full h-full bg-border/40" />
             {/* Animated fill */}
             <motion.div
-              className="absolute top-0 left-0 w-full origin-top zap-line"
+              className="absolute top-0 left-0 h-full w-full origin-top"
               style={{
-                height: lineHeight,
-                background: "linear-gradient(180deg, hsl(45 100% 55%), hsl(38 90% 45%))",
+                scaleY: lineScaleY,
+                background: `linear-gradient(180deg, ${timelineBlue}, ${timelineDeepBlue})`,
+                boxShadow: `0 0 18px ${timelineSoftBlue}`,
               }}
             />
           </div>
@@ -63,19 +67,19 @@ const ProcessGraph = () => {
           <div className="space-y-8 md:space-y-0">
             {steps.map((s, i) => {
               const isLeft = i % 2 === 0;
-              // Each step activates at its portion of scroll
-              const stepStart = i / steps.length;
-              const stepEnd = (i + 0.6) / steps.length;
+              const stepPoint = steps.length === 1 ? 0 : i / (steps.length - 1);
+              const revealStart = Math.max(0, stepPoint - 0.13);
+              const revealEnd = Math.min(1, stepPoint + 0.08);
 
               return (
                 <StepNode
                   key={s.step}
                   step={s}
-                  index={i}
                   isLeft={isLeft}
                   scrollYProgress={scrollYProgress}
-                  stepStart={stepStart}
-                  stepEnd={stepEnd}
+                  revealStart={revealStart}
+                  revealEnd={revealEnd}
+                  stepPoint={stepPoint}
                 />
               );
             })}
@@ -88,43 +92,60 @@ const ProcessGraph = () => {
 
 interface StepNodeProps {
   step: typeof steps[0];
-  index: number;
   isLeft: boolean;
-  scrollYProgress: any;
-  stepStart: number;
-  stepEnd: number;
+  scrollYProgress: MotionValue<number>;
+  revealStart: number;
+  revealEnd: number;
+  stepPoint: number;
 }
 
-const StepNode = ({ step, index, isLeft, scrollYProgress, stepStart, stepEnd }: StepNodeProps) => {
-  const nodeOpacity = useTransform(scrollYProgress, [stepStart, stepEnd], [0, 1]);
-  const nodeY = useTransform(scrollYProgress, [stepStart, stepEnd], [30, 0]);
-  const nodeScale = useTransform(scrollYProgress, [stepStart, stepEnd], [0.5, 1]);
-  const dotGlow = useTransform(scrollYProgress, [stepStart, stepEnd], [0, 1]);
+const StepNode = ({ step, isLeft, scrollYProgress, revealStart, revealEnd, stepPoint }: StepNodeProps) => {
+  const nodeOpacity = useTransform(scrollYProgress, [revealStart, revealEnd], [0, 1]);
+  const nodeY = useTransform(scrollYProgress, [revealStart, revealEnd], [30, 0]);
+  const nodeScale = useTransform(scrollYProgress, [revealStart, revealEnd], [0.96, 1]);
+
+  const activePeak = Math.min(0.96, Math.max(0.04, stepPoint));
+  const activeStart = Math.max(0, activePeak - 0.08);
+  const activeEnd = Math.min(1, activePeak + 0.1);
+  const dotScale = useTransform(scrollYProgress, [activeStart, activePeak, activeEnd], [0.86, 1.18, 1]);
+  const glowOpacity = useTransform(scrollYProgress, [activeStart, activePeak, activeEnd], [0, 1, 0.22]);
+  const glowScale = useTransform(scrollYProgress, [activeStart, activePeak, activeEnd], [0.7, 1.75, 1.05]);
+  const dotShadow = useTransform(glowOpacity, (value) => `0 0 ${6 + value * 16}px rgba(20, 71, 212, ${0.16 + value * 0.34})`);
 
   return (
     <div className={`relative flex items-start md:items-center gap-6 md:gap-0 ${isLeft ? "md:flex-row" : "md:flex-row-reverse"}`}>
       {/* Dot on the line */}
       <div className="absolute left-5 md:left-1/2 top-1 md:top-1/2 -translate-x-1/2 md:-translate-y-1/2 z-20">
         <motion.div
-          style={{ scale: nodeScale }}
+          style={{ scale: dotScale }}
           className="relative"
         >
           <motion.div
-            style={{ opacity: dotGlow }}
-            className="absolute -inset-3 rounded-full"
+            style={{
+              opacity: glowOpacity,
+              scale: glowScale,
+              background: "radial-gradient(circle, rgba(20, 71, 212, 0.18), rgba(20, 71, 212, 0.08) 34%, transparent 68%)",
+            }}
+            className="absolute -inset-4 rounded-full"
             aria-hidden
-          >
-            <div
-              className="w-full h-full rounded-full"
-              style={{ background: "radial-gradient(circle, hsl(45 100% 55% / 0.5), transparent 70%)" }}
-            />
-          </motion.div>
-          <div
+          />
+          <motion.div
             className="w-3 h-3 md:w-4 md:h-4 rounded-full border-2"
             style={{
-              borderColor: "hsl(45 100% 55%)",
+              borderColor: timelineBlue,
               background: "hsl(var(--background))",
+              boxShadow: dotShadow,
             }}
+          />
+          <motion.div
+            style={{
+              opacity: glowOpacity,
+              scale: glowScale,
+              borderColor: "rgba(20, 71, 212, 0.48)",
+              boxShadow: "0 0 12px rgba(20, 71, 212, 0.22)",
+            }}
+            className="absolute -inset-3 rounded-full border"
+            aria-hidden
           />
         </motion.div>
       </div>
@@ -132,7 +153,7 @@ const StepNode = ({ step, index, isLeft, scrollYProgress, stepStart, stepEnd }: 
       {/* Content card — mobile: always right side; desktop: alternating */}
       <div className="md:w-1/2" />
       <motion.div
-        style={{ opacity: nodeOpacity, y: nodeY }}
+        style={{ opacity: nodeOpacity, y: nodeY, scale: nodeScale }}
         className={`ml-10 md:ml-0 md:w-1/2 ${isLeft ? "md:pr-12 lg:pr-16" : "md:pl-12 lg:pl-16"}`}
       >
         <div
@@ -144,7 +165,7 @@ const StepNode = ({ step, index, isLeft, scrollYProgress, stepStart, stepEnd }: 
               <step.icon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
             </div>
             <div>
-              <span className="font-display font-bold text-[10px] md:text-xs gradient-text">{step.step}</span>
+              <span className="font-display font-bold text-[10px] md:text-xs text-primary">{step.step}</span>
               <h3 className="font-display font-semibold text-sm md:text-lg leading-tight">{step.title}</h3>
             </div>
           </div>

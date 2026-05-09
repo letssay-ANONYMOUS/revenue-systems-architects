@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Phone, MessageSquare, CalendarCheck, Globe, Smartphone, Workflow,
   PhoneIncoming, PhoneOutgoing, Bot, UserCheck, Clock, BarChart3,
   Zap, Target, Shield, ArrowRight, CheckCircle2, XCircle, TrendingUp,
-  Layers, Code2, Database, LineChart, Sparkles, Activity, Bell,
+  Layers, Code2, Database, LineChart, Bell,
   Users, Star, Headphones, Send, CreditCard
 } from "lucide-react";
 import { useRef } from "react";
@@ -16,19 +16,9 @@ import GradientMesh from "@/components/GradientMesh";
 import AnimatedText from "@/components/AnimatedText";
 import Marquee from "@/components/Marquee";
 import TiltCard from "@/components/TiltCard";
-import CountUp from "@/components/CountUp";
 import ScrollShowcase from "@/components/ScrollShowcase";
 import LazySection from "@/components/LazySection";
 import ProcessGraph from "@/components/ProcessGraph";
-import MagneticButton from "@/components/MagneticButton";
-import heroDashboard from "@/assets/hero-dashboard.jpg";
-
-const stats = [
-  { value: 97, suffix: "%", label: "Calls Answered", icon: Phone },
-  { value: 3, suffix: "x", label: "More Bookings", icon: CalendarCheck },
-  { value: 60, suffix: "%", label: "Less Admin", icon: Zap },
-  { value: 24, suffix: "/7", label: "Always On", icon: Activity },
-];
 
 const services = [
   { icon: PhoneIncoming, title: "Inbound AI Agent", desc: "Answers, qualifies, books — 24/7.", benefit: "Capture every lead", accent: "primary", span: "col-span-1 md:col-span-2 md:row-span-2" },
@@ -85,11 +75,52 @@ const caseStudies = [
 
 const trustNames = ["Meridian Group", "Vertex Capital", "Solara Health", "Atlas RE", "Prism Digital", "Arcadia Cafés", "Nova Systems", "Apex Ventures"];
 
+const heroHeadlineLines = ["Your Business,", "Answered.", "Automated.", "Accelerated."];
+const heroHeadlineEase = [0.25, 0.46, 0.45, 0.94] as const;
+
+const AnimatedHeroHeadline = () => {
+  let characterIndex = 0;
+
+  return (
+    <h1
+      aria-label="Your Business, Answered. Automated. Accelerated."
+      className="font-['Cormorant_Garamond'] text-[2.7rem] font-semibold leading-[0.86] tracking-normal text-[#07101f] sm:text-[3.15rem] md:text-[4.35rem] lg:text-[4.85rem]"
+      style={{ perspective: "600px" }}
+    >
+      {heroHeadlineLines.map((line) => (
+        <span key={line} className="block">
+          {line.split(" ").map((word, wordIndex) => (
+            <span
+              key={`${line}-${word}`}
+              className={`inline-block whitespace-nowrap ${wordIndex === line.split(" ").length - 1 ? "" : "mr-[0.22em]"}`}
+            >
+              {Array.from(word).map((character, index) => {
+                const delay = characterIndex * 0.025;
+                characterIndex += 1;
+
+                return (
+                  <motion.span
+                    key={`${line}-${word}-${character}-${index}`}
+                    aria-hidden="true"
+                    className="inline-block origin-bottom transform-gpu"
+                    initial={{ opacity: 0, y: 40, rotateX: -90 }}
+                    animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                    transition={{ duration: 0.5, delay, ease: heroHeadlineEase }}
+                  >
+                    {character}
+                  </motion.span>
+                );
+              })}
+            </span>
+          ))}
+        </span>
+      ))}
+    </h1>
+  );
+};
+
 const Index = () => {
   const heroRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const heroY = useTransform(scrollYProgress, [0, 1], [0, 150]);
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -97,164 +128,62 @@ const Index = () => {
       <Navbar />
 
       {/* HERO — immediate, no lazy loading */}
-      <section ref={heroRef} className="relative min-h-[85vh] md:min-h-screen flex items-center pt-16 md:pt-20 overflow-hidden">
-        <GradientMesh />
+      <section ref={heroRef} className="relative min-h-[100dvh] overflow-hidden bg-black">
+        <video
+          className="absolute inset-0 h-full w-full object-cover object-[62%_center] md:object-[64%_center]"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden="true"
+        >
+          <source src="/hero-background-framed-pingpong.mp4" type="video/mp4" />
+        </video>
 
-        <motion.div style={{ y: heroY, opacity: heroOpacity }} className="max-w-7xl mx-auto px-5 md:section-padding w-full relative z-10">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
-            <div>
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-secondary/50 mb-5 md:mb-8"
-              >
-                <Sparkles className="w-3 h-3 text-primary" />
-                <span className="text-[10px] md:text-xs font-medium text-muted-foreground">AI-Powered Business Systems</span>
-              </motion.div>
-              <h1 className="font-display font-bold text-[2rem] sm:text-5xl lg:text-6xl xl:text-7xl leading-[1.08] mb-4 md:mb-6">
-                <AnimatedText text="Your Business," delay={0.2} />
-                <br />
-                <AnimatedText text="Answered. Automated. Accelerated." delay={0.5} gradient />
-              </h1>
-              <motion.p
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 1 }}
-                className="text-sm md:text-lg text-muted-foreground max-w-xl mb-6 md:mb-10 leading-relaxed"
-              >
-                AI agents, chatbots, websites & automation that capture leads, book appointments, and run your operations.
-              </motion.p>
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 1.2 }}
-                className="flex flex-col sm:flex-row gap-3"
-              >
-                <MagneticButton>
-                  <Link to="/book-a-call" className="premium-btn text-center text-sm px-6 py-3.5 md:px-8 md:py-4 group inline-flex">
-                    <span className="relative z-10 flex items-center justify-center gap-2">
-                      Book a Strategy Call
-                      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                    </span>
-                  </Link>
-                </MagneticButton>
-                <MagneticButton>
-                  <Link to="/case-studies" className="btn-outline-premium text-center text-sm px-6 py-3.5 md:px-8 md:py-4 inline-flex items-center justify-center">
-                    See Our Work
-                  </Link>
-                </MagneticButton>
-              </motion.div>
-            </div>
-
+        <div className="pointer-events-none absolute inset-0 pt-20 md:pt-0">
+          <div className="mx-auto flex min-h-[100dvh] max-w-[1480px] items-end justify-center px-4 pb-10 sm:px-6 md:items-center md:justify-end md:px-6 md:pb-0 lg:px-8 xl:translate-x-8 2xl:translate-x-12">
             <motion.div
-              initial={{ opacity: 0, scale: 0.92 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="relative mt-2 lg:mt-0"
+              initial={{ opacity: 0, y: 18, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+              className="pointer-events-auto w-full max-w-[370px] sm:max-w-[430px] md:max-w-[520px] lg:max-w-[600px]"
             >
-              {/* Main dashboard */}
-              <div className="relative rounded-2xl overflow-hidden border border-border shadow-2xl">
-                <img src={heroDashboard} alt="AI-powered business dashboard" className="w-full h-auto" loading="eager" />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/20 to-transparent" />
-
-                {/* Overlay mini stats */}
-                <div className="absolute bottom-3 left-3 right-3 md:bottom-4 md:left-4 md:right-4 flex gap-2">
-                  {[
-                    { label: "Active Calls", val: "12" },
-                    { label: "Leads Today", val: "47" },
-                    { label: "Booked", val: "23" },
-                  ].map((s, i) => (
-                    <motion.div
-                      key={s.label}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 1.4 + i * 0.15 }}
-                      className="flex-1 rounded-lg border border-border/50 p-2 md:p-3 backdrop-blur-xl"
-                      style={{ background: "hsl(var(--card) / 0.85)" }}
-                    >
-                      <p className="font-display font-bold text-base md:text-xl text-foreground">{s.val}</p>
-                      <p className="text-[8px] md:text-[10px] text-muted-foreground truncate">{s.label}</p>
-                    </motion.div>
-                  ))}
-                </div>
+              <div className="mb-5 inline-flex items-center gap-3 rounded-full border border-white/55 bg-white/55 px-3.5 py-2 shadow-[0_16px_50px_rgba(11,31,79,0.13),inset_0_1px_0_rgba(255,255,255,0.86)] backdrop-blur-2xl md:mb-8 md:px-4">
+                <span className="hero-signal-dot relative flex h-3 w-3 items-center justify-center">
+                  <span className="hero-signal-ring hero-signal-ring-1" />
+                  <span className="hero-signal-core" />
+                </span>
+                <span className="h-px w-9 bg-gradient-to-r from-[#1447d4]/45 to-transparent" />
+                <p className="text-[9px] font-semibold uppercase tracking-[0.28em] text-foreground/70 sm:text-[10px] md:tracking-[0.36em]">
+                  AI Automation Studio
+                </p>
               </div>
 
-              {/* Floating call card */}
-              <motion.div
-                animate={{ y: [0, -6, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -left-1 md:-left-4 top-1/4 rounded-xl border border-border p-2.5 md:p-4 max-w-[150px] md:max-w-[200px] backdrop-blur-xl"
-                style={{ background: "hsl(var(--card) / 0.95)", boxShadow: "0 8px 32px hsl(var(--primary) / 0.15)" }}
-              >
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Phone className="w-3.5 h-3.5 md:w-5 md:h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] md:text-xs font-semibold">Incoming Call</p>
-                    <p className="text-[9px] md:text-xs text-muted-foreground">AI Answering...</p>
-                  </div>
-                </div>
-                <div className="flex items-end gap-0.5 mt-2 h-3 md:h-4">
-                  {[3, 5, 2, 6, 4, 3, 5, 7, 4, 3].map((h, i) => (
-                    <motion.div
-                      key={i}
-                      className="w-0.5 md:w-1 rounded-full bg-primary/60"
-                      animate={{ height: [h * 1.5, h * 3, h * 1.5] }}
-                      transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.08 }}
-                    />
-                  ))}
-                </div>
-              </motion.div>
+              <AnimatedHeroHeadline />
 
-              {/* Floating booked card */}
-              <motion.div
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                className="absolute -right-1 md:-right-4 bottom-1/3 rounded-xl border border-border p-2.5 md:p-4 backdrop-blur-xl"
-                style={{ background: "hsl(var(--card) / 0.95)", boxShadow: "0 8px 32px hsl(var(--accent) / 0.15)" }}
-              >
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-accent/10 flex items-center justify-center">
-                    <CalendarCheck className="w-3.5 h-3.5 md:w-5 md:h-5 text-accent" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] md:text-xs font-semibold">Booked ✓</p>
-                    <p className="text-[9px] md:text-xs text-muted-foreground">Tomorrow, 2 PM</p>
-                  </div>
-                </div>
-              </motion.div>
+              <p className="mt-4 max-w-[34rem] text-xs leading-relaxed text-muted-foreground sm:text-sm md:mt-6 md:text-base">
+                AI agents, chatbots, websites and automation that capture leads, book appointments, and run your operations.
+              </p>
+
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center md:mt-8 md:gap-4">
+                <Link to="/book-a-call" className="premium-btn inline-flex items-center justify-center gap-3 rounded-full px-6 py-3 text-[11px] md:px-7 md:py-4 md:text-xs">
+                  Book a Call
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+
+              <div className="mt-8 flex items-center gap-4 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground/48 md:text-xs md:tracking-[0.28em]">
+                <span className="h-px w-9 bg-foreground/16" />
+                <span>Built for businesses that want speed, clarity, and execution.</span>
+              </div>
             </motion.div>
           </div>
-
-          {/* Stats strip with CountUp */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.4 }}
-            className="mt-10 md:mt-20 grid grid-cols-4 gap-2 md:gap-8 border-t border-border pt-6 md:pt-10"
-          >
-            {stats.map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.6 + i * 0.1 }}
-                className="text-center"
-              >
-                <p className="font-display font-bold text-xl md:text-4xl gradient-text">
-                  <CountUp target={stat.value} suffix={stat.suffix} />
-                </p>
-                <p className="text-[9px] md:text-sm text-muted-foreground mt-0.5">{stat.label}</p>
-              </motion.div>
-            ))}
-          </motion.div>
-        </motion.div>
+        </div>
       </section>
 
       {/* MARQUEE TRUST STRIP — lightweight, no lazy needed */}
-      <section className="py-8 md:py-16 border-b border-border overflow-hidden">
+      <section className="-mt-24 py-8 md:-mt-32 md:py-12 border-b border-border overflow-hidden relative z-10">
         <SectionReveal>
           <p className="text-center text-[9px] md:text-xs uppercase tracking-[0.2em] text-muted-foreground mb-5 md:mb-8">
             Trusted by forward-thinking businesses
@@ -579,58 +508,56 @@ const Index = () => {
               </SectionReveal>
 
               <SectionReveal delay={0.2}>
-                <TiltCard>
-                  <div className="rounded-xl md:rounded-2xl border border-border overflow-hidden" style={{ background: "hsl(var(--card))", boxShadow: "0 20px 60px hsl(var(--primary) / 0.08)" }}>
-                    <div className="px-3 py-2.5 md:px-4 md:py-3 border-b border-border flex items-center gap-2 md:gap-3">
-                      <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                        <Bot className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
-                      </div>
-                      <div>
-                        <p className="text-[10px] md:text-xs font-semibold">AgentForge Assistant</p>
-                        <div className="flex items-center gap-1">
-                          <motion.div
-                            animate={{ scale: [1, 1.3, 1] }}
-                            transition={{ duration: 2, repeat: Infinity }}
-                            className="w-1.5 h-1.5 rounded-full bg-green-500"
-                          />
-                          <p className="text-[9px] md:text-[10px] text-muted-foreground">Online</p>
-                        </div>
-                      </div>
+                <div className="rounded-xl md:rounded-2xl border border-border overflow-hidden transform-gpu" style={{ background: "hsl(var(--card))", boxShadow: "0 20px 60px hsl(var(--primary) / 0.08)" }}>
+                  <div className="px-3 py-2.5 md:px-4 md:py-3 border-b border-border flex items-center gap-2 md:gap-3">
+                    <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-primary/20 flex items-center justify-center">
+                      <Bot className="w-3.5 h-3.5 md:w-4 md:h-4 text-primary" />
                     </div>
-                    <div className="p-3 md:p-4 space-y-2.5 md:space-y-3">
-                      {[
-                        { from: "bot", text: "Hi! 👋 How can I help?" },
-                        { from: "user", text: "I'd like to book an appointment." },
-                        { from: "bot", text: "What service are you looking for?" },
-                        { from: "user", text: "Digital presence for my restaurant." },
-                        { from: "bot", text: "Tuesday 10 AM or Thursday 2 PM?" },
-                      ].map((msg, i) => (
+                    <div>
+                      <p className="text-[10px] md:text-xs font-semibold">AgentForge Assistant</p>
+                      <div className="flex items-center gap-1">
                         <motion.div
-                          key={i}
-                          initial={{ opacity: 0, y: 6 }}
-                          whileInView={{ opacity: 1, y: 0 }}
-                          viewport={{ once: true }}
-                          transition={{ delay: 0.15 + i * 0.12 }}
-                          className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}
-                        >
-                          <div className={`max-w-[80%] rounded-xl px-3 py-2 ${
-                            msg.from === "user" ? "bg-primary/10 rounded-br-sm" : "bg-secondary rounded-bl-sm"
-                          }`}>
-                            <p className="text-[10px] md:text-xs leading-relaxed">{msg.text}</p>
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                    <div className="px-3 py-2.5 md:px-4 md:py-3 border-t border-border flex items-center gap-2">
-                      <div className="flex-1 rounded-full border border-border px-3 py-1.5 md:py-2">
-                        <p className="text-[9px] md:text-[10px] text-muted-foreground">Type a message...</p>
-                      </div>
-                      <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-primary flex items-center justify-center">
-                        <Send className="w-3 h-3 md:w-3.5 md:h-3.5 text-primary-foreground" />
+                          animate={{ scale: [1, 1.3, 1] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                          className="w-1.5 h-1.5 rounded-full bg-green-500"
+                        />
+                        <p className="text-[9px] md:text-[10px] text-muted-foreground">Online</p>
                       </div>
                     </div>
                   </div>
-                </TiltCard>
+                  <div className="p-3 md:p-4 space-y-2.5 md:space-y-3">
+                    {[
+                      { from: "bot", text: "Hi. How can I help?" },
+                      { from: "user", text: "I'd like to book an appointment." },
+                      { from: "bot", text: "What service are you looking for?" },
+                      { from: "user", text: "Digital presence for my restaurant." },
+                      { from: "bot", text: "Tuesday 10 AM or Thursday 2 PM?" },
+                    ].map((msg, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 6 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: 0.15 + i * 0.12 }}
+                        className={`flex ${msg.from === "user" ? "justify-end" : "justify-start"}`}
+                      >
+                        <div className={`max-w-[80%] rounded-xl px-3 py-2 ${
+                          msg.from === "user" ? "bg-primary/10 rounded-br-sm" : "bg-secondary rounded-bl-sm"
+                        }`}>
+                          <p className="text-[10px] md:text-xs leading-relaxed">{msg.text}</p>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                  <div className="px-3 py-2.5 md:px-4 md:py-3 border-t border-border flex items-center gap-2">
+                    <div className="flex-1 rounded-full border border-border px-3 py-1.5 md:py-2">
+                      <p className="text-[9px] md:text-[10px] text-muted-foreground">Type a message...</p>
+                    </div>
+                    <div className="w-7 h-7 md:w-8 md:h-8 rounded-full bg-primary flex items-center justify-center">
+                      <Send className="w-3 h-3 md:w-3.5 md:h-3.5 text-primary-foreground" />
+                    </div>
+                  </div>
+                </div>
               </SectionReveal>
             </div>
           </div>
