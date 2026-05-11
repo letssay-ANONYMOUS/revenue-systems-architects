@@ -194,25 +194,32 @@ interface RisingCardProps {
   index: number;
   total: number;
   progress: MotionValue<number>;
+  anchor: { side: "left" | "right"; vAlign: "top" | "bottom"; offsetX: string; offsetY: string };
 }
 
-const RisingCard = ({ card, index, total, progress }: RisingCardProps) => {
-  // Each card enters in its own staggered window. Apple-style: slide up from below + scale up.
-  const headRoom = 0.08;
-  const tail = 0.12;
+const RisingCard = ({ card, index, total, progress, anchor }: RisingCardProps) => {
+  // Each card rises from below the viewport (y: 110vh) up to its anchored slot.
+  // Stagger so each card lands before the next begins to rise.
+  const headRoom = 0.06;
+  const tail = 0.08;
   const usable = 1 - headRoom - tail;
-  const stagger = usable / (total + 0.6);
-  const enterStart = headRoom + stagger * index;
-  const enterEnd = enterStart + stagger * 1.4;
+  const slot = usable / total;
+  const enterStart = headRoom + slot * index;
+  const enterEnd = enterStart + slot * 0.85;
 
-  const y = useTransform(progress, [enterStart, enterEnd], ["88vh", "0vh"]);
-  const scale = useTransform(progress, [enterStart, enterEnd], [0.78, 1]);
-  const opacity = useTransform(progress, [enterStart, enterStart + stagger * 0.35], [0, 1]);
+  const y = useTransform(progress, [enterStart, enterEnd], ["110vh", "0vh"]);
+  const scale = useTransform(progress, [enterStart, enterEnd], [0.82, 1]);
+  const opacity = useTransform(progress, [enterStart, enterStart + slot * 0.25], [0, 1]);
+
+  const positional: React.CSSProperties = {
+    [anchor.side]: anchor.offsetX,
+    [anchor.vAlign]: anchor.offsetY,
+  } as React.CSSProperties;
 
   return (
     <motion.article
-      className="relative w-full transform-gpu overflow-hidden rounded-[1.35rem] border border-white/45 bg-white/65 p-3 text-left shadow-[0_30px_95px_rgba(24,31,39,0.22),inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-xl will-change-transform"
-      style={{ y, scale, opacity }}
+      className="absolute w-[min(38rem,46vw)] transform-gpu overflow-hidden rounded-[1.35rem] border border-white/45 bg-white/70 p-3 text-left shadow-[0_40px_120px_rgba(20,28,38,0.28),inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur-xl will-change-transform"
+      style={{ ...positional, y, scale, opacity, zIndex: 10 + index }}
     >
       <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/45 bg-[#d5dbe0] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
         {card.imageSrc ? (
@@ -248,6 +255,13 @@ const RisingCard = ({ card, index, total, progress }: RisingCardProps) => {
   );
 };
 
+// Alternating anchors: bottom-left, top-right, bottom-right — large, overlapping the centered headline.
+const CARD_ANCHORS: RisingCardProps["anchor"][] = [
+  { side: "left",  vAlign: "bottom", offsetX: "4vw", offsetY: "6vh" },
+  { side: "right", vAlign: "top",    offsetX: "4vw", offsetY: "10vh" },
+  { side: "right", vAlign: "bottom", offsetX: "8vw", offsetY: "4vh" },
+];
+
 const HeroScrollTransition = () => {
   const transitionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
@@ -260,40 +274,39 @@ const HeroScrollTransition = () => {
     mass: 0.5,
     restDelta: 0.001,
   });
-  const headOpacity = useTransform(smooth, [0, 0.05, 0.18], [0, 1, 1]);
+  const headOpacity = useTransform(smooth, [0, 0.05, 0.9, 1], [0, 1, 1, 0.85]);
   const headY = useTransform(smooth, [0, 0.18], [18, 0]);
 
   return (
     <section
       ref={transitionRef}
-      className="relative hidden h-[260vh] md:block"
+      className="relative hidden h-[320vh] md:block"
       aria-label="Rising cards showcase"
     >
-      <div className="sticky top-0 flex h-[100dvh] w-full flex-col items-center justify-center overflow-hidden bg-[hsl(var(--background))] px-6">
+      <div className="sticky top-0 h-[100dvh] w-full overflow-hidden bg-[hsl(var(--background))]">
         <motion.div
-          className="pointer-events-none mb-10 max-w-2xl text-center transform-gpu"
+          className="pointer-events-none absolute left-1/2 top-1/2 z-[5] w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 px-6 text-center transform-gpu"
           style={{ opacity: headOpacity, y: headY }}
         >
           <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.42em] text-foreground/55">
             Revenue Systems
           </p>
           <div className="mx-auto mb-4 h-px w-32 bg-gradient-to-r from-transparent via-foreground/30 to-transparent" />
-          <p className="font-display text-2xl font-semibold leading-tight text-foreground md:text-4xl">
+          <p className="font-display text-3xl font-semibold leading-tight text-foreground md:text-5xl">
             The quiet layer that catches what your team misses.
           </p>
         </motion.div>
 
-        <div className="grid w-full max-w-6xl grid-cols-3 items-end gap-4 md:gap-5">
-          {transitionCards.map((card, index) => (
-            <RisingCard
-              key={card.label}
-              card={card}
-              index={index}
-              total={transitionCards.length}
-              progress={smooth}
-            />
-          ))}
-        </div>
+        {transitionCards.map((card, index) => (
+          <RisingCard
+            key={card.label}
+            card={card}
+            index={index}
+            total={transitionCards.length}
+            progress={smooth}
+            anchor={CARD_ANCHORS[index % CARD_ANCHORS.length]}
+          />
+        ))}
       </div>
     </section>
   );
