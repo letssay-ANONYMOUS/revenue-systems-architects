@@ -16,7 +16,7 @@ import GradientMesh from "@/components/GradientMesh";
 import TiltCard from "@/components/TiltCard";
 import LazySection from "@/components/LazySection";
 import ProcessGraph from "@/components/ProcessGraph";
-import BandReveal from "@/components/BandReveal";
+
 import InboundCallingConsole from "@/components/calling/InboundCallingConsole";
 import OutboundAnalyticsPanel from "@/components/calling/OutboundAnalyticsPanel";
 import PainPointCard from "@/components/painpoints/PainPointCard";
@@ -189,128 +189,82 @@ const AnimatedHeroHeadline = () => {
   );
 };
 
-interface RisingCardProps {
+interface QuietLayerCardProps {
   card: (typeof transitionCards)[number];
   index: number;
-  total: number;
-  progress: MotionValue<number>;
-  anchor: { side: "left" | "right"; vAlign: "top" | "bottom"; offsetX: string; offsetY: string };
 }
 
-const RisingCard = ({ card, index, total, progress, anchor }: RisingCardProps) => {
-  // Each card rises from below the viewport (y: 110vh) up to its anchored slot.
-  // Stagger so each card lands before the next begins to rise.
-  const headRoom = 0.06;
-  const tail = 0.08;
-  const usable = 1 - headRoom - tail;
-  const slot = usable / total;
-  const enterStart = headRoom + slot * index;
-  const enterEnd = enterStart + slot * 0.85;
-
-  const y = useTransform(progress, [enterStart, enterEnd], ["110vh", "0vh"]);
-  const scale = useTransform(progress, [enterStart, enterEnd], [0.82, 1]);
-  const opacity = useTransform(progress, [enterStart, enterStart + slot * 0.25], [0, 1]);
-
-  const positional: React.CSSProperties = {
-    [anchor.side]: anchor.offsetX,
-    [anchor.vAlign]: anchor.offsetY,
-  } as React.CSSProperties;
-
-  return (
-    <motion.article
-      className="absolute w-[min(38rem,46vw)] transform-gpu overflow-hidden rounded-[1.35rem] border border-white/45 bg-white/70 p-3 text-left shadow-[0_40px_120px_rgba(20,28,38,0.28),inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur-xl will-change-transform"
-      style={{ ...positional, y, scale, opacity, zIndex: 10 + index }}
-    >
-      <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/45 bg-[#d5dbe0] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
-        {card.imageSrc ? (
-          <img
-            src={card.imageSrc}
-            alt=""
-            className="h-full w-full object-cover"
-            loading="lazy"
-            decoding="async"
-          />
-        ) : (
-          <div className="absolute inset-0 overflow-hidden bg-[radial-gradient(circle_at_22%_20%,rgba(255,255,255,0.7),transparent_25%),linear-gradient(135deg,rgba(255,255,255,0.28),rgba(79,91,103,0.2)_48%,rgba(31,40,49,0.18))]">
-            <div className="absolute inset-0 opacity-[0.18]" style={{
-              backgroundImage: "linear-gradient(rgba(255,255,255,0.45) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.45) 1px, transparent 1px)",
-              backgroundSize: "34px 34px",
-            }} />
-          </div>
-        )}
-        <div className="absolute right-3 top-3 rounded-full border border-white/45 bg-white/70 px-3 py-1 text-sm font-semibold text-[#101827] shadow-[0_10px_30px_rgba(24,31,39,0.12)] backdrop-blur-xl">
-          {card.value}
+const QuietLayerCard = ({ card, index }: QuietLayerCardProps) => (
+  <motion.article
+    initial={{ opacity: 0, y: 36, scale: 0.96 }}
+    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+    viewport={{ once: true, amount: 0.3 }}
+    transition={{ duration: 0.7, delay: index * 0.12, ease: [0.16, 1, 0.3, 1] }}
+    className="group relative overflow-hidden rounded-[1.35rem] border border-white/45 bg-white/70 p-3 text-left shadow-[0_30px_80px_rgba(20,28,38,0.18),inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur-xl transform-gpu"
+  >
+    <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/45 bg-[#d5dbe0] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
+      {card.imageSrc ? (
+        <img
+          src={card.imageSrc}
+          alt=""
+          className="h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
+        />
+      ) : (
+        <div className="absolute inset-0 overflow-hidden bg-[radial-gradient(circle_at_22%_20%,rgba(255,255,255,0.7),transparent_25%),linear-gradient(135deg,rgba(255,255,255,0.28),rgba(79,91,103,0.2)_48%,rgba(31,40,49,0.18))]">
+          <div className="absolute inset-0 opacity-[0.18]" style={{
+            backgroundImage: "linear-gradient(rgba(255,255,255,0.45) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.45) 1px, transparent 1px)",
+            backgroundSize: "34px 34px",
+          }} />
         </div>
+      )}
+      <div className="absolute right-3 top-3 rounded-full border border-white/45 bg-white/70 px-3 py-1 text-sm font-semibold text-[#101827] shadow-[0_10px_30px_rgba(24,31,39,0.12)] backdrop-blur-xl">
+        {card.value}
       </div>
+    </div>
 
-      <div className="px-2 pb-2 pt-5">
-        <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#2e3842]/55">
-          {card.label}
+    <div className="px-2 pb-2 pt-5">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#2e3842]/55">
+        {card.label}
+      </p>
+      <p className="mt-3 text-sm leading-relaxed text-[#2e3842]/72">
+        {card.description}
+      </p>
+    </div>
+  </motion.article>
+);
+
+const HeroScrollTransition = () => (
+  <section
+    className="relative px-5 py-20 md:px-10 md:py-32"
+    aria-label="Quiet layer showcase"
+  >
+    <div className="mx-auto max-w-6xl">
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.4 }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="mx-auto mb-12 max-w-3xl text-center md:mb-16"
+      >
+        <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.42em] text-foreground/55">
+          Revenue Systems
         </p>
-        <p className="mt-3 text-sm leading-relaxed text-[#2e3842]/72">
-          {card.description}
-        </p>
-      </div>
-    </motion.article>
-  );
-};
+        <div className="mx-auto mb-5 h-px w-32 bg-gradient-to-r from-transparent via-foreground/30 to-transparent" />
+        <h2 className="font-display text-3xl font-semibold leading-tight text-foreground md:text-5xl">
+          The quiet layer that catches what your team misses.
+        </h2>
+      </motion.div>
 
-// Alternating anchors: bottom-left, top-right, bottom-right — large, overlapping the centered headline.
-const CARD_ANCHORS: RisingCardProps["anchor"][] = [
-  { side: "left",  vAlign: "bottom", offsetX: "4vw", offsetY: "6vh" },
-  { side: "right", vAlign: "top",    offsetX: "4vw", offsetY: "10vh" },
-  { side: "right", vAlign: "bottom", offsetX: "8vw", offsetY: "4vh" },
-];
-
-const HeroScrollTransition = () => {
-  const transitionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: transitionRef,
-    offset: ["start start", "end end"],
-  });
-  const smooth = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 28,
-    mass: 0.5,
-    restDelta: 0.001,
-  });
-  const headOpacity = useTransform(smooth, [0, 0.05, 0.9, 1], [0, 1, 1, 0.85]);
-  const headY = useTransform(smooth, [0, 0.18], [18, 0]);
-
-  return (
-    <section
-      ref={transitionRef}
-      className="relative hidden h-[320vh] md:block"
-      aria-label="Rising cards showcase"
-    >
-      <div className="sticky top-0 h-[100dvh] w-full overflow-hidden bg-[hsl(var(--background))]">
-        <motion.div
-          className="pointer-events-none absolute left-1/2 top-1/2 z-[5] w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 px-6 text-center transform-gpu"
-          style={{ opacity: headOpacity, y: headY }}
-        >
-          <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.42em] text-foreground/55">
-            Revenue Systems
-          </p>
-          <div className="mx-auto mb-4 h-px w-32 bg-gradient-to-r from-transparent via-foreground/30 to-transparent" />
-          <p className="font-display text-3xl font-semibold leading-tight text-foreground md:text-5xl">
-            The quiet layer that catches what your team misses.
-          </p>
-        </motion.div>
-
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
         {transitionCards.map((card, index) => (
-          <RisingCard
-            key={card.label}
-            card={card}
-            index={index}
-            total={transitionCards.length}
-            progress={smooth}
-            anchor={CARD_ANCHORS[index % CARD_ANCHORS.length]}
-          />
+          <QuietLayerCard key={card.label} card={card} index={index} />
         ))}
       </div>
-    </section>
-  );
-};
+    </div>
+  </section>
+);
 
 const DarkStageShowcase = () => {
   const sectionRef = useRef<HTMLElement>(null);
@@ -469,9 +423,6 @@ const Index = () => {
         <GrayStageBackdrop />
 
         <HeroScrollTransition />
-
-        <BandReveal />
-
         <DarkStageShowcase />
 
         {/* BUSINESS PAIN */}
