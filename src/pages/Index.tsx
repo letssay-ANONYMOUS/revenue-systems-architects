@@ -463,6 +463,8 @@ const Index = () => {
 
         <HeroScrollTransition />
 
+        <BandReveal />
+
         <DarkStageShowcase />
 
         {/* BUSINESS PAIN */}
