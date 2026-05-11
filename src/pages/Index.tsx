@@ -349,73 +349,72 @@ const DarkStageShowcase = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: sectionRef,
-    offset: ["start start", "end end"],
+    offset: ["start 85%", "end 35%"],
   });
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 86,
-    damping: 25,
-    mass: 0.72,
+    stiffness: 90,
+    damping: 28,
+    mass: 0.5,
     restDelta: 0.001,
   });
-  const introY = useTransform(smoothProgress, [0, 0.12, 0.27], ["0vh", "-4vh", "-38vh"]);
-  const introOpacity = useTransform(smoothProgress, [0, 0.16, 0.28], [1, 1, 0]);
+
+  const headlineY = useTransform(smoothProgress, [0, 1], ["24px", "-24px"]);
+  const headlineOpacity = useTransform(smoothProgress, [0, 0.2, 0.85, 1], [0, 1, 1, 0.85]);
+  const ruleScaleX = useTransform(smoothProgress, [0.05, 0.55], [0, 1]);
+  const copyOpacity = useTransform(smoothProgress, [0.15, 0.45], [0, 1]);
+  const copyY = useTransform(smoothProgress, [0.15, 0.45], [16, 0]);
+  const eyebrowOpacity = useTransform(smoothProgress, [0, 0.25], [0, 1]);
+
+  const stages = serviceStackStages;
 
   return (
-    <section ref={sectionRef} className="relative bg-[#1447d4] text-[#02040a] md:h-[280vh]">
-      <div className="relative hidden h-full md:block">
-        <div className="sticky top-0 h-[100dvh] overflow-hidden bg-[#1447d4]">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_16%,rgba(255,255,255,0.16),transparent_26%),linear-gradient(180deg,#1a58ff,#0d38b3)]" />
-          <div
-            className="absolute inset-0 opacity-[0.12]"
-            style={{
-              backgroundImage: "linear-gradient(rgba(255,255,255,0.38) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.38) 1px, transparent 1px)",
-              backgroundSize: "78px 78px",
-            }}
-          />
-          <motion.div
-            className="absolute inset-x-0 top-0 z-10 flex h-[48vh] flex-col items-center px-6 pt-[12vh] text-center will-change-transform"
-            style={{ y: introY, opacity: introOpacity }}
-          >
-            <h2 className="service-cut-text max-w-5xl text-[clamp(2.8rem,6.2vw,6rem)] leading-[0.84] [--cut-color:#02040a]">
-              What We Do For Your Business
-            </h2>
-            <p className="mt-6 max-w-3xl font-serif text-lg leading-snug text-[#06132f]/78">
-              We build AI agents, automation, websites, and apps that capture leads, book appointments, and keep operations moving.
-            </p>
-          </motion.div>
+    <section
+      ref={sectionRef}
+      className="relative isolate overflow-hidden bg-[hsl(var(--background))] text-[hsl(var(--foreground))]"
+    >
+      {/* Soft luxury wash — keeps it on-brand with the off-white system */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(20,71,212,0.05),transparent_55%)]" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/12 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-foreground/12 to-transparent" />
 
-          {serviceStackStages.map((stage, index) => (
-            <SlidingServicePanel
-              key={stage.title}
-              stage={stage}
-              index={index}
-              progress={smoothProgress}
-            />
-          ))}
-        </div>
-      </div>
+      <div className="relative mx-auto max-w-6xl px-5 py-24 md:px-10 md:py-36 lg:py-44">
+        <motion.p
+          style={{ opacity: eyebrowOpacity }}
+          className="text-[10px] font-semibold uppercase tracking-[0.32em] text-foreground/55 md:text-xs"
+        >
+          What We Do
+        </motion.p>
 
-      <div className="px-5 py-16 md:hidden">
-        <div className="mb-12 text-center">
-          <h2 className="service-cut-text text-5xl leading-[0.86] [--cut-color:#02040a]">
-            What We Do For Your Business
-          </h2>
-          <p className="mt-5 font-serif text-base leading-snug text-[#06132f]/78">
-            We build AI agents, automation, websites, and apps that capture leads, book appointments, and keep operations moving.
-          </p>
-        </div>
-        <div className="space-y-5">
-          {serviceStackStages.map((stage) => (
-            <article key={stage.title} className="rounded-2xl bg-[#02040a] px-5 py-12 text-center text-[#6f9bff]">
-              <h3 className="service-cut-text text-4xl leading-[0.84] [--cut-color:#1c63ff]">
+        <motion.h2
+          style={{ y: headlineY, opacity: headlineOpacity }}
+          className="mt-6 font-display text-[clamp(2.4rem,7vw,5.6rem)] font-semibold leading-[0.92] tracking-[-0.02em] text-foreground transform-gpu"
+        >
+          Revenue systems that <span className="italic text-foreground/70 font-serif font-normal">answer, automate,</span> and <span className="italic text-foreground/70 font-serif font-normal">accelerate</span> your business.
+        </motion.h2>
+
+        <motion.div
+          style={{ scaleX: ruleScaleX }}
+          className="mt-10 h-px w-full origin-left bg-foreground/15 transform-gpu"
+        />
+
+        <motion.div
+          style={{ opacity: copyOpacity, y: copyY }}
+          className="mt-10 grid grid-cols-1 gap-10 md:mt-14 md:grid-cols-3 md:gap-8 transform-gpu"
+        >
+          {stages.map((stage, i) => (
+            <div key={stage.title} className="relative">
+              <p className="font-display text-xs font-semibold uppercase tracking-[0.28em] text-foreground/45">
+                0{i + 1}
+              </p>
+              <h3 className="mt-3 font-display text-2xl font-semibold tracking-tight text-foreground md:text-[1.65rem]">
                 {stage.title}
               </h3>
-              <p className="mt-5 font-serif text-sm leading-snug text-[#9db8ff]">
+              <p className="mt-3 max-w-xs font-serif text-[15px] leading-relaxed text-foreground/65">
                 {stage.description}
               </p>
-            </article>
+            </div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );
