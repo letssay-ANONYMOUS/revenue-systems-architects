@@ -423,9 +423,6 @@ const Index = () => {
         <GrayStageBackdrop />
 
         <HeroScrollTransition />
-
-        <BandReveal />
-
         <DarkStageShowcase />
 
         {/* BUSINESS PAIN */}
