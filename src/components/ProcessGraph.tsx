@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, type MotionValue } from "framer-motion";
 import { Target, Layers, Code2, Workflow, Zap, LineChart } from "lucide-react";
 
 const steps = [
@@ -13,16 +13,23 @@ const steps = [
 
 const timelineBlue = "#1447d4";
 const timelineDeepBlue = "#082a96";
-const timelineSoftBlue = "rgba(20, 71, 212, 0.18)";
 
 const ProcessGraph = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start 0.8", "end 0.3"],
+    offset: ["start 0.85", "end 0.25"],
   });
 
-  const lineScaleY = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  // Spring-smoothed progress — eliminates jitter on both directions
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 110,
+    damping: 26,
+    mass: 0.4,
+    restDelta: 0.001,
+  });
+
+  const lineScaleY = useTransform(smoothProgress, [0, 1], [0, 1]);
 
   return (
     <section ref={containerRef} className="py-14 md:py-32 surface-elevated relative overflow-hidden">
@@ -52,14 +59,24 @@ const ProcessGraph = () => {
           {/* Vertical track line (background) */}
           <div className="absolute left-5 md:left-1/2 top-0 bottom-0 w-px md:-translate-x-px">
             <div className="w-full h-full bg-border/40" />
-            {/* Animated fill */}
+            {/* Animated fill — GPU only (transform), no shadow repaint */}
             <motion.div
-              className="absolute top-0 left-0 h-full w-full origin-top"
+              className="absolute top-0 left-0 h-full w-full origin-top transform-gpu"
               style={{
                 scaleY: lineScaleY,
                 background: `linear-gradient(180deg, ${timelineBlue}, ${timelineDeepBlue})`,
-                boxShadow: `0 0 18px ${timelineSoftBlue}`,
+                willChange: "transform",
               }}
+            />
+            {/* Static soft glow behind the line — no per-frame repaint */}
+            <motion.div
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-[6px] h-full origin-top transform-gpu blur-[6px] opacity-60"
+              style={{
+                scaleY: lineScaleY,
+                background: `linear-gradient(180deg, ${timelineBlue}, ${timelineDeepBlue})`,
+                willChange: "transform",
+              }}
+              aria-hidden
             />
           </div>
 
@@ -76,7 +93,7 @@ const ProcessGraph = () => {
                   key={s.step}
                   step={s}
                   isLeft={isLeft}
-                  scrollYProgress={scrollYProgress}
+                  scrollYProgress={smoothProgress}
                   revealStart={revealStart}
                   revealEnd={revealEnd}
                   stepPoint={stepPoint}
@@ -110,31 +127,31 @@ const StepNode = ({ step, isLeft, scrollYProgress, revealStart, revealEnd, stepP
   const dotScale = useTransform(scrollYProgress, [activeStart, activePeak, activeEnd], [0.86, 1.18, 1]);
   const glowOpacity = useTransform(scrollYProgress, [activeStart, activePeak, activeEnd], [0, 1, 0.22]);
   const glowScale = useTransform(scrollYProgress, [activeStart, activePeak, activeEnd], [0.7, 1.75, 1.05]);
-  const dotShadow = useTransform(glowOpacity, (value) => `0 0 ${6 + value * 16}px rgba(20, 71, 212, ${0.16 + value * 0.34})`);
 
   return (
     <div className={`relative flex items-start md:items-center gap-6 md:gap-0 ${isLeft ? "md:flex-row" : "md:flex-row-reverse"}`}>
       {/* Dot on the line */}
       <div className="absolute left-5 md:left-1/2 top-1 md:top-1/2 -translate-x-1/2 md:-translate-y-1/2 z-20">
         <motion.div
-          style={{ scale: dotScale }}
-          className="relative"
+          style={{ scale: dotScale, willChange: "transform" }}
+          className="relative transform-gpu"
         >
           <motion.div
             style={{
               opacity: glowOpacity,
               scale: glowScale,
               background: "radial-gradient(circle, rgba(20, 71, 212, 0.18), rgba(20, 71, 212, 0.08) 34%, transparent 68%)",
+              willChange: "transform, opacity",
             }}
-            className="absolute -inset-4 rounded-full"
+            className="absolute -inset-4 rounded-full transform-gpu"
             aria-hidden
           />
-          <motion.div
+          <div
             className="w-3 h-3 md:w-4 md:h-4 rounded-full border-2"
             style={{
               borderColor: timelineBlue,
               background: "hsl(var(--background))",
-              boxShadow: dotShadow,
+              boxShadow: "0 0 12px rgba(20, 71, 212, 0.28)",
             }}
           />
           <motion.div
@@ -142,9 +159,9 @@ const StepNode = ({ step, isLeft, scrollYProgress, revealStart, revealEnd, stepP
               opacity: glowOpacity,
               scale: glowScale,
               borderColor: "rgba(20, 71, 212, 0.48)",
-              boxShadow: "0 0 12px rgba(20, 71, 212, 0.22)",
+              willChange: "transform, opacity",
             }}
-            className="absolute -inset-3 rounded-full border"
+            className="absolute -inset-3 rounded-full border transform-gpu"
             aria-hidden
           />
         </motion.div>
@@ -153,8 +170,8 @@ const StepNode = ({ step, isLeft, scrollYProgress, revealStart, revealEnd, stepP
       {/* Content card — mobile: always right side; desktop: alternating */}
       <div className="md:w-1/2" />
       <motion.div
-        style={{ opacity: nodeOpacity, y: nodeY, scale: nodeScale }}
-        className={`ml-10 md:ml-0 md:w-1/2 ${isLeft ? "md:pr-12 lg:pr-16" : "md:pl-12 lg:pl-16"}`}
+        style={{ opacity: nodeOpacity, y: nodeY, scale: nodeScale, willChange: "transform, opacity" }}
+        className={`ml-10 md:ml-0 md:w-1/2 transform-gpu ${isLeft ? "md:pr-12 lg:pr-16" : "md:pl-12 lg:pl-16"}`}
       >
         <div
           className="group rounded-xl md:rounded-2xl border border-border p-4 md:p-6 transition-all duration-500 hover:border-primary/20"
