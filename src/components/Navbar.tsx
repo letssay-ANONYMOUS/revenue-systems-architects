@@ -38,7 +38,7 @@ const Navbar = () => {
   return (
     <>
       <motion.nav
-        className="fixed top-0 left-0 right-0 z-50 transform-gpu"
+        className="fixed top-0 left-0 right-0 z-[1000] transform-gpu"
         style={{ padding: "0 32px", willChange: "contents" }}
       >
         <div
@@ -100,9 +100,9 @@ const Navbar = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="lg:hidden fixed inset-0 z-40 flex flex-col bg-background/95 backdrop-blur-2xl"
-          >
+          transition={{ duration: 0.2 }}
+          className="lg:hidden fixed inset-0 z-[990] flex flex-col bg-background/95 backdrop-blur-2xl"
+        >
             <div className="h-16" />
             <div className="flex-1 flex flex-col justify-center px-8 gap-2">
               {navLinks.map((link, i) => (
@@ -142,4 +142,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-

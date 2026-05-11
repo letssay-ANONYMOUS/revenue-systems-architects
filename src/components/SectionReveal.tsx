@@ -9,11 +9,11 @@ interface SectionRevealProps {
 
 const SectionReveal = ({ children, className = "", delay = 0 }: SectionRevealProps) => (
   <motion.div
-    initial={{ opacity: 0, y: 40 }}
+    initial={{ opacity: 0, y: 22 }}
     whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, amount: 0.1, margin: "-40px" }}
-    transition={{ duration: 0.7, delay, ease: [0.25, 0.46, 0.45, 0.94] }}
-    className={className}
+    viewport={{ once: true, amount: 0.16, margin: "-20px" }}
+    transition={{ duration: 0.85, delay, ease: [0.16, 1, 0.3, 1] }}
+    className={`transform-gpu ${className}`}
   >
     {children}
   </motion.div>

@@ -10,13 +10,14 @@ import SmoothScroll from "@/components/SmoothScroll";
 import FilmGrain from "@/components/FilmGrain";
 import CustomCursor from "@/components/CustomCursor";
 import Index from "./pages/Index";
-import AICallingAgents from "./pages/AICallingAgents";
-import ChatbotsAutomation from "./pages/ChatbotsAutomation";
-import WebsitesApps from "./pages/WebsitesApps";
-import CaseStudies from "./pages/CaseStudies";
-import About from "./pages/About";
-import BookACall from "./pages/BookACall";
-import NotFound from "./pages/NotFound";
+
+const AICallingAgents = lazy(() => import("./pages/AICallingAgents"));
+const ChatbotsAutomation = lazy(() => import("./pages/ChatbotsAutomation"));
+const WebsitesApps = lazy(() => import("./pages/WebsitesApps"));
+const CaseStudies = lazy(() => import("./pages/CaseStudies"));
+const About = lazy(() => import("./pages/About"));
+const BookACall = lazy(() => import("./pages/BookACall"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
 
@@ -32,19 +33,25 @@ function AnimatedRoutes() {
   const location = useLocation();
   return (
     <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<PageTransition><Index /></PageTransition>} />
-        <Route path="/ai-calling-agents" element={<PageTransition><AICallingAgents /></PageTransition>} />
-        <Route path="/chatbots-automation" element={<PageTransition><ChatbotsAutomation /></PageTransition>} />
-        <Route path="/websites-apps" element={<PageTransition><WebsitesApps /></PageTransition>} />
-        <Route path="/case-studies" element={<PageTransition><CaseStudies /></PageTransition>} />
-        <Route path="/about" element={<PageTransition><About /></PageTransition>} />
-        <Route path="/book-a-call" element={<PageTransition><BookACall /></PageTransition>} />
-        <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
-      </Routes>
+      <Suspense fallback={<PageRouteFallback />}>
+        <Routes location={location} key={location.pathname}>
+          <Route path="/" element={<PageTransition><Index /></PageTransition>} />
+          <Route path="/ai-calling-agents" element={<PageTransition><AICallingAgents /></PageTransition>} />
+          <Route path="/chatbots-automation" element={<PageTransition><ChatbotsAutomation /></PageTransition>} />
+          <Route path="/websites-apps" element={<PageTransition><WebsitesApps /></PageTransition>} />
+          <Route path="/case-studies" element={<PageTransition><CaseStudies /></PageTransition>} />
+          <Route path="/about" element={<PageTransition><About /></PageTransition>} />
+          <Route path="/book-a-call" element={<PageTransition><BookACall /></PageTransition>} />
+          <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />
+        </Routes>
+      </Suspense>
     </AnimatePresence>
   );
 }
+
+const PageRouteFallback = () => (
+  <div className="min-h-[100dvh] bg-background" aria-label="Loading page" />
+);
 
 const App = () => (
   <QueryClientProvider client={queryClient}>

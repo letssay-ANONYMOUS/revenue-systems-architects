@@ -12,8 +12,7 @@ interface Props {
 const PainPointCard = ({ icon: Icon, pain, solution, visual }: Props) => (
   <TiltCard className="h-full">
     <div
-      className="group relative rounded-xl md:rounded-2xl border border-border h-full overflow-hidden transition-all duration-500 hover:border-primary/30 flex flex-col"
-      style={{ background: "hsl(var(--card))" }}
+      className="group relative h-full overflow-hidden rounded-xl border border-white/35 bg-white/55 shadow-[inset_0_1px_0_rgba(255,255,255,0.38)] transition-all duration-500 hover:border-white/60 md:rounded-2xl flex flex-col"
     >
       {/* Pain row */}
       <div className="relative flex items-center gap-2 p-3.5 md:p-5 pb-2 md:pb-3 transition-opacity duration-500 group-hover:opacity-50">
@@ -45,7 +44,7 @@ const PainPointCard = ({ icon: Icon, pain, solution, visual }: Props) => (
 
       {/* Animated visual */}
       <div className="mt-auto px-3.5 md:px-5 pb-3.5 md:pb-5 pt-2">
-        <div className="relative h-14 md:h-20 rounded-lg border border-border/60 bg-background/50 overflow-hidden">
+        <div className="relative h-14 md:h-20 rounded-lg border border-white/45 bg-white/35 overflow-hidden">
           {visual}
         </div>
       </div>

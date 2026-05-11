@@ -14,9 +14,12 @@ const CTASection = ({
 }: CTASectionProps) => (
   <section className="relative py-20 md:py-32 overflow-hidden">
     <div className="absolute inset-0 bg-glow opacity-50" />
-    {/* Decorative visual orbs */}
-    <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-32 h-32 md:w-64 md:h-64 rounded-full bg-primary/5 blur-[80px]" />
-    <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-32 h-32 md:w-64 md:h-64 rounded-full bg-accent/5 blur-[80px]" />
+    <div
+      className="absolute inset-0 pointer-events-none"
+      style={{
+        background: "radial-gradient(ellipse at 28% 50%, hsl(var(--primary) / 0.045), transparent 38%), radial-gradient(ellipse at 72% 50%, hsl(var(--accent) / 0.04), transparent 38%)",
+      }}
+    />
     
     <div className="max-w-4xl mx-auto px-5 md:section-padding text-center relative z-10">
       <SectionReveal>

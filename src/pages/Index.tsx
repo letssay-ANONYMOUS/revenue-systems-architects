@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useScroll, useSpring, useTransform, type MotionValue } from "framer-motion";
 import {
-  Phone, MessageSquare, CalendarCheck, Globe, Smartphone, Workflow,
-  PhoneIncoming, PhoneOutgoing, Bot, UserCheck, Clock, BarChart3,
+  Phone, CalendarCheck, Globe, Smartphone,
+  Bot, UserCheck, Clock, BarChart3,
   Zap, Target, Shield, ArrowRight, CheckCircle2, XCircle, TrendingUp,
-  Layers, Code2, Database, LineChart, Bell,
-  Users, Star, Headphones, Send, CreditCard
+  Layers, Database,
+  Headphones, Send
 } from "lucide-react";
 import { useRef } from "react";
 import Navbar from "@/components/Navbar";
@@ -13,10 +13,7 @@ import Footer from "@/components/Footer";
 import CTASection from "@/components/CTASection";
 import SectionReveal from "@/components/SectionReveal";
 import GradientMesh from "@/components/GradientMesh";
-import AnimatedText from "@/components/AnimatedText";
-import Marquee from "@/components/Marquee";
 import TiltCard from "@/components/TiltCard";
-import ScrollShowcase from "@/components/ScrollShowcase";
 import LazySection from "@/components/LazySection";
 import ProcessGraph from "@/components/ProcessGraph";
 import InboundCallingConsole from "@/components/calling/InboundCallingConsole";
@@ -29,17 +26,6 @@ import LighthouseVisual from "@/components/painpoints/visuals/LighthouseVisual";
 import WorkflowNodesVisual from "@/components/painpoints/visuals/WorkflowNodesVisual";
 import ConnectedToolsVisual from "@/components/painpoints/visuals/ConnectedToolsVisual";
 
-const services = [
-  { icon: PhoneIncoming, title: "Inbound AI Agent", desc: "Answers, qualifies, books — 24/7.", benefit: "Capture every lead", accent: "primary", span: "col-span-1 md:col-span-2 md:row-span-2" },
-  { icon: PhoneOutgoing, title: "Outbound AI Agent", desc: "Follow-ups, reminders, and outreach on autopilot.", benefit: "Reactivate leads", accent: "accent", span: "col-span-1" },
-  { icon: Bot, title: "Support Chatbot", desc: "Instant website replies. Captures leads, handles FAQs.", benefit: "24/7 front desk", accent: "primary", span: "col-span-1" },
-  { icon: Target, title: "Lead Qualification", desc: "Smart flows that qualify before reaching your team.", benefit: "Better prospects", accent: "accent", span: "col-span-1 md:col-span-2" },
-  { icon: CalendarCheck, title: "Scheduling", desc: "Integrated booking that syncs and reduces no-shows.", benefit: "Auto bookings", accent: "primary", span: "col-span-1" },
-  { icon: Globe, title: "Business Website", desc: "Premium sites built to convert, not just impress.", benefit: "Revenue-ready", accent: "accent", span: "col-span-1" },
-  { icon: Smartphone, title: "Web & Mobile App", desc: "Custom apps that serve customers and streamline ops.", benefit: "Custom systems", accent: "primary", span: "col-span-1" },
-  { icon: Workflow, title: "Workflow Automation", desc: "Connect tools, automate handoffs, eliminate busywork.", benefit: "Run smoother", accent: "accent", span: "col-span-1" },
-];
-
 const painPoints = [
   { icon: XCircle, pain: "Missed calls", solution: "AI answers every call", Visual: MissedCallVisual },
   { icon: Clock, pain: "Slow responses", solution: "Instant voice & chat", Visual: InstantReplyVisual },
@@ -47,15 +33,6 @@ const painPoints = [
   { icon: XCircle, pain: "Weak web presence", solution: "Premium conversion site", Visual: LighthouseVisual },
   { icon: XCircle, pain: "Manual admin", solution: "Automated workflows", Visual: WorkflowNodesVisual },
   { icon: XCircle, pain: "Fragmented tools", solution: "One connected system", Visual: ConnectedToolsVisual },
-];
-
-const processSteps = [
-  { step: "01", title: "Strategy", icon: Target },
-  { step: "02", title: "Design", icon: Layers },
-  { step: "03", title: "Build", icon: Code2 },
-  { step: "04", title: "Automate", icon: Workflow },
-  { step: "05", title: "Launch", icon: Zap },
-  { step: "06", title: "Optimize", icon: LineChart },
 ];
 
 const caseStudies = [
@@ -82,7 +59,90 @@ const caseStudies = [
   },
 ];
 
-const trustNames = ["Meridian Group", "Vertex Capital", "Solara Health", "Atlas RE", "Prism Digital", "Arcadia Cafés", "Nova Systems", "Apex Ventures"];
+const transitionCards = [
+  {
+    label: "Calls captured",
+    value: "97%",
+    description: "AI stays on the line when your team is busy.",
+    imageSrc: "/calls-captured-card.jpg",
+  },
+  {
+    label: "Bookings lifted",
+    value: "3x",
+    description: "Qualified leads move straight into scheduled calls.",
+    imageSrc: "/bookings-lifted-card.jpg",
+  },
+  {
+    label: "Admin reduced",
+    value: "60%",
+    description: "Follow-ups, reminders, and routing happen in the background.",
+    imageSrc: "",
+  },
+];
+
+const serviceStackStages = [
+  {
+    title: "AI Calling",
+    description: "Calls answered, qualified, and booked automatically — so every lead gets handled while your team stays focused.",
+  },
+  {
+    title: "Automation",
+    description: "Workflows, reminders, routing, and follow-ups move in the background without manual handoffs.",
+  },
+  {
+    title: "Web & Apps",
+    description: "Conversion-focused websites and connected systems turn attention into booked calls and measurable revenue.",
+  },
+];
+
+interface SlidingServicePanelProps {
+  stage: typeof serviceStackStages[number];
+  index: number;
+  progress: MotionValue<number>;
+}
+
+const SlidingServicePanel = ({ stage, index, progress }: SlidingServicePanelProps) => {
+  const start = 0.1 + index * 0.23;
+  const settle = start + 0.13;
+  const hold = start + 0.29;
+  const exit = start + 0.45;
+
+  const y = useTransform(progress, [start, settle, hold, exit], ["104vh", "31vh", "24vh", "-34vh"]);
+  const scale = useTransform(progress, [start, settle, exit], [0.985, 1, 1]);
+  const opacity = useTransform(progress, [start - 0.04, start, exit - 0.08, exit], [0, 1, 1, 0.96]);
+
+  return (
+    <motion.article
+      className="absolute inset-x-0 top-0 flex h-[46vh] will-change-transform items-center justify-center overflow-hidden bg-[#02040a] px-6 text-center text-[#6f9bff] shadow-[0_-22px_80px_rgba(0,0,0,0.32)]"
+      style={{
+        y,
+        scale,
+        opacity,
+        zIndex: 20 + index,
+      }}
+    >
+      <div
+        className="absolute inset-0 opacity-[0.12]"
+        style={{
+          backgroundImage: "linear-gradient(rgba(111,155,255,0.28) 1px, transparent 1px), linear-gradient(90deg, rgba(111,155,255,0.28) 1px, transparent 1px)",
+          backgroundSize: "74px 74px",
+          maskImage: "radial-gradient(circle at 50% 48%, black, transparent 74%)",
+          WebkitMaskImage: "radial-gradient(circle at 50% 48%, black, transparent 74%)",
+        }}
+      />
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#2f73ff]/70 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#2f73ff]/35 to-transparent" />
+      <div className="relative z-10 max-w-4xl">
+        <h3 className="service-cut-text text-[clamp(2.7rem,5.4vw,5.8rem)] leading-[0.82] [--cut-color:#1c63ff]">
+          {stage.title}
+        </h3>
+        <p className="mx-auto mt-6 max-w-3xl font-serif text-base leading-snug text-[#9db8ff]">
+          {stage.description}
+        </p>
+      </div>
+    </motion.article>
+  );
+};
 
 const heroHeadlineLines = ["Your Business,", "Answered.", "Automated.", "Accelerated."];
 const heroHeadlineEase = [0.25, 0.46, 0.45, 0.94] as const;
@@ -128,6 +188,254 @@ const AnimatedHeroHeadline = () => {
   );
 };
 
+interface RisingShowcaseCardProps {
+  card: (typeof transitionCards)[number];
+  index: number;
+  progress: MotionValue<number>;
+}
+
+const RisingShowcaseCard = ({ card, index, progress }: RisingShowcaseCardProps) => {
+  const start = 0.08 + index * 0.035;
+  const settled = 0.2 + index * 0.035;
+  const opacity = useTransform(progress, [start, settled], [0, 1]);
+  const y = useTransform(progress, [start, settled, 0.78], [72, 0, -14]);
+  const scale = useTransform(progress, [start, settled], [0.9, 1]);
+  const rotateX = useTransform(progress, [start, settled], [9, 0]);
+
+  return (
+    <motion.article
+      className="relative overflow-hidden rounded-[1.35rem] border border-white/36 bg-white/58 p-3 text-left shadow-[0_30px_95px_rgba(24,31,39,0.2),inset_0_1px_0_rgba(255,255,255,0.64)] backdrop-blur-xl"
+      style={{ opacity, y, scale, rotateX, transformPerspective: 900 }}
+    >
+      <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/42 bg-[#d5dbe0] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
+        {card.imageSrc ? (
+          <img
+            src={card.imageSrc}
+            alt=""
+            className="h-full w-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <div className="absolute inset-0 overflow-hidden bg-[radial-gradient(circle_at_22%_20%,rgba(255,255,255,0.7),transparent_25%),linear-gradient(135deg,rgba(255,255,255,0.28),rgba(79,91,103,0.2)_48%,rgba(31,40,49,0.18))]">
+            <div className="absolute inset-0 opacity-[0.18]" style={{
+              backgroundImage: "linear-gradient(rgba(255,255,255,0.45) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.45) 1px, transparent 1px)",
+              backgroundSize: "34px 34px",
+            }} />
+            <div className="absolute bottom-4 left-4 right-4 rounded-full border border-white/45 bg-white/42 px-4 py-2 text-[9px] font-semibold uppercase tracking-[0.24em] text-[#2e3842]/58 backdrop-blur-md">
+              Image slot
+            </div>
+          </div>
+        )}
+        <div className="absolute right-3 top-3 rounded-full border border-white/45 bg-white/62 px-3 py-1 text-sm font-semibold text-[#101827] shadow-[0_10px_30px_rgba(24,31,39,0.12)] backdrop-blur-xl">
+          {card.value}
+        </div>
+      </div>
+
+      <div className="px-2 pb-2 pt-5">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#2e3842]/55">
+          {card.label}
+        </p>
+        <p className="mt-3 text-sm leading-relaxed text-[#2e3842]/72">
+          {card.description}
+        </p>
+      </div>
+    </motion.article>
+  );
+};
+
+const HeroScrollTransition = () => {
+  const transitionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: transitionRef,
+    offset: ["start 106%", "end 34%"],
+  });
+  const revealClip = useTransform(scrollYProgress, [0, 0.12, 0.34, 1], ["inset(100% 50% 0% 50% round 999px)", "inset(58% 22% 0% 22% round 44px)", "inset(0% 0% 0% 0% round 0px)", "inset(0% 0% 0% 0% round 0px)"]);
+  const revealY = useTransform(scrollYProgress, [0, 0.34, 1], [60, 0, 0]);
+  const coverClip = useTransform(scrollYProgress, [0, 0.06, 0.18, 1], ["inset(0% 0% 0% 0%)", "inset(0% 0% 36% 0%)", "inset(0% 0% 100% 0%)", "inset(0% 0% 100% 0%)"]);
+  const contentOpacity = useTransform(scrollYProgress, [0.04, 0.16, 0.42], [0, 1, 0]);
+  const contentY = useTransform(scrollYProgress, [0.04, 0.42], [18, -18]);
+  const cardsY = useTransform(scrollYProgress, [0.08, 0.3, 0.78], ["24vh", "0vh", "-32vh"]);
+  const sparkOpacity = useTransform(scrollYProgress, [0.12, 0.3, 0.52], [0, 0.82, 0]);
+  const sparkScale = useTransform(scrollYProgress, [0.12, 0.3, 0.52], [0.82, 1, 1.12]);
+
+  return (
+    <section
+      ref={transitionRef}
+      className="relative hidden h-[245vh] overflow-hidden md:block"
+      aria-label="Scroll transition"
+    >
+      <motion.div
+        className="sticky top-0 flex h-[100dvh] items-center justify-center overflow-hidden"
+      >
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            clipPath: revealClip,
+            y: revealY,
+          }}
+        >
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.38),transparent_42%),linear-gradient(115deg,rgba(255,255,255,0.1),transparent_38%,rgba(255,255,255,0.12)_58%,transparent_78%)]" />
+          <div
+            className="absolute inset-0 opacity-[0.14]"
+            style={{
+              backgroundImage: "linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px)",
+              backgroundSize: "72px 72px",
+              maskImage: "linear-gradient(180deg, transparent, black 24%, black 76%, transparent)",
+              WebkitMaskImage: "linear-gradient(180deg, transparent, black 24%, black 76%, transparent)",
+            }}
+          />
+          {[
+            ["18%", "24%", "0.44rem"],
+            ["73%", "29%", "0.36rem"],
+            ["61%", "68%", "0.28rem"],
+          ].map(([left, top, size]) => (
+            <motion.span
+              key={`${left}-${top}`}
+              className="absolute rounded-full bg-white"
+              style={{
+                left,
+                top,
+                width: size,
+                height: size,
+                opacity: sparkOpacity,
+                scale: sparkScale,
+                boxShadow: "0 0 18px rgba(255,255,255,0.52)",
+              }}
+            />
+          ))}
+        </motion.div>
+
+        <motion.div
+          className="pointer-events-none relative z-10 max-w-2xl px-6 text-center"
+          style={{ opacity: contentOpacity, y: contentY }}
+        >
+          <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.42em] text-white/58">
+            Revenue Systems
+          </p>
+          <div className="mx-auto mb-6 h-px w-40 bg-gradient-to-r from-transparent via-white/48 to-transparent" />
+          <p className="font-display text-3xl font-semibold leading-tight text-white md:text-5xl">
+            The quiet layer that catches what your team misses.
+          </p>
+        </motion.div>
+
+        <div className="pointer-events-none absolute inset-x-0 top-[34%] z-10 flex justify-center px-8">
+          <motion.div
+            className="grid w-[min(72rem,88vw)] grid-cols-3 gap-5"
+            style={{ y: cardsY }}
+          >
+            {transitionCards.map((card, index) => (
+              <RisingShowcaseCard
+                key={card.label}
+                card={card}
+                index={index}
+                progress={scrollYProgress}
+              />
+            ))}
+          </motion.div>
+        </div>
+
+        <motion.div
+          className="pointer-events-none absolute inset-0 z-[5] bg-background"
+          style={{ clipPath: coverClip }}
+          aria-hidden="true"
+        />
+      </motion.div>
+    </section>
+  );
+};
+
+const DarkStageShowcase = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 86,
+    damping: 25,
+    mass: 0.72,
+    restDelta: 0.001,
+  });
+  const introY = useTransform(smoothProgress, [0, 0.12, 0.27], ["0vh", "-4vh", "-38vh"]);
+  const introOpacity = useTransform(smoothProgress, [0, 0.16, 0.28], [1, 1, 0]);
+
+  return (
+    <section ref={sectionRef} className="relative bg-[#1447d4] text-[#02040a] md:h-[280vh]">
+      <div className="relative hidden h-full md:block">
+        <div className="sticky top-0 h-[100dvh] overflow-hidden bg-[#1447d4]">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_16%,rgba(255,255,255,0.16),transparent_26%),linear-gradient(180deg,#1a58ff,#0d38b3)]" />
+          <div
+            className="absolute inset-0 opacity-[0.12]"
+            style={{
+              backgroundImage: "linear-gradient(rgba(255,255,255,0.38) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.38) 1px, transparent 1px)",
+              backgroundSize: "78px 78px",
+            }}
+          />
+          <motion.div
+            className="absolute inset-x-0 top-0 z-10 flex h-[48vh] flex-col items-center px-6 pt-[12vh] text-center will-change-transform"
+            style={{ y: introY, opacity: introOpacity }}
+          >
+            <h2 className="service-cut-text max-w-5xl text-[clamp(2.8rem,6.2vw,6rem)] leading-[0.84] [--cut-color:#02040a]">
+              What We Do For Your Business
+            </h2>
+            <p className="mt-6 max-w-3xl font-serif text-lg leading-snug text-[#06132f]/78">
+              We build AI agents, automation, websites, and apps that capture leads, book appointments, and keep operations moving.
+            </p>
+          </motion.div>
+
+          {serviceStackStages.map((stage, index) => (
+            <SlidingServicePanel
+              key={stage.title}
+              stage={stage}
+              index={index}
+              progress={smoothProgress}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="px-5 py-16 md:hidden">
+        <div className="mb-12 text-center">
+          <h2 className="service-cut-text text-5xl leading-[0.86] [--cut-color:#02040a]">
+            What We Do For Your Business
+          </h2>
+          <p className="mt-5 font-serif text-base leading-snug text-[#06132f]/78">
+            We build AI agents, automation, websites, and apps that capture leads, book appointments, and keep operations moving.
+          </p>
+        </div>
+        <div className="space-y-5">
+          {serviceStackStages.map((stage) => (
+            <article key={stage.title} className="rounded-2xl bg-[#02040a] px-5 py-12 text-center text-[#6f9bff]">
+              <h3 className="service-cut-text text-4xl leading-[0.84] [--cut-color:#1c63ff]">
+                {stage.title}
+              </h3>
+              <p className="mt-5 font-serif text-sm leading-snug text-[#9db8ff]">
+                {stage.description}
+              </p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const GrayStageBackdrop = () => (
+  <>
+    <div className="absolute inset-0 bg-[#687079]" />
+    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.2),transparent_16%,transparent_84%,rgba(255,255,255,0.14))]" />
+    <div
+      className="absolute inset-0 opacity-[0.11]"
+      style={{
+        backgroundImage: "linear-gradient(rgba(255,255,255,0.28) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.28) 1px, transparent 1px)",
+        backgroundSize: "72px 72px",
+      }}
+    />
+    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_12%,rgba(255,255,255,0.24),transparent_32%),radial-gradient(ellipse_at_50%_62%,rgba(38,49,60,0.13),transparent_46%)]" />
+  </>
+);
+
 const Index = () => {
   const heroRef = useRef<HTMLDivElement>(null);
 
@@ -137,7 +445,7 @@ const Index = () => {
       <Navbar />
 
       {/* HERO — immediate, no lazy loading */}
-      <section ref={heroRef} className="relative min-h-[100dvh] overflow-hidden bg-black">
+      <section ref={heroRef} className="relative min-h-[100dvh] overflow-hidden bg-black md:min-h-[132dvh]">
         <video
           className="absolute inset-0 h-full w-full object-cover object-[62%_center] md:object-[64%_center]"
           autoPlay
@@ -151,7 +459,7 @@ const Index = () => {
         </video>
 
         <div className="pointer-events-none absolute inset-0 pt-20 md:pt-0">
-          <div className="mx-auto flex min-h-[100dvh] max-w-[1480px] items-end justify-center px-4 pb-10 sm:px-6 md:items-center md:justify-end md:px-6 md:pb-0 lg:px-8 xl:translate-x-8 2xl:translate-x-12">
+          <div className="mx-auto flex min-h-[100dvh] max-w-[1480px] items-end justify-center px-4 pb-10 sm:px-6 md:min-h-[132dvh] md:items-center md:justify-end md:px-6 md:pb-[20vh] lg:px-8 xl:translate-x-8 2xl:translate-x-12">
             <motion.div
               initial={{ opacity: 0, y: 18, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -191,132 +499,58 @@ const Index = () => {
         </div>
       </section>
 
-      {/* MARQUEE TRUST STRIP — lightweight, no lazy needed */}
-      <section className="-mt-24 py-8 md:-mt-32 md:py-12 border-b border-border overflow-hidden relative z-10">
-        <SectionReveal>
-          <p className="text-center text-[9px] md:text-xs uppercase tracking-[0.2em] text-muted-foreground mb-5 md:mb-8">
-            Trusted by forward-thinking businesses
-          </p>
-        </SectionReveal>
-        <Marquee speed={35} className="opacity-30 mb-3">
-          {trustNames.map((name) => (
-            <span key={name} className="font-display font-semibold text-lg md:text-2xl text-foreground px-4">{name}</span>
-          ))}
-        </Marquee>
-        <Marquee speed={40} reverse className="opacity-20">
-          {trustNames.map((name) => (
-            <span key={`r-${name}`} className="font-display font-semibold text-sm md:text-lg text-foreground px-4">{name}</span>
-          ))}
-        </Marquee>
-      </section>
+      <div className="relative overflow-hidden bg-[#687079] text-white">
+        <GrayStageBackdrop />
 
-      {/* WHAT WE BUILD — Scroll Showcase (preloaded 300px before) */}
-      <LazySection rootMargin="400px" minHeight="800vh">
-        <section className="pt-14 md:pt-32">
-          <div className="max-w-7xl mx-auto px-5 md:section-padding">
-            <SectionReveal>
-              <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">What We Build</p>
-              <h2 className="font-display font-bold text-xl md:text-5xl leading-tight max-w-3xl mb-3 md:mb-6">
-                A Complete System, <span className="gradient-text">Not Scattered Tools</span>
-              </h2>
-              <p className="text-xs md:text-lg text-muted-foreground max-w-2xl mb-8 md:mb-16 hidden md:block">
-                Every service connects. Your AI agent books appointments. Your chatbot captures leads. Your website converts. Your backend keeps it all running.
-              </p>
-            </SectionReveal>
-          </div>
-        </section>
+        <HeroScrollTransition />
 
-        <ScrollShowcase />
+        <DarkStageShowcase />
 
-        <section className="pb-14 md:pb-32">
-          <div className="max-w-7xl mx-auto px-5 md:section-padding">
-            <SectionReveal delay={0.2}>
-              <div className="mt-8 md:mt-16 relative rounded-xl md:rounded-2xl border border-border p-5 md:p-10 overflow-hidden" style={{ background: "hsl(var(--card))" }}>
-                <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 50% 50%, hsl(var(--primary) / 0.03), transparent 70%)" }} />
-                <div className="relative z-10">
-                  <h4 className="font-display font-semibold text-sm md:text-lg mb-4 md:mb-6 text-center">Everything Connects</h4>
-                  <div className="grid grid-cols-3 md:flex md:flex-wrap md:justify-center gap-3 md:gap-4">
-                    {[
-                      { icon: Phone, label: "AI Calls" },
-                      { icon: Bot, label: "Chatbot" },
-                      { icon: Globe, label: "Website" },
-                      { icon: CalendarCheck, label: "Booking" },
-                      { icon: CreditCard, label: "Payments" },
-                      { icon: Database, label: "Backend" },
-                      { icon: BarChart3, label: "Analytics" },
-                    ].map((item, i) => (
-                      <motion.div
-                        key={item.label}
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: i * 0.06 }}
-                        whileHover={{ scale: 1.1, transition: { duration: 0.2 } }}
-                        className="flex flex-col items-center gap-1.5 md:gap-2 p-2 md:p-4 cursor-default"
-                      >
-                        <div className="w-10 h-10 md:w-14 md:h-14 rounded-xl md:rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-                          <item.icon className="w-4 h-4 md:w-6 md:h-6 text-primary" />
-                        </div>
-                        <span className="text-[9px] md:text-xs font-medium text-muted-foreground">{item.label}</span>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </SectionReveal>
-          </div>
-        </section>
-      </LazySection>
-
-      {/* BUSINESS PAIN — lazy loaded */}
-      <LazySection rootMargin="300px" minHeight="400px">
-        <section className="py-14 md:py-32 surface-elevated relative overflow-hidden">
-          <GradientMesh />
-          <div className="max-w-7xl mx-auto px-5 md:section-padding relative z-10">
-            <SectionReveal>
-              <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Why It Matters</p>
-              <h2 className="font-display font-bold text-xl md:text-5xl leading-tight max-w-3xl mb-8 md:mb-16">
-                Every Missed Call Is a <span className="text-destructive">Missed Sale</span>
-              </h2>
-            </SectionReveal>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
-              {painPoints.map((pp, i) => (
-                <SectionReveal key={i} delay={i * 0.05}>
-                  <PainPointCard
-                    icon={pp.icon}
-                    pain={pp.pain}
-                    solution={pp.solution}
-                    visual={<pp.Visual />}
-                  />
-                </SectionReveal>
-              ))}
-            </div>
-          </div>
-        </section>
-      </LazySection>
-
-      {/* AI CALLING AGENT SHOWCASE — lazy loaded */}
-      <LazySection rootMargin="300px" minHeight="500px">
-        <section className="py-14 md:py-32 relative">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] md:w-[500px] md:h-[500px] rounded-full bg-primary/3 blur-[100px] md:blur-[150px]" />
-          <div className="max-w-7xl mx-auto px-5 md:section-padding relative z-10">
-            <SectionReveal>
-              <div className="text-center mb-8 md:mb-16">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-primary/20 bg-primary/5 mb-4 md:mb-6">
-                  <Headphones className="w-3 h-3 text-primary" />
-                  <span className="text-[10px] md:text-xs font-medium text-primary">Featured Product</span>
-                </div>
-                <h2 className="font-display font-bold text-xl md:text-5xl leading-tight max-w-3xl mx-auto mb-3 md:mb-6">
-                  AI Calling Agents That <span className="gradient-text">Work While You Sleep</span>
+        {/* BUSINESS PAIN */}
+        <section className="relative overflow-hidden py-14 md:py-32">
+            <div className="max-w-7xl mx-auto px-5 md:section-padding relative z-10">
+              <SectionReveal>
+                <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-white/58 mb-2 md:mb-4">Why It Matters</p>
+                <h2 className="font-display font-bold text-xl md:text-5xl leading-tight max-w-3xl mb-8 md:mb-16 text-white">
+                  Every Missed Call Is a <span className="text-white/72">Missed Sale</span>
                 </h2>
+              </SectionReveal>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
+                {painPoints.map((pp, i) => (
+                  <SectionReveal key={i} delay={i * 0.05}>
+                    <PainPointCard
+                      icon={pp.icon}
+                      pain={pp.pain}
+                      solution={pp.solution}
+                      visual={<pp.Visual />}
+                    />
+                  </SectionReveal>
+                ))}
               </div>
-            </SectionReveal>
+            </div>
+          </section>
+
+        {/* AI CALLING AGENT SHOWCASE — lazy loaded */}
+        <LazySection rootMargin="300px" minHeight="500px">
+          <section className="py-14 md:py-32 relative">
+            <div className="max-w-7xl mx-auto px-5 md:section-padding relative z-10">
+              <SectionReveal>
+                <div className="text-center mb-8 md:mb-16">
+                  <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-white/18 bg-white/10 mb-4 md:mb-6">
+                    <Headphones className="w-3 h-3 text-white/70" />
+                    <span className="text-[10px] md:text-xs font-medium text-white/70">Featured Product</span>
+                  </div>
+                  <h2 className="font-display font-bold text-xl md:text-5xl leading-tight max-w-3xl mx-auto mb-3 md:mb-6 text-white">
+                    AI Calling Agents That <span className="text-white/72">Work While You Sleep</span>
+                  </h2>
+                </div>
+              </SectionReveal>
 
             <div className="grid md:grid-cols-2 gap-4 md:gap-8">
               {/* Inbound */}
               <SectionReveal>
                 <TiltCard>
-                  <div className="rounded-xl md:rounded-2xl border border-border p-4 md:p-8 h-full" style={{ background: "hsl(var(--card))" }}>
+                  <div className="h-full rounded-xl border border-white/35 bg-white/55 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.38)] md:rounded-2xl md:p-8">
                     <InboundCallingConsole />
                   </div>
                 </TiltCard>
@@ -325,7 +559,7 @@ const Index = () => {
               {/* Outbound */}
               <SectionReveal delay={0.15}>
                 <TiltCard>
-                  <div className="rounded-xl md:rounded-2xl border border-border p-4 md:p-8 h-full" style={{ background: "hsl(var(--card))" }}>
+                  <div className="h-full rounded-xl border border-white/35 bg-white/55 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.38)] md:rounded-2xl md:p-8">
                     <OutboundAnalyticsPanel />
                   </div>
                 </TiltCard>
@@ -334,7 +568,7 @@ const Index = () => {
 
             {/* Call flow pipeline */}
             <SectionReveal delay={0.2}>
-              <div className="mt-6 md:mt-16 rounded-xl md:rounded-2xl border border-border p-4 md:p-10 overflow-hidden" style={{ background: "hsl(var(--card))" }}>
+              <div className="mt-6 overflow-hidden rounded-xl border border-white/35 bg-white/55 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.38)] md:mt-16 md:rounded-2xl md:p-10">
                 <h4 className="font-display font-semibold text-xs md:text-lg mb-4 md:mb-8 text-center">How a Call Flows</h4>
                 <div className="flex items-center justify-between gap-1 md:gap-0">
                   {[
@@ -378,13 +612,14 @@ const Index = () => {
             </SectionReveal>
 
             <div className="mt-4 md:mt-8 text-center">
-              <Link to="/ai-calling-agents" className="inline-flex items-center gap-2 text-xs md:text-sm font-medium text-primary hover:underline group">
+              <Link to="/ai-calling-agents" className="inline-flex items-center gap-2 text-xs md:text-sm font-medium text-white/80 hover:underline group">
                 Explore AI Calling Agents <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
           </div>
         </section>
       </LazySection>
+      </div>
 
       {/* CHATBOTS & AUTOMATION — lazy loaded */}
       <LazySection rootMargin="300px" minHeight="400px">

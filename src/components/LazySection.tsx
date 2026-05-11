@@ -17,7 +17,11 @@ const LazySection = ({
   fallback,
 }: LazySectionProps) => {
   const ref = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(() => (
+    typeof window !== "undefined" &&
+    window.innerWidth >= 1024 &&
+    window.matchMedia("(pointer: fine)").matches
+  ));
 
   useEffect(() => {
     const el = ref.current;

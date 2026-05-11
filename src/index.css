@@ -60,12 +60,20 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   * {
     @apply border-border;
   }
 
   body {
     @apply bg-background text-foreground font-body antialiased;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    overscroll-behavior-y: none;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -146,6 +154,31 @@
     color: hsl(var(--text-tertiary));
   }
 
+  .service-cut-text {
+    --cut-color: #02040a;
+    font-family: "Outfit", sans-serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: -0.07em;
+    background-image:
+      linear-gradient(
+        to bottom,
+        var(--cut-color) 0%,
+        var(--cut-color) 34%,
+        transparent 34%,
+        transparent 43%,
+        var(--cut-color) 43%,
+        var(--cut-color) 64%,
+        transparent 64%,
+        transparent 72%,
+        var(--cut-color) 72%,
+        var(--cut-color) 100%
+      );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
   .bg-glow {
     background-image: var(--gradient-glow);
   }
@@ -189,7 +222,7 @@
   .delay-500 { animation-delay: 500ms; }
 }
 
-/* Aurora background — CSS only, GPU-composited */
+/* Aurora background — static to avoid full-viewport repaints during scroll */
 @keyframes aurora-shift {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -272,11 +305,11 @@
     hsl(215 10% 97%) 75%,
     hsl(0 0% 99%) 100%
   );
-  background-size: 400% 400%;
-  animation: aurora-shift 25s ease infinite;
+  background-size: 100% 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
   .aurora-bg { animation: none; }
   .zap-line { animation: none; }
   .hero-signal-core,
