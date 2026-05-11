@@ -189,40 +189,32 @@ const AnimatedHeroHeadline = () => {
   );
 };
 
-interface StackedDeckCardProps {
+interface RisingCardProps {
   card: (typeof transitionCards)[number];
   index: number;
   total: number;
   progress: MotionValue<number>;
 }
 
-// Per-card tilt locked once landed; offsets so previous tilt peeks under the next card.
-const TILTS = [-3, 2, -2];
-const PEEK_OFFSETS = [0, 18, 36];
+const RisingCard = ({ card, index, total, progress }: RisingCardProps) => {
+  // Each card enters in its own staggered window. Apple-style: slide up from below + scale up.
+  const headRoom = 0.08;
+  const tail = 0.12;
+  const usable = 1 - headRoom - tail;
+  const stagger = usable / (total + 0.6);
+  const enterStart = headRoom + stagger * index;
+  const enterEnd = enterStart + stagger * 1.4;
 
-const StackedDeckCard = ({ card, index, total, progress }: StackedDeckCardProps) => {
-  const headRoom = 0.06;
-  const slot = (1 - headRoom - 0.12) / total;
-  const enterStart = headRoom + slot * index;
-  const enterEnd = enterStart + slot * 0.75;
-
-  const y = useTransform(progress, [enterStart, enterEnd], ["72vh", "0vh"]);
-  const scale = useTransform(progress, [enterStart, enterEnd], [0.92, 1]);
-  const opacity = useTransform(progress, [enterStart, enterStart + slot * 0.25], [0, 1]);
+  const y = useTransform(progress, [enterStart, enterEnd], ["88vh", "0vh"]);
+  const scale = useTransform(progress, [enterStart, enterEnd], [0.78, 1]);
+  const opacity = useTransform(progress, [enterStart, enterStart + stagger * 0.35], [0, 1]);
 
   return (
     <motion.article
-      className="absolute left-1/2 top-1/2 w-[min(34rem,82vw)] -translate-x-1/2 -translate-y-1/2 transform-gpu overflow-hidden rounded-[1.35rem] border border-white/36 bg-white/58 p-3 text-left shadow-[0_30px_95px_rgba(24,31,39,0.28),inset_0_1px_0_rgba(255,255,255,0.64)] backdrop-blur-xl will-change-transform"
-      style={{
-        y,
-        scale,
-        opacity,
-        rotate: TILTS[index % TILTS.length],
-        zIndex: 10 + index,
-        marginTop: PEEK_OFFSETS[index] ?? 0,
-      }}
+      className="relative w-full transform-gpu overflow-hidden rounded-[1.35rem] border border-white/45 bg-white/65 p-3 text-left shadow-[0_30px_95px_rgba(24,31,39,0.22),inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-xl will-change-transform"
+      style={{ y, scale, opacity }}
     >
-      <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/42 bg-[#d5dbe0] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
+      <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/45 bg-[#d5dbe0] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
         {card.imageSrc ? (
           <img
             src={card.imageSrc}
@@ -239,7 +231,7 @@ const StackedDeckCard = ({ card, index, total, progress }: StackedDeckCardProps)
             }} />
           </div>
         )}
-        <div className="absolute right-3 top-3 rounded-full border border-white/45 bg-white/62 px-3 py-1 text-sm font-semibold text-[#101827] shadow-[0_10px_30px_rgba(24,31,39,0.12)] backdrop-blur-xl">
+        <div className="absolute right-3 top-3 rounded-full border border-white/45 bg-white/70 px-3 py-1 text-sm font-semibold text-[#101827] shadow-[0_10px_30px_rgba(24,31,39,0.12)] backdrop-blur-xl">
           {card.value}
         </div>
       </div>
@@ -268,38 +260,40 @@ const HeroScrollTransition = () => {
     mass: 0.5,
     restDelta: 0.001,
   });
-  const headOpacity = useTransform(smooth, [0, 0.04, 0.1], [0, 1, 1]);
-  const headY = useTransform(smooth, [0, 0.1], [18, 0]);
+  const headOpacity = useTransform(smooth, [0, 0.05, 0.18], [0, 1, 1]);
+  const headY = useTransform(smooth, [0, 0.18], [18, 0]);
 
   return (
     <section
       ref={transitionRef}
-      className="relative hidden h-[360vh] md:block"
-      aria-label="Stacked card deck"
+      className="relative hidden h-[260vh] md:block"
+      aria-label="Rising cards showcase"
     >
-      <div className="sticky top-0 flex h-[100dvh] w-full items-center justify-center overflow-hidden">
+      <div className="sticky top-0 flex h-[100dvh] w-full flex-col items-center justify-center overflow-hidden bg-[hsl(var(--background))] px-6">
         <motion.div
-          className="pointer-events-none absolute left-1/2 top-[12%] z-[5] -translate-x-1/2 max-w-2xl px-6 text-center transform-gpu"
+          className="pointer-events-none mb-10 max-w-2xl text-center transform-gpu"
           style={{ opacity: headOpacity, y: headY }}
         >
-          <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.42em] text-white/58">
+          <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.42em] text-foreground/55">
             Revenue Systems
           </p>
-          <div className="mx-auto mb-4 h-px w-40 bg-gradient-to-r from-transparent via-white/48 to-transparent" />
-          <p className="font-display text-2xl font-semibold leading-tight text-white md:text-4xl">
+          <div className="mx-auto mb-4 h-px w-32 bg-gradient-to-r from-transparent via-foreground/30 to-transparent" />
+          <p className="font-display text-2xl font-semibold leading-tight text-foreground md:text-4xl">
             The quiet layer that catches what your team misses.
           </p>
         </motion.div>
 
-        {transitionCards.map((card, index) => (
-          <StackedDeckCard
-            key={card.label}
-            card={card}
-            index={index}
-            total={transitionCards.length}
-            progress={smooth}
-          />
-        ))}
+        <div className="grid w-full max-w-6xl grid-cols-3 items-end gap-4 md:gap-5">
+          {transitionCards.map((card, index) => (
+            <RisingCard
+              key={card.label}
+              card={card}
+              index={index}
+              total={transitionCards.length}
+              progress={smooth}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );
