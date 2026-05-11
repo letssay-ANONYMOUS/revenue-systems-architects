@@ -16,6 +16,7 @@ import GradientMesh from "@/components/GradientMesh";
 import TiltCard from "@/components/TiltCard";
 import LazySection from "@/components/LazySection";
 import ProcessGraph from "@/components/ProcessGraph";
+import BandReveal from "@/components/BandReveal";
 import InboundCallingConsole from "@/components/calling/InboundCallingConsole";
 import OutboundAnalyticsPanel from "@/components/calling/OutboundAnalyticsPanel";
 import PainPointCard from "@/components/painpoints/PainPointCard";
@@ -188,24 +189,38 @@ const AnimatedHeroHeadline = () => {
   );
 };
 
-interface RisingShowcaseCardProps {
+interface StackedDeckCardProps {
   card: (typeof transitionCards)[number];
   index: number;
+  total: number;
   progress: MotionValue<number>;
 }
 
-const RisingShowcaseCard = ({ card, index, progress }: RisingShowcaseCardProps) => {
-  const start = 0.08 + index * 0.035;
-  const settled = 0.2 + index * 0.035;
-  const opacity = useTransform(progress, [start, settled], [0, 1]);
-  const y = useTransform(progress, [start, settled, 0.78], [72, 0, -14]);
-  const scale = useTransform(progress, [start, settled], [0.9, 1]);
-  const rotateX = useTransform(progress, [start, settled], [9, 0]);
+// Per-card tilt locked once landed; offsets so previous tilt peeks under the next card.
+const TILTS = [-3, 2, -2];
+const PEEK_OFFSETS = [0, 18, 36];
+
+const StackedDeckCard = ({ card, index, total, progress }: StackedDeckCardProps) => {
+  const headRoom = 0.06;
+  const slot = (1 - headRoom - 0.12) / total;
+  const enterStart = headRoom + slot * index;
+  const enterEnd = enterStart + slot * 0.75;
+
+  const y = useTransform(progress, [enterStart, enterEnd], ["72vh", "0vh"]);
+  const scale = useTransform(progress, [enterStart, enterEnd], [0.92, 1]);
+  const opacity = useTransform(progress, [enterStart, enterStart + slot * 0.25], [0, 1]);
 
   return (
     <motion.article
-      className="relative overflow-hidden rounded-[1.35rem] border border-white/36 bg-white/58 p-3 text-left shadow-[0_30px_95px_rgba(24,31,39,0.2),inset_0_1px_0_rgba(255,255,255,0.64)] backdrop-blur-xl"
-      style={{ opacity, y, scale, rotateX, transformPerspective: 900 }}
+      className="absolute left-1/2 top-1/2 w-[min(34rem,82vw)] -translate-x-1/2 -translate-y-1/2 transform-gpu overflow-hidden rounded-[1.35rem] border border-white/36 bg-white/58 p-3 text-left shadow-[0_30px_95px_rgba(24,31,39,0.28),inset_0_1px_0_rgba(255,255,255,0.64)] backdrop-blur-xl will-change-transform"
+      style={{
+        y,
+        scale,
+        opacity,
+        rotate: TILTS[index % TILTS.length],
+        zIndex: 10 + index,
+        marginTop: PEEK_OFFSETS[index] ?? 0,
+      }}
     >
       <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/42 bg-[#d5dbe0] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
         {card.imageSrc ? (
@@ -222,9 +237,6 @@ const RisingShowcaseCard = ({ card, index, progress }: RisingShowcaseCardProps) 
               backgroundImage: "linear-gradient(rgba(255,255,255,0.45) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.45) 1px, transparent 1px)",
               backgroundSize: "34px 34px",
             }} />
-            <div className="absolute bottom-4 left-4 right-4 rounded-full border border-white/45 bg-white/42 px-4 py-2 text-[9px] font-semibold uppercase tracking-[0.24em] text-[#2e3842]/58 backdrop-blur-md">
-              Image slot
-            </div>
           </div>
         )}
         <div className="absolute right-3 top-3 rounded-full border border-white/45 bg-white/62 px-3 py-1 text-sm font-semibold text-[#101827] shadow-[0_10px_30px_rgba(24,31,39,0.12)] backdrop-blur-xl">
@@ -248,99 +260,47 @@ const HeroScrollTransition = () => {
   const transitionRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: transitionRef,
-    offset: ["start 106%", "end 34%"],
+    offset: ["start start", "end end"],
   });
-  const revealClip = useTransform(scrollYProgress, [0, 0.12, 0.34, 1], ["inset(100% 50% 0% 50% round 999px)", "inset(58% 22% 0% 22% round 44px)", "inset(0% 0% 0% 0% round 0px)", "inset(0% 0% 0% 0% round 0px)"]);
-  const revealY = useTransform(scrollYProgress, [0, 0.34, 1], [60, 0, 0]);
-  const coverClip = useTransform(scrollYProgress, [0, 0.06, 0.18, 1], ["inset(0% 0% 0% 0%)", "inset(0% 0% 36% 0%)", "inset(0% 0% 100% 0%)", "inset(0% 0% 100% 0%)"]);
-  const contentOpacity = useTransform(scrollYProgress, [0.04, 0.16, 0.42], [0, 1, 0]);
-  const contentY = useTransform(scrollYProgress, [0.04, 0.42], [18, -18]);
-  const cardsY = useTransform(scrollYProgress, [0.08, 0.3, 0.78], ["24vh", "0vh", "-32vh"]);
-  const sparkOpacity = useTransform(scrollYProgress, [0.12, 0.3, 0.52], [0, 0.82, 0]);
-  const sparkScale = useTransform(scrollYProgress, [0.12, 0.3, 0.52], [0.82, 1, 1.12]);
+  const smooth = useSpring(scrollYProgress, {
+    stiffness: 90,
+    damping: 28,
+    mass: 0.5,
+    restDelta: 0.001,
+  });
+  const headOpacity = useTransform(smooth, [0, 0.04, 0.1], [0, 1, 1]);
+  const headY = useTransform(smooth, [0, 0.1], [18, 0]);
 
   return (
     <section
       ref={transitionRef}
-      className="relative hidden h-[245vh] overflow-hidden md:block"
-      aria-label="Scroll transition"
+      className="relative hidden h-[360vh] md:block"
+      aria-label="Stacked card deck"
     >
-      <motion.div
-        className="sticky top-0 flex h-[100dvh] items-center justify-center overflow-hidden"
-      >
+      <div className="sticky top-0 flex h-[100dvh] w-full items-center justify-center overflow-hidden">
         <motion.div
-          className="absolute inset-0"
-          style={{
-            clipPath: revealClip,
-            y: revealY,
-          }}
+          className="pointer-events-none absolute left-1/2 top-[12%] z-[5] -translate-x-1/2 max-w-2xl px-6 text-center transform-gpu"
+          style={{ opacity: headOpacity, y: headY }}
         >
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(255,255,255,0.38),transparent_42%),linear-gradient(115deg,rgba(255,255,255,0.1),transparent_38%,rgba(255,255,255,0.12)_58%,transparent_78%)]" />
-          <div
-            className="absolute inset-0 opacity-[0.14]"
-            style={{
-              backgroundImage: "linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px)",
-              backgroundSize: "72px 72px",
-              maskImage: "linear-gradient(180deg, transparent, black 24%, black 76%, transparent)",
-              WebkitMaskImage: "linear-gradient(180deg, transparent, black 24%, black 76%, transparent)",
-            }}
-          />
-          {[
-            ["18%", "24%", "0.44rem"],
-            ["73%", "29%", "0.36rem"],
-            ["61%", "68%", "0.28rem"],
-          ].map(([left, top, size]) => (
-            <motion.span
-              key={`${left}-${top}`}
-              className="absolute rounded-full bg-white"
-              style={{
-                left,
-                top,
-                width: size,
-                height: size,
-                opacity: sparkOpacity,
-                scale: sparkScale,
-                boxShadow: "0 0 18px rgba(255,255,255,0.52)",
-              }}
-            />
-          ))}
-        </motion.div>
-
-        <motion.div
-          className="pointer-events-none relative z-10 max-w-2xl px-6 text-center"
-          style={{ opacity: contentOpacity, y: contentY }}
-        >
-          <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.42em] text-white/58">
+          <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.42em] text-white/58">
             Revenue Systems
           </p>
-          <div className="mx-auto mb-6 h-px w-40 bg-gradient-to-r from-transparent via-white/48 to-transparent" />
-          <p className="font-display text-3xl font-semibold leading-tight text-white md:text-5xl">
+          <div className="mx-auto mb-4 h-px w-40 bg-gradient-to-r from-transparent via-white/48 to-transparent" />
+          <p className="font-display text-2xl font-semibold leading-tight text-white md:text-4xl">
             The quiet layer that catches what your team misses.
           </p>
         </motion.div>
 
-        <div className="pointer-events-none absolute inset-x-0 top-[34%] z-10 flex justify-center px-8">
-          <motion.div
-            className="grid w-[min(72rem,88vw)] grid-cols-3 gap-5"
-            style={{ y: cardsY }}
-          >
-            {transitionCards.map((card, index) => (
-              <RisingShowcaseCard
-                key={card.label}
-                card={card}
-                index={index}
-                progress={scrollYProgress}
-              />
-            ))}
-          </motion.div>
-        </div>
-
-        <motion.div
-          className="pointer-events-none absolute inset-0 z-[5] bg-background"
-          style={{ clipPath: coverClip }}
-          aria-hidden="true"
-        />
-      </motion.div>
+        {transitionCards.map((card, index) => (
+          <StackedDeckCard
+            key={card.label}
+            card={card}
+            index={index}
+            total={transitionCards.length}
+            progress={smooth}
+          />
+        ))}
+      </div>
     </section>
   );
 };
@@ -502,6 +462,8 @@ const Index = () => {
         <GrayStageBackdrop />
 
         <HeroScrollTransition />
+
+        <BandReveal />
 
         <DarkStageShowcase />
 

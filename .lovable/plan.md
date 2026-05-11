@@ -1,60 +1,76 @@
-# Pain Points Section: Split-Card Redesign with 6 Animated Micro-UIs
+## Two effects from your video, applied cleanly
 
-Replace the flat 3×2 grid in the "Every Missed Call Is a Missed Sale" section with diagonal split cards, each containing a unique animated mini-UI on the "fix" side that visually demonstrates the transformation.
+**1. Stacked card deck (replaces the current "rising cards" under the hero)**
+Cards become a sticky deck. Each card slides up into the viewport as you scroll, lands at center with a subtle rotation, then the next card slides up over it — previous cards stay visible underneath, peeking out with their tilt. Same content as today (Calls captured / Bookings lifted / Admin reduced), only the motion changes.
 
-## Visual structure (per card)
+**2. B&W liquid-glass band reveal (new section between hero-deck and DarkStageShowcase)**
+Three horizontal glass bands stack vertically and slide up from below in a staggered sequence as you scroll, like blinds closing upward. Pure black & white liquid-glass styling (frosted dark surfaces, inner highlights, soft sheen). Easy to upgrade to refractive 3D liquid glass later without changing structure.
+
+Nothing else on the page is touched.
+
+## Implementation
+
+### Part 1 — Stacked deck
+
+File: `src/pages/Index.tsx` → rewrite `HeroScrollTransition` and `RisingShowcaseCard`.
+
+- Section height `~360vh`, one sticky `100dvh` stage inside
+- Cards rendered absolutely-centered, stacked in z-order
+- Per-card scroll range: card N active in `[N/3, (N+1)/3]` of `scrollYProgress`
+- Card animation in its range:
+  - `y`: `70vh → 0`
+  - `scale`: `0.92 → 1`
+  - `rotate`: locked tilt per card (`-3°`, `+2°`, `-2°`)
+  - `opacity`: `0 → 1`
+- Once landed, card stays pinned; next card slides up on top, slightly offset down so previous tilt peeks
+- `useSpring` (stiffness 90, damping 28, mass 0.5, restDelta 0.001) wrapping `scrollYProgress` for smoothness
+- All transforms GPU-only (`transform-gpu`, `will-change: transform`)
+- Headline ("The quiet layer…") fades in/out as today
+- Off-brand orange grid overlay removed; keeps the existing glass card styling
+
+### Part 2 — Band reveal
+
+New file: `src/components/BandReveal.tsx`. Inserted in `Index.tsx` between `<HeroScrollTransition />` and `<DarkStageShowcase />`.
+
+- Section height `~220vh`, sticky `100dvh` inner stage
+- 3 bands stacked vertically, each `33.34dvh`
+- Each band starts at `y: 100%`, slides to its slot
+- Stagger: band 1 `[0, 0.35]`, band 2 `[0.18, 0.55]`, band 3 `[0.36, 0.75]`
+- Spring smoothing on `scrollYProgress` (same constants as above)
+- Band content (placeholders, swappable any time):
+  - 01 — "Answers" / "AI inbound that picks up every call"
+  - 02 — "Automates" / "Workflows that run while you sleep"
+  - 03 — "Accelerates" / "Web & apps engineered to convert"
+
+B&W liquid-glass styling per band:
+- Surface: `rgba(12,14,18,0.78)` + `backdrop-filter: blur(28px) saturate(140%)`
+- Inner highlight: `inset 0 1px 0 rgba(255,255,255,0.18)`
+- Bottom hairline: `inset 0 -1px 0 rgba(255,255,255,0.06)`
+- Top sheen: `linear-gradient(180deg, rgba(255,255,255,0.10), transparent 40%)`
+- FilmGrain (existing component) at low opacity for depth
+- Serif white headline, `white/55` eyebrow, no color
+
+### Performance & safety
+
+- Both sections `hidden md:block` — mobile keeps a static fallback (cards as the existing grid; band reveal omitted)
+- One `useScroll` per section, springs reused across children
+- No layout thrash: only `transform` + `opacity` animated
+- No new dependencies
+
+### Final page order
 
 ```text
-┌─────────────────────────────────┐
-│  [icon] Missed calls            │  ← pain side: muted, line-through, faint red wash
-│  - - - - - - - - - - - - - - -  │  ← hairline diagonal divider (~115°)
-│  [icon] AI answers every call   │  ← fix label: ink, primary blue accent
-│                                 │
-│  ┌───────────────────────────┐  │
-│  │   [animated micro-UI]     │  │  ← ~80px tall, unique per card, loops
-│  └───────────────────────────┘  │
-└─────────────────────────────────┘
+Hero
+HeroScrollTransition  (sticky stacked deck)
+BandReveal            (NEW — B&W liquid glass)
+DarkStageShowcase
+Pain points grid
+… rest of page
 ```
 
-Card stays inside `TiltCard` + `SectionReveal`, keeps `rounded-2xl`, `border-border`, `hsl(var(--card))` bg. Pain row uses existing strikethrough styling. Fix row gains a small inset surface beneath it that holds the micro-UI.
+### Files touched
 
-## The 6 micro-UIs (all pure SVG/CSS, no images, no new deps)
+- `src/pages/Index.tsx` — rewrite `HeroScrollTransition` + `RisingShowcaseCard`; insert `<BandReveal />`
+- `src/components/BandReveal.tsx` — new
 
-| # | Card | Micro-UI behavior |
-|---|---|---|
-| 1 | Missed calls → AI answers | Inbound call ring with pulsing concentric circles, "Answered · 0.4s" label fades in |
-| 2 | Slow responses → Instant voice & chat | Two chat bubbles: typing dots → "Sent" check, with a tiny "<1s" timestamp |
-| 3 | No-show chaos → Automated reminders | Mini calendar row with 3 slots; SMS ping icons fly out → slots flip to green check |
-| 4 | Weak web presence → Premium conversion site | Lighthouse-style score dial: counts 32 → 98, ring fills from red arc to primary |
-| 5 | Manual admin → Automated workflows | 4 workflow nodes connected by lines; pulse travels through them, each lights up sequentially |
-| 6 | Fragmented tools → One connected system | 5 small app dots scattered → snap into a hub-and-spoke with lines drawing between them |
-
-Each loops on a 3–4s cycle. All use `whileInView` (once: true) for entry, then a single CSS or framer-motion loop. Reduced-motion: freeze on the final "fixed" frame.
-
-## Style rules
-
-- Pain side: `text-muted-foreground`, opacity reduced, `bg-destructive/4` wash on top half only
-- Fix side: full ink, primary blue accents on micro-UI strokes/fills
-- Diagonal divider: 1px gradient from `destructive/20` → `primary/30` at ~115° (replaces current horizontal divider)
-- Card hover: pain side dims to 40%, fix micro-UI plays one accelerated cycle
-- Card height equalizes via `h-full` + flex column
-
-## Mobile (≤md)
-
-- Keep 2-column grid (matches current layout)
-- Micro-UI shrinks to ~56px tall
-- Diagonal divider reverts to horizontal hairline (cleaner at small sizes)
-- Animations still play (CSS-only, cheap)
-
-## Files
-
-- **New:** `src/components/painpoints/PainPointCard.tsx` — wraps the split layout, takes `pain`, `solution`, `icon`, and a `visual` slot
-- **New:** `src/components/painpoints/visuals/` — 6 small components: `MissedCallVisual.tsx`, `InstantReplyVisual.tsx`, `RemindersVisual.tsx`, `LighthouseVisual.tsx`, `WorkflowNodesVisual.tsx`, `ConnectedToolsVisual.tsx`
-- **Edit:** `src/pages/Index.tsx` — replace lines ~275–300 (the `painPoints.map` block) with new card + visual mapping
-- **Edit:** `src/index.css` — add 2–3 small `@keyframes` (pulse-ring, draw-line, dial-fill) + reduced-motion guards
-
-## Out of scope
-
-- Section heading, section spacing, surrounding sections — untouched
-- No new dependencies (Framer Motion + Tailwind cover everything)
-- No copy changes to the 6 pain/solution pairs
+No other files, copy, or sections modified.
