@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { motion, useScroll, useTransform, useSpring, type MotionValue } from "framer-motion";
+import { motion, useScroll, useSpring, useTransform, type MotionValue } from "framer-motion";
 import { Target, Layers, Code2, Workflow, Zap, LineChart } from "lucide-react";
 
 const steps = [
@@ -11,25 +11,20 @@ const steps = [
   { step: "06", title: "Launch", desc: "Deploy, monitor, iterate based on real data", icon: Zap },
 ];
 
-const timelineBlue = "#1447d4";
-const timelineDeepBlue = "#082a96";
+const timelineCore = "#fff9fc";
+const timelineGlass = "#f7e3ef";
+const timelineEdge = "#eac0d7";
+const timelineAura = "rgba(255, 224, 240, 0.74)";
+const timelineInk = "#3d3140";
 
 const ProcessGraph = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start 0.85", "end 0.25"],
+    offset: ["start 0.8", "end 0.3"],
   });
 
-  // Spring-smoothed progress — eliminates jitter on both directions
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 110,
-    damping: 26,
-    mass: 0.4,
-    restDelta: 0.001,
-  });
-
-  const lineScaleY = useTransform(smoothProgress, [0, 1], [0, 1]);
+  const lineScaleY = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
   return (
     <section ref={containerRef} className="py-14 md:py-32 surface-elevated relative overflow-hidden">
@@ -59,24 +54,14 @@ const ProcessGraph = () => {
           {/* Vertical track line (background) */}
           <div className="absolute left-5 md:left-1/2 top-0 bottom-0 w-px md:-translate-x-px">
             <div className="w-full h-full bg-border/40" />
-            {/* Animated fill — GPU only (transform), no shadow repaint */}
+            {/* Animated fill */}
             <motion.div
-              className="absolute top-0 left-0 h-full w-full origin-top transform-gpu"
+              className="absolute top-0 left-0 h-full w-full origin-top"
               style={{
                 scaleY: lineScaleY,
-                background: `linear-gradient(180deg, ${timelineBlue}, ${timelineDeepBlue})`,
-                willChange: "transform",
+                background: `linear-gradient(180deg, rgba(255,249,252,0.98), ${timelineGlass} 46%, ${timelineEdge})`,
+                boxShadow: `0 0 18px ${timelineAura}, 0 0 42px rgba(255,245,250,0.42)`,
               }}
-            />
-            {/* Static soft glow behind the line — no per-frame repaint */}
-            <motion.div
-              className="absolute top-0 left-1/2 -translate-x-1/2 w-[6px] h-full origin-top transform-gpu blur-[6px] opacity-60"
-              style={{
-                scaleY: lineScaleY,
-                background: `linear-gradient(180deg, ${timelineBlue}, ${timelineDeepBlue})`,
-                willChange: "transform",
-              }}
-              aria-hidden
             />
           </div>
 
@@ -93,7 +78,7 @@ const ProcessGraph = () => {
                   key={s.step}
                   step={s}
                   isLeft={isLeft}
-                  scrollYProgress={smoothProgress}
+                  scrollYProgress={scrollYProgress}
                   revealStart={revealStart}
                   revealEnd={revealEnd}
                   stepPoint={stepPoint}
@@ -124,44 +109,57 @@ const StepNode = ({ step, isLeft, scrollYProgress, revealStart, revealEnd, stepP
   const activePeak = Math.min(0.96, Math.max(0.04, stepPoint));
   const activeStart = Math.max(0, activePeak - 0.08);
   const activeEnd = Math.min(1, activePeak + 0.1);
-  const dotScale = useTransform(scrollYProgress, [activeStart, activePeak, activeEnd], [0.86, 1.18, 1]);
-  const glowOpacity = useTransform(scrollYProgress, [activeStart, activePeak, activeEnd], [0, 1, 0.22]);
-  const glowScale = useTransform(scrollYProgress, [activeStart, activePeak, activeEnd], [0.7, 1.75, 1.05]);
+  const rawDotScale = useTransform(scrollYProgress, [activeStart, activePeak, activeEnd], [0.9, 1.44, 1]);
+  const dotScale = useSpring(rawDotScale, {
+    stiffness: 170,
+    damping: 18,
+    mass: 0.72,
+    restDelta: 0.001,
+  });
+  const glowOpacity = useTransform(scrollYProgress, [activeStart, activePeak, activeEnd], [0.18, 1, 0.32]);
+  const glowScale = useTransform(scrollYProgress, [activeStart, activePeak, activeEnd], [0.8, 2.05, 1.18]);
+  const dotShadow = useTransform(glowOpacity, (value) => `0 10px ${18 + value * 22}px rgba(177, 129, 158, ${0.12 + value * 0.18}), inset 0 1px 0 rgba(255,255,255,0.94), inset 0 -7px 14px rgba(117,76,101,${0.07 + value * 0.05})`);
 
   return (
     <div className={`relative flex items-start md:items-center gap-6 md:gap-0 ${isLeft ? "md:flex-row" : "md:flex-row-reverse"}`}>
       {/* Dot on the line */}
       <div className="absolute left-5 md:left-1/2 top-1 md:top-1/2 -translate-x-1/2 md:-translate-y-1/2 z-20">
         <motion.div
-          style={{ scale: dotScale, willChange: "transform" }}
-          className="relative transform-gpu"
+          style={{ scale: dotScale }}
+          className="relative flex h-8 w-8 items-center justify-center rounded-full md:h-9 md:w-9"
         >
           <motion.div
             style={{
               opacity: glowOpacity,
               scale: glowScale,
-              background: "radial-gradient(circle, rgba(20, 71, 212, 0.18), rgba(20, 71, 212, 0.08) 34%, transparent 68%)",
-              willChange: "transform, opacity",
+              background: "radial-gradient(circle, rgba(255,255,255,0.76), rgba(255,224,240,0.3) 34%, rgba(234,192,215,0.1) 56%, transparent 74%)",
             }}
-            className="absolute -inset-4 rounded-full transform-gpu"
+            className="absolute -inset-5 rounded-full blur-[0.5px]"
             aria-hidden
           />
-          <div
-            className="w-3 h-3 md:w-4 md:h-4 rounded-full border-2"
+          <motion.div
+            className="relative flex h-6 w-6 items-center justify-center rounded-full border border-white/70 bg-white/28 backdrop-blur-xl md:h-7 md:w-7"
             style={{
-              borderColor: timelineBlue,
-              background: "hsl(var(--background))",
-              boxShadow: "0 0 12px rgba(20, 71, 212, 0.28)",
+              boxShadow: dotShadow,
             }}
-          />
+          >
+            <span className="absolute inset-[2px] rounded-full border border-white/52 bg-[linear-gradient(135deg,rgba(255,255,255,0.88),rgba(247,227,239,0.5)_46%,rgba(255,255,255,0.24))] shadow-[inset_0_1px_0_rgba(255,255,255,0.95),inset_0_-5px_10px_rgba(117,76,101,0.075)]" />
+            <span
+              className="relative h-2.5 w-2.5 rounded-full md:h-3 md:w-3"
+              style={{
+                background: `radial-gradient(circle at 34% 28%, #ffffff 0%, ${timelineCore} 32%, ${timelineGlass} 72%, ${timelineEdge} 100%)`,
+                boxShadow: "0 0 16px rgba(255,249,252,0.92), 0 0 28px rgba(247,227,239,0.54), inset 0 1px 2px rgba(255,255,255,0.96)",
+              }}
+            />
+          </motion.div>
           <motion.div
             style={{
               opacity: glowOpacity,
               scale: glowScale,
-              borderColor: "rgba(20, 71, 212, 0.48)",
-              willChange: "transform, opacity",
+              borderColor: "rgba(255, 225, 242, 0.58)",
+              boxShadow: "0 0 18px rgba(255,224,240,0.46), inset 0 1px 0 rgba(255,255,255,0.7)",
             }}
-            className="absolute -inset-3 rounded-full border transform-gpu"
+            className="absolute -inset-2 rounded-full border"
             aria-hidden
           />
         </motion.div>
@@ -170,19 +168,19 @@ const StepNode = ({ step, isLeft, scrollYProgress, revealStart, revealEnd, stepP
       {/* Content card — mobile: always right side; desktop: alternating */}
       <div className="md:w-1/2" />
       <motion.div
-        style={{ opacity: nodeOpacity, y: nodeY, scale: nodeScale, willChange: "transform, opacity" }}
-        className={`ml-10 md:ml-0 md:w-1/2 transform-gpu ${isLeft ? "md:pr-12 lg:pr-16" : "md:pl-12 lg:pl-16"}`}
+        style={{ opacity: nodeOpacity, y: nodeY, scale: nodeScale }}
+        className={`ml-10 md:ml-0 md:w-1/2 ${isLeft ? "md:pr-12 lg:pr-16" : "md:pl-12 lg:pl-16"}`}
       >
         <div
           className="group rounded-xl md:rounded-2xl border border-border p-4 md:p-6 transition-all duration-500 hover:border-primary/20"
           style={{ background: "hsl(var(--card))" }}
         >
           <div className="flex items-center gap-3 mb-2 md:mb-3">
-            <div className="w-9 h-9 md:w-11 md:h-11 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center group-hover:bg-primary/15 transition-colors">
-              <step.icon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+            <div className="w-9 h-9 md:w-11 md:h-11 rounded-xl border border-white/60 bg-white/38 flex items-center justify-center shadow-[0_12px_34px_rgba(49,64,82,0.08),inset_0_1px_0_rgba(255,255,255,0.78),inset_0_-1px_0_rgba(49,64,82,0.06)] backdrop-blur-xl transition-colors group-hover:bg-white/52">
+              <step.icon className="w-4 h-4 md:w-5 md:h-5" style={{ color: timelineInk }} />
             </div>
             <div>
-              <span className="font-display font-bold text-[10px] md:text-xs text-primary">{step.step}</span>
+              <span className="font-display font-bold text-[10px] md:text-xs" style={{ color: timelineInk }}>{step.step}</span>
               <h3 className="font-display font-semibold text-sm md:text-lg leading-tight">{step.title}</h3>
             </div>
           </div>

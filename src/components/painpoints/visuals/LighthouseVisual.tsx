@@ -1,34 +1,42 @@
 import CountUp from "@/components/CountUp";
 
 const LighthouseVisual = () => {
-  const r = 22;
-  const c = 2 * Math.PI * r;
-  const target = 0.98;
+  const radius = 33;
+  const circumference = 2 * Math.PI * radius;
+
   return (
-    <div className="relative h-full w-full flex items-center justify-between px-3">
-      <div className="relative w-14 h-14 md:w-16 md:h-16">
-        <svg viewBox="0 0 60 60" className="w-full h-full -rotate-90">
-          <circle cx="30" cy="30" r={r} fill="none" stroke="hsl(var(--border))" strokeWidth="4" />
+    <div className="relative flex h-full w-full items-center px-6">
+      <div className="relative mr-8 h-[6.1rem] w-[6.1rem] shrink-0">
+        <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
+          <circle cx="50" cy="50" r={radius} fill="none" stroke="#dbe2f2" strokeWidth="11" strokeLinecap="round" />
           <circle
-            cx="30"
-            cy="30"
-            r={r}
+            cx="50"
+            cy="50"
+            r={radius}
             fill="none"
-            stroke="hsl(var(--primary))"
-            strokeWidth="4"
+            stroke="#6572ed"
+            strokeWidth="11"
             strokeLinecap="round"
-            strokeDasharray={c}
-            strokeDashoffset={c}
-            style={{ animation: "pp-dial 2.4s ease-out forwards", ["--pp-dial-end" as never]: c * (1 - target) }}
+            strokeDasharray={circumference}
+            strokeDashoffset={circumference}
+            style={{ animation: "pp-dial 2.4s ease-out forwards", ["--pp-dial-end" as never]: circumference * 0.1 }}
           />
         </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <CountUp target={98} duration={2.2} className="font-display font-bold text-sm md:text-base text-foreground tabular-nums" />
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <CountUp target={98} duration={2.2} className="font-display text-3xl font-bold leading-none tracking-[-0.06em] text-[#111936] tabular-nums" />
+          <span className="text-[0.62rem] font-medium text-[#65709c]">/100</span>
         </div>
       </div>
-      <div className="flex flex-col items-end gap-0.5">
-        <span className="text-[9px] md:text-[10px] uppercase tracking-wider text-primary font-semibold">Performance</span>
-        <span className="text-[9px] md:text-[10px] text-muted-foreground line-through">was 32</span>
+
+      <div className="h-20 w-px bg-[#d9e1f2]" />
+
+      <div className="ml-7 flex-1">
+        <p className="mb-3 text-[0.64rem] font-bold uppercase tracking-[0.22em] text-[#40518b]">Conversion score</p>
+        <p className="font-display text-2xl font-bold tracking-[-0.04em] text-[#6572ed]">+32%</p>
+        <p className="mt-1 text-[0.64rem] font-semibold uppercase tracking-[0.12em] text-[#65709c]">vs. last 30 days</p>
+        <svg viewBox="0 0 150 40" className="mt-2 h-8 w-full">
+          <path d="M3 30 C20 21 28 30 42 25 C56 19 65 25 78 22 C96 18 103 4 119 8 C132 11 138 2 147 6" fill="none" stroke="#6572ed" strokeWidth="3" strokeLinecap="round" />
+        </svg>
       </div>
     </div>
   );

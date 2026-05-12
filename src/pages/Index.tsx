@@ -1,13 +1,14 @@
 import { Link } from "react-router-dom";
-import { motion, useScroll, useSpring, useTransform, type MotionValue } from "framer-motion";
+import { createPortal } from "react-dom";
+import { AnimatePresence, motion, useScroll, useSpring, useTransform, type MotionValue } from "framer-motion";
 import {
   Phone, CalendarCheck, Globe, Smartphone,
-  Bot, UserCheck, Clock, BarChart3,
-  Zap, Target, Shield, ArrowRight, CheckCircle2, XCircle, TrendingUp,
+  Bot, UserCheck, BarChart3,
+  Zap, Target, Shield, ArrowRight, CheckCircle2, TrendingUp,
   Layers, Database,
-  Headphones, Send
+  Headphones, Send, X, ChevronLeft, ChevronRight
 } from "lucide-react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CTASection from "@/components/CTASection";
@@ -16,7 +17,7 @@ import GradientMesh from "@/components/GradientMesh";
 import TiltCard from "@/components/TiltCard";
 import LazySection from "@/components/LazySection";
 import ProcessGraph from "@/components/ProcessGraph";
-
+import LiquidCaseStudyCards from "@/components/LiquidCaseStudyCards";
 import InboundCallingConsole from "@/components/calling/InboundCallingConsole";
 import OutboundAnalyticsPanel from "@/components/calling/OutboundAnalyticsPanel";
 import PainPointCard from "@/components/painpoints/PainPointCard";
@@ -28,122 +29,58 @@ import WorkflowNodesVisual from "@/components/painpoints/visuals/WorkflowNodesVi
 import ConnectedToolsVisual from "@/components/painpoints/visuals/ConnectedToolsVisual";
 
 const painPoints = [
-  { icon: XCircle, pain: "Missed calls", solution: "AI answers every call", Visual: MissedCallVisual },
-  { icon: Clock, pain: "Slow responses", solution: "Instant voice & chat", Visual: InstantReplyVisual },
-  { icon: XCircle, pain: "No-show chaos", solution: "Automated reminders", Visual: RemindersVisual },
-  { icon: XCircle, pain: "Weak web presence", solution: "Premium conversion site", Visual: LighthouseVisual },
-  { icon: XCircle, pain: "Manual admin", solution: "Automated workflows", Visual: WorkflowNodesVisual },
-  { icon: XCircle, pain: "Fragmented tools", solution: "One connected system", Visual: ConnectedToolsVisual },
-];
-
-const caseStudies = [
-  {
-    title: "Premium Café Chain",
-    tag: "Hospitality",
-    metric: "3x",
-    metricLabel: "More Bookings",
-    result: "95% call answer rate",
-  },
-  {
-    title: "Medical Clinic Network",
-    tag: "Healthcare",
-    metric: "30s",
-    metricLabel: "Response Time",
-    result: "40% fewer missed appointments",
-  },
-  {
-    title: "Real Estate Agency",
-    tag: "Real Estate",
-    metric: "2x",
-    metricLabel: "Qualified Leads",
-    result: "50% faster follow-up",
-  },
+  { pain: "Missed calls", solution: "AI answers every call", caption: "Every call. Every time. Instantly.", Visual: MissedCallVisual },
+  { pain: "Slow responses", solution: "Instant voice & chat", caption: "Respond in seconds. Book more.", Visual: InstantReplyVisual },
+  { pain: "No-show chaos", solution: "Automated reminders", caption: "Reduce no-shows. Increase show-ups.", Visual: RemindersVisual },
+  { pain: "Weak web presence", solution: "Premium conversion site", caption: "Beautiful. Fast. Built to convert.", Visual: LighthouseVisual },
+  { pain: "Manual admin", solution: "Automated workflows", caption: "Save time. Eliminate busywork.", Visual: WorkflowNodesVisual },
+  { pain: "Fragmented tools", solution: "One connected system", caption: "All your tools. One intelligent hub.", Visual: ConnectedToolsVisual },
 ];
 
 const transitionCards = [
   {
     label: "Calls captured",
     value: "97%",
+    valueTone: "gold",
     description: "AI stays on the line when your team is busy.",
     imageSrc: "/calls-captured-card.jpg",
+    detail: "Live conversations stay handled when your team is busy, so the first response never depends on someone being free.",
   },
   {
     label: "Bookings lifted",
     value: "3x",
+    valueTone: "blue",
     description: "Qualified leads move straight into scheduled calls.",
     imageSrc: "/bookings-lifted-card.jpg",
+    detail: "Qualified prospects move directly from conversation to appointment, with the context preserved for your team.",
   },
   {
     label: "Admin reduced",
     value: "60%",
+    valueTone: "blue",
     description: "Follow-ups, reminders, and routing happen in the background.",
-    imageSrc: "",
+    imageSrc: "/admin-reduced-card.jpg",
+    detail: "Follow-ups, reminders, and routing keep moving behind the scenes without adding another manual task list.",
   },
 ];
 
-const serviceStackStages = [
+type TransitionCard = (typeof transitionCards)[number];
+
+const websiteShowcases = [
   {
-    title: "AI Calling",
-    description: "Calls answered, qualified, and booked automatically — so every lead gets handled while your team stays focused.",
+    title: "Real Estate",
+    eyebrow: "Luxury property website",
+    imageSrc: "/real-estate-website-card.jpg",
   },
   {
-    title: "Automation",
-    description: "Workflows, reminders, routing, and follow-ups move in the background without manual handoffs.",
+    title: "Cafe Orders",
+    eyebrow: "Cafe ordering system",
   },
   {
-    title: "Web & Apps",
-    description: "Conversion-focused websites and connected systems turn attention into booked calls and measurable revenue.",
+    title: "Clinics",
+    eyebrow: "Clinic booking system",
   },
 ];
-
-interface SlidingServicePanelProps {
-  stage: typeof serviceStackStages[number];
-  index: number;
-  progress: MotionValue<number>;
-}
-
-const SlidingServicePanel = ({ stage, index, progress }: SlidingServicePanelProps) => {
-  const start = 0.1 + index * 0.23;
-  const settle = start + 0.13;
-  const hold = start + 0.29;
-  const exit = start + 0.45;
-
-  const y = useTransform(progress, [start, settle, hold, exit], ["104vh", "31vh", "24vh", "-34vh"]);
-  const scale = useTransform(progress, [start, settle, exit], [0.985, 1, 1]);
-  const opacity = useTransform(progress, [start - 0.04, start, exit - 0.08, exit], [0, 1, 1, 0.96]);
-
-  return (
-    <motion.article
-      className="absolute inset-x-0 top-0 flex h-[46vh] will-change-transform items-center justify-center overflow-hidden bg-[#02040a] px-6 text-center text-[#6f9bff] shadow-[0_-22px_80px_rgba(0,0,0,0.32)]"
-      style={{
-        y,
-        scale,
-        opacity,
-        zIndex: 20 + index,
-      }}
-    >
-      <div
-        className="absolute inset-0 opacity-[0.12]"
-        style={{
-          backgroundImage: "linear-gradient(rgba(111,155,255,0.28) 1px, transparent 1px), linear-gradient(90deg, rgba(111,155,255,0.28) 1px, transparent 1px)",
-          backgroundSize: "74px 74px",
-          maskImage: "radial-gradient(circle at 50% 48%, black, transparent 74%)",
-          WebkitMaskImage: "radial-gradient(circle at 50% 48%, black, transparent 74%)",
-        }}
-      />
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#2f73ff]/70 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#2f73ff]/35 to-transparent" />
-      <div className="relative z-10 max-w-4xl">
-        <h3 className="service-cut-text text-[clamp(2.7rem,5.4vw,5.8rem)] leading-[0.82] [--cut-color:#1c63ff]">
-          {stage.title}
-        </h3>
-        <p className="mx-auto mt-6 max-w-3xl font-serif text-base leading-snug text-[#9db8ff]">
-          {stage.description}
-        </p>
-      </div>
-    </motion.article>
-  );
-};
 
 const heroHeadlineLines = ["Your Business,", "Answered.", "Automated.", "Accelerated."];
 const heroHeadlineEase = [0.25, 0.46, 0.45, 0.94] as const;
@@ -189,172 +126,459 @@ const AnimatedHeroHeadline = () => {
   );
 };
 
-interface QuietLayerCardProps {
-  card: (typeof transitionCards)[number];
+interface RisingShowcaseCardProps {
+  card: TransitionCard;
   index: number;
+  progress: MotionValue<number>;
+  onSelect: (card: TransitionCard) => void;
 }
 
-const QuietLayerCard = ({ card, index }: QuietLayerCardProps) => (
-  <motion.article
-    initial={{ opacity: 0, y: 36, scale: 0.96 }}
-    whileInView={{ opacity: 1, y: 0, scale: 1 }}
-    viewport={{ once: true, amount: 0.3 }}
-    transition={{ duration: 0.7, delay: index * 0.12, ease: [0.16, 1, 0.3, 1] }}
-    className="group relative overflow-hidden rounded-[1.35rem] border border-white/45 bg-white/70 p-3 text-left shadow-[0_30px_80px_rgba(20,28,38,0.18),inset_0_1px_0_rgba(255,255,255,0.75)] backdrop-blur-xl transform-gpu"
-  >
-    <div className="relative aspect-[16/10] overflow-hidden rounded-2xl border border-white/45 bg-[#d5dbe0] shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]">
-      {card.imageSrc ? (
-        <img
-          src={card.imageSrc}
-          alt=""
-          className="h-full w-full object-cover"
-          loading="lazy"
-          decoding="async"
-        />
-      ) : (
-        <div className="absolute inset-0 overflow-hidden bg-[radial-gradient(circle_at_22%_20%,rgba(255,255,255,0.7),transparent_25%),linear-gradient(135deg,rgba(255,255,255,0.28),rgba(79,91,103,0.2)_48%,rgba(31,40,49,0.18))]">
-          <div className="absolute inset-0 opacity-[0.18]" style={{
-            backgroundImage: "linear-gradient(rgba(255,255,255,0.45) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.45) 1px, transparent 1px)",
-            backgroundSize: "34px 34px",
-          }} />
-        </div>
-      )}
-      <div className="absolute right-3 top-3 rounded-full border border-white/45 bg-white/70 px-3 py-1 text-sm font-semibold text-[#101827] shadow-[0_10px_30px_rgba(24,31,39,0.12)] backdrop-blur-xl">
-        {card.value}
-      </div>
-    </div>
-
-    <div className="px-2 pb-2 pt-5">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#2e3842]/55">
-        {card.label}
-      </p>
-      <p className="mt-3 text-sm leading-relaxed text-[#2e3842]/72">
-        {card.description}
-      </p>
-    </div>
-  </motion.article>
-);
-
-const HeroScrollTransition = () => (
-  <section
-    className="relative px-5 py-20 md:px-10 md:py-32"
-    aria-label="Quiet layer showcase"
-  >
-    <div className="mx-auto max-w-6xl">
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.4 }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="mx-auto mb-12 max-w-3xl text-center md:mb-16"
-      >
-        <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.42em] text-foreground/55">
-          Revenue Systems
-        </p>
-        <div className="mx-auto mb-5 h-px w-32 bg-gradient-to-r from-transparent via-foreground/30 to-transparent" />
-        <h2 className="font-display text-3xl font-semibold leading-tight text-foreground md:text-5xl">
-          The quiet layer that catches what your team misses.
-        </h2>
-      </motion.div>
-
-      <div className="grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
-        {transitionCards.map((card, index) => (
-          <QuietLayerCard key={card.label} card={card} index={index} />
-        ))}
-      </div>
-    </div>
-  </section>
-);
-
-const DarkStageShowcase = () => {
-  const sectionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start 85%", "end 35%"],
-  });
-  const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 28,
-    mass: 0.5,
-    restDelta: 0.001,
-  });
-
-  const headlineY = useTransform(smoothProgress, [0, 1], ["24px", "-24px"]);
-  const headlineOpacity = useTransform(smoothProgress, [0, 0.2, 0.85, 1], [0, 1, 1, 0.85]);
-  const ruleScaleX = useTransform(smoothProgress, [0.05, 0.55], [0, 1]);
-  const copyOpacity = useTransform(smoothProgress, [0.15, 0.45], [0, 1]);
-  const copyY = useTransform(smoothProgress, [0.15, 0.45], [16, 0]);
-  const eyebrowOpacity = useTransform(smoothProgress, [0, 0.25], [0, 1]);
-
-  const stages = serviceStackStages;
+const RisingShowcaseCard = ({ card, index, progress, onSelect }: RisingShowcaseCardProps) => {
+  const start = 0.12 + index * 0.045;
+  const lift = start + 0.16;
+  const settled = start + 0.26;
+  const opacity = useTransform(progress, [start - 0.035, lift], [0, 1]);
+  const x = useTransform(progress, [start, settled], [index === 0 ? -72 : index === 1 ? 0 : 72, 0]);
+  const y = useTransform(progress, [start, lift, settled, 0.88], [148, -8, 0, -30]);
+  const scale = useTransform(progress, [start, lift, settled], [0.78, 1.045, 1]);
+  const rotateX = useTransform(progress, [start, lift, settled], [18, -2.5, 0]);
+  const rotateY = useTransform(progress, [start, settled], [index === 0 ? 8 : index === 1 ? 0 : -8, 0]);
+  const rotateZ = useTransform(progress, [start, lift, settled], [index === 0 ? -2.8 : index === 1 ? 0.6 : 2.8, index === 0 ? 0.35 : index === 1 ? -0.15 : -0.35, 0]);
+  const openCard = () => {
+    window.requestAnimationFrame(() => onSelect(card));
+  };
+  const valuePillClass = card.valueTone === "gold"
+    ? "border-[#c8a568]/50 bg-[#c69a4f] text-[#080b12] shadow-[0_10px_30px_rgba(111,75,24,0.24),inset_0_1px_0_rgba(255,238,194,0.64)]"
+    : "border-[#6ca8ff]/48 bg-[#2f74ff] text-[#07101f] shadow-[0_10px_30px_rgba(21,75,196,0.26),inset_0_1px_0_rgba(196,221,255,0.66)]";
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative isolate overflow-hidden bg-[hsl(var(--background))] text-[hsl(var(--foreground))]"
+    <motion.article
+      className="group relative cursor-pointer overflow-hidden rounded-[1.65rem] border border-white/46 bg-white/34 p-3 text-left shadow-[0_42px_120px_rgba(20,29,38,0.28),0_16px_42px_rgba(255,255,255,0.1),inset_0_1px_0_rgba(255,255,255,0.72),inset_0_-1px_0_rgba(28,39,51,0.08)] backdrop-blur-2xl transition-[filter,box-shadow] duration-500 hover:brightness-[1.025] focus-within:ring-2 focus-within:ring-[#1447d4]/45 focus-within:ring-offset-4 focus-within:ring-offset-white"
+      style={{
+        opacity,
+        x,
+        y,
+        scale,
+        rotateX,
+        rotateY,
+        rotateZ,
+        transformPerspective: 1350,
+        transformStyle: "preserve-3d",
+      }}
     >
-      {/* Soft luxury wash — keeps it on-brand with the off-white system */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(20,71,212,0.05),transparent_55%)]" />
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-foreground/12 to-transparent" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-foreground/12 to-transparent" />
+      <button
+        type="button"
+        aria-label={`Open ${card.label} details`}
+        className="absolute inset-0 z-50 rounded-[1.65rem] bg-transparent focus:outline-none"
+        style={{ touchAction: "manipulation" }}
+        onPointerDown={(event) => event.stopPropagation()}
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          openCard();
+        }}
+      />
+      <div
+        className="pointer-events-none absolute inset-0 rounded-[1.65rem] bg-[linear-gradient(135deg,rgba(255,255,255,0.74),rgba(255,255,255,0.18)_32%,rgba(255,255,255,0.08)_58%,rgba(18,28,39,0.1))]"
+        style={{ transform: "translateZ(18px)" }}
+      />
+      <div
+        className="pointer-events-none absolute inset-[1px] rounded-[1.55rem] border border-white/38 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.2),inset_0_20px_44px_rgba(255,255,255,0.22),inset_0_-26px_42px_rgba(35,45,56,0.08)]"
+        style={{ transform: "translateZ(24px)" }}
+      />
+      <motion.div
+        className="pointer-events-none absolute -inset-y-12 -left-1/2 w-1/2 rotate-12 bg-gradient-to-r from-transparent via-white/34 to-transparent blur-[1px]"
+        animate={{ x: ["0%", "330%"] }}
+        transition={{
+          duration: 5.8,
+          repeat: Infinity,
+          ease: [0.16, 1, 0.3, 1],
+          delay: index * 0.55,
+        }}
+        style={{ transform: "translateZ(30px)" }}
+      />
 
-      <div className="relative mx-auto max-w-6xl px-5 py-24 md:px-10 md:py-36 lg:py-44">
-        <motion.p
-          style={{ opacity: eyebrowOpacity }}
-          className="text-[10px] font-semibold uppercase tracking-[0.32em] text-foreground/55 md:text-xs"
-        >
-          What We Do
-        </motion.p>
-
-        <motion.h2
-          style={{ y: headlineY, opacity: headlineOpacity }}
-          className="mt-6 font-display text-[clamp(2.4rem,7vw,5.6rem)] font-semibold leading-[0.92] tracking-[-0.02em] text-foreground transform-gpu"
-        >
-          Revenue systems that <span className="italic text-foreground/70 font-serif font-normal">answer, automate,</span> and <span className="italic text-foreground/70 font-serif font-normal">accelerate</span> your business.
-        </motion.h2>
-
-        <motion.div
-          style={{ scaleX: ruleScaleX }}
-          className="mt-10 h-px w-full origin-left bg-foreground/15 transform-gpu"
-        />
-
-        <motion.div
-          style={{ opacity: copyOpacity, y: copyY }}
-          className="mt-10 grid grid-cols-1 gap-10 md:mt-14 md:grid-cols-3 md:gap-8 transform-gpu"
-        >
-          {stages.map((stage, i) => (
-            <div key={stage.title} className="relative">
-              <p className="font-display text-xs font-semibold uppercase tracking-[0.28em] text-foreground/45">
-                0{i + 1}
-              </p>
-              <h3 className="mt-3 font-display text-2xl font-semibold tracking-tight text-foreground md:text-[1.65rem]">
-                {stage.title}
-              </h3>
-              <p className="mt-3 max-w-xs font-serif text-[15px] leading-relaxed text-foreground/65">
-                {stage.description}
-              </p>
+      <div
+        className="relative aspect-[16/10] overflow-hidden rounded-[1.25rem] border border-white/48 bg-[#d5dbe0] shadow-[0_18px_50px_rgba(21,31,41,0.16),inset_0_1px_0_rgba(255,255,255,0.72)]"
+        style={{ transform: "translateZ(38px)" }}
+      >
+        {card.imageSrc ? (
+          <img
+            src={card.imageSrc}
+            alt=""
+            className="h-full w-full object-cover saturate-[1.04] contrast-[1.02] transition-transform duration-700 ease-out group-hover:scale-[1.035]"
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <div className="absolute inset-0 overflow-hidden bg-[radial-gradient(circle_at_22%_20%,rgba(255,255,255,0.7),transparent_25%),linear-gradient(135deg,rgba(255,255,255,0.28),rgba(79,91,103,0.2)_48%,rgba(31,40,49,0.18))]">
+            <div className="absolute inset-0 opacity-[0.18]" style={{
+              backgroundImage: "linear-gradient(rgba(255,255,255,0.45) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.45) 1px, transparent 1px)",
+              backgroundSize: "34px 34px",
+            }} />
+            <div className="absolute bottom-4 left-4 right-4 rounded-full border border-white/45 bg-white/42 px-4 py-2 text-[9px] font-semibold uppercase tracking-[0.24em] text-[#2e3842]/58 backdrop-blur-md">
+              Image slot
             </div>
-          ))}
-        </motion.div>
+          </div>
+        )}
+        <div className={`absolute right-3 top-3 rounded-full px-3.5 py-1 text-sm font-black tracking-[-0.03em] backdrop-blur-xl ${valuePillClass}`}>
+          {card.value}
+        </div>
       </div>
-    </section>
+
+      <div
+        className="relative px-2 pb-2 pt-4"
+        style={{ transform: "translateZ(42px)" }}
+      >
+        <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#2e3842]/55">
+          {card.label}
+        </p>
+        <p className="mt-2.5 text-sm leading-relaxed text-[#2e3842]/72">
+          {card.description}
+        </p>
+      </div>
+      <div
+        className="pointer-events-none absolute inset-0 rounded-[1.65rem] opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+        style={{
+          transform: "translateZ(46px)",
+          background: "radial-gradient(circle at 50% 0%, rgba(20,71,212,0.11), transparent 42%), linear-gradient(135deg, transparent, rgba(255,255,255,0.18))",
+        }}
+      />
+    </motion.article>
   );
 };
 
-const GrayStageBackdrop = () => (
-  <>
-    <div className="absolute inset-0 bg-[#687079]" />
-    <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.2),transparent_16%,transparent_84%,rgba(255,255,255,0.14))]" />
-    <div
-      className="absolute inset-0 opacity-[0.11]"
-      style={{
-        backgroundImage: "linear-gradient(rgba(255,255,255,0.28) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.28) 1px, transparent 1px)",
-        backgroundSize: "72px 72px",
-      }}
-    />
-    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_12%,rgba(255,255,255,0.24),transparent_32%),radial-gradient(ellipse_at_50%_62%,rgba(38,49,60,0.13),transparent_46%)]" />
-  </>
-);
+interface RisingCardDetailProps {
+  card: TransitionCard;
+  onClose: () => void;
+}
+
+const RisingCardDetail = ({ card, onClose }: RisingCardDetailProps) => {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    const originalOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [onClose]);
+
+  return createPortal(
+    <motion.div
+      className="fixed inset-0 z-[90] hidden items-end justify-center px-5 pb-[7vh] pt-20 md:flex"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${card.label} details`}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <motion.button
+        type="button"
+        aria-label="Close card details"
+        className="absolute inset-0 cursor-default bg-[#07101f]/24 backdrop-blur-[5px]"
+        onClick={onClose}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      />
+
+      <motion.div
+        className="relative w-[min(1320px,95vw)] overflow-hidden rounded-[2.2rem] border border-white/60 bg-white/56 p-4 text-[#111827] shadow-[0_50px_140px_rgba(10,18,30,0.36),inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(17,24,39,0.1)] backdrop-blur-2xl"
+        initial={{ y: "104%", scale: 0.96, opacity: 0.96 }}
+        animate={{ y: 0, scale: 1, opacity: 1 }}
+        exit={{ y: "108%", scale: 0.98, opacity: 0 }}
+        transition={{ type: "spring", stiffness: 122, damping: 24, mass: 0.88 }}
+      >
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.78),rgba(255,255,255,0.24)_42%,rgba(20,71,212,0.08))]" />
+        <div className="pointer-events-none absolute inset-[1px] rounded-[1.9rem] border border-white/44 shadow-[inset_0_26px_80px_rgba(255,255,255,0.24)]" />
+
+        <button
+          type="button"
+          aria-label="Close card details"
+          className="absolute right-6 top-6 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white/60 bg-white/58 text-[#111827]/76 shadow-[0_12px_34px_rgba(14,23,36,0.16),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur-xl transition hover:bg-white/78"
+          onClick={onClose}
+        >
+          <X className="h-4 w-4" />
+        </button>
+
+        <div className="relative z-10 grid gap-5 lg:grid-cols-[1.65fr_0.8fr]">
+          <div className="overflow-hidden rounded-[1.65rem] border border-white/64 bg-[#eef3f7]/68 p-2 shadow-[0_28px_80px_rgba(26,39,55,0.18),inset_0_1px_0_rgba(255,255,255,0.8)]">
+            <div className="relative aspect-[16/9] overflow-hidden rounded-[1.28rem] bg-white">
+              <motion.img
+                src={card.imageSrc}
+                alt={`${card.label} detail`}
+                className="h-full w-full object-contain"
+                decoding="async"
+                initial={{ opacity: 0, y: 18, scale: 0.985 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.52, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col justify-between rounded-[1.5rem] border border-white/50 bg-white/34 p-7 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)] backdrop-blur-xl">
+            <div>
+              <div className="mb-6 inline-flex items-center gap-3 rounded-full border border-white/64 bg-white/62 px-3.5 py-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.76)]">
+                <span className="h-2 w-2 rounded-full bg-[#1447d4]" />
+                <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#263445]/64">
+                  Revenue detail
+                </span>
+              </div>
+              <p className="text-[4.2rem] font-semibold leading-none tracking-[-0.06em] text-[#111827]">
+                {card.value}
+              </p>
+              <h3 className="mt-5 font-display text-4xl font-semibold leading-[0.95] tracking-[-0.04em] text-[#111827]">
+                {card.label}
+              </h3>
+              <p className="mt-5 text-base leading-relaxed text-[#2e3842]/72">
+                {card.detail}
+              </p>
+            </div>
+
+            <div className="mt-8 border-t border-[#111827]/10 pt-5">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[#2e3842]/48">
+                Click outside or press Escape to close
+              </p>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>,
+    document.body
+  );
+};
+
+const WebsiteShowcaseCarousel = () => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const active = websiteShowcases[activeIndex];
+  const showPrevious = () => setActiveIndex((current) => (current - 1 + websiteShowcases.length) % websiteShowcases.length);
+  const showNext = () => setActiveIndex((current) => (current + 1) % websiteShowcases.length);
+
+  return (
+    <div className="mb-10 flex justify-center md:mb-18">
+      <div className="relative w-full max-w-[860px]">
+        <div className="pointer-events-none absolute -inset-10 rounded-[3rem] bg-[radial-gradient(ellipse_at_50%_12%,rgba(255,255,255,0.95),transparent_42%),radial-gradient(ellipse_at_70%_52%,rgba(20,71,212,0.07),transparent_45%)] blur-2xl" />
+        <motion.div
+          className="relative overflow-hidden rounded-[1.55rem] border border-white/72 bg-white/58 p-2.5 shadow-[0_36px_95px_rgba(24,38,60,0.14),inset_0_1px_0_rgba(255,255,255,0.92)] backdrop-blur-2xl md:rounded-[1.9rem] md:p-3"
+          initial={{ opacity: 0, y: 22, scale: 0.98 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: true, margin: "-8% 0px" }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <div className="flex h-7 items-center justify-between border-b border-[#111827]/8 px-3 md:h-9 md:px-4">
+            <div className="flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-[#efb0a8]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[#d8bf82]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[#9dd0a8]" />
+            </div>
+            <div className="hidden rounded-full border border-white/70 bg-white/54 px-3 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#1d2a3c]/48 md:block">
+              {active.eyebrow}
+            </div>
+          </div>
+
+          <div className="relative aspect-[16/9.4] overflow-hidden rounded-b-[1.2rem] bg-[#07101f] md:rounded-b-[1.55rem]">
+            <AnimatePresence mode="wait" initial={false}>
+              {active.imageSrc ? (
+                <motion.img
+                  key={active.title}
+                  src={active.imageSrc}
+                  alt={`${active.title} website example`}
+                  className="absolute inset-0 h-full w-full object-cover object-top"
+                  loading="lazy"
+                  decoding="async"
+                  initial={{ opacity: 0, x: 72, scale: 1.045, filter: "blur(10px)" }}
+                  animate={{ opacity: 1, x: 0, scale: 1, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, x: -72, scale: 0.985, filter: "blur(10px)" }}
+                  transition={{ duration: 0.78, ease: [0.16, 1, 0.3, 1] }}
+                />
+              ) : (
+                <motion.div
+                  key={active.title}
+                  className="absolute inset-0 bg-[radial-gradient(ellipse_at_72%_12%,rgba(255,255,255,0.18),transparent_34%),linear-gradient(135deg,#0a1322,#111827_46%,#07101f)]"
+                  initial={{ opacity: 0, x: 72, scale: 1.045, filter: "blur(10px)" }}
+                  animate={{ opacity: 1, x: 0, scale: 1, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, x: -72, scale: 0.985, filter: "blur(10px)" }}
+                  transition={{ duration: 0.78, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <div
+                    className="absolute inset-0 opacity-[0.22]"
+                    style={{
+                      backgroundImage: "linear-gradient(rgba(255,255,255,0.16) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.16) 1px, transparent 1px)",
+                      backgroundSize: "44px 44px",
+                    }}
+                  />
+                  <div className="absolute left-8 top-8 max-w-[23rem]">
+                    <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.28em] text-white/48">{active.eyebrow}</p>
+                    <p className="font-display text-4xl font-semibold leading-[0.96] tracking-[-0.05em] text-white md:text-6xl">
+                      {active.title}
+                    </p>
+                  </div>
+                  <div className="absolute bottom-7 left-7 right-7 h-24 rounded-[1.35rem] border border-white/14 bg-white/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_0%,rgba(255,255,255,0.12),transparent_35%),linear-gradient(180deg,transparent_0%,rgba(7,16,31,0.12)_100%)]" />
+          </div>
+        </motion.div>
+
+        <div className="absolute right-4 top-1/2 z-20 flex -translate-y-1/2 items-center gap-3 md:-right-16">
+          <button
+            type="button"
+            aria-label="Previous website example"
+            onClick={showPrevious}
+            className="hidden h-11 w-11 items-center justify-center rounded-full border border-white/70 bg-white/62 text-[#111827] shadow-[0_18px_45px_rgba(20,32,50,0.14),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl transition duration-300 hover:-translate-x-0.5 hover:bg-white/82 md:flex"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            aria-label="Next website example"
+            onClick={showNext}
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-white/70 bg-white/72 text-[#111827] shadow-[0_20px_52px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.92)] backdrop-blur-xl transition duration-300 hover:translate-x-0.5 hover:bg-white/90"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="mt-5 flex justify-center gap-2">
+          {websiteShowcases.map((item, index) => (
+            <button
+              key={item.title}
+              type="button"
+              aria-label={`Show ${item.title} website example`}
+              onClick={() => setActiveIndex(index)}
+              className={`h-1.5 rounded-full transition-all duration-500 ${index === activeIndex ? "w-8 bg-[#111827]" : "w-1.5 bg-[#111827]/18 hover:bg-[#111827]/34"}`}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const HeroScrollTransition = () => {
+  const transitionRef = useRef<HTMLElement>(null);
+  const [selectedCard, setSelectedCard] = useState<TransitionCard | null>(null);
+  const { scrollYProgress } = useScroll({
+    target: transitionRef,
+    offset: ["start 106%", "end 34%"],
+  });
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 88,
+    damping: 24,
+    mass: 0.72,
+    restDelta: 0.001,
+  });
+  const surfaceOpacity = useTransform(smoothProgress, [0, 0.18, 1], [0, 1, 1]);
+  const surfaceY = useTransform(smoothProgress, [0, 0.22, 1], [28, 0, 0]);
+  const headerOpacity = useTransform(smoothProgress, [0.05, 0.16, 0.72], [0, 1, 1]);
+  const headerY = useTransform(smoothProgress, [0.05, 0.22, 0.82], [18, 0, -18]);
+  const cardsY = useTransform(smoothProgress, [0.1, 0.36, 0.9], ["38vh", "0vh", "-28vh"]);
+  const sparkOpacity = useTransform(smoothProgress, [0.12, 0.3, 0.52], [0, 0.82, 0]);
+  const sparkScale = useTransform(smoothProgress, [0.12, 0.3, 0.52], [0.82, 1, 1.12]);
+
+  return (
+    <section
+      ref={transitionRef}
+      className="relative hidden h-[185vh] overflow-hidden bg-white md:block"
+      aria-label="Scroll transition"
+    >
+      <motion.div
+        className="sticky top-0 flex h-[100dvh] items-center justify-center overflow-hidden"
+      >
+        <motion.div
+          className="absolute inset-0"
+          style={{
+            opacity: surfaceOpacity,
+            y: surfaceY,
+            backgroundImage: "radial-gradient(ellipse at 50% 4%, rgba(255,255,255,0.98), transparent 36%), radial-gradient(ellipse at 21% 36%, rgba(20,71,212,0.08), transparent 32%), radial-gradient(ellipse at 78% 74%, rgba(24,37,54,0.06), transparent 36%), linear-gradient(180deg, #ffffff 0%, #f8fafc 46%, #eef3f7 100%)",
+          }}
+        >
+          <div
+            className="absolute inset-0 opacity-[0.42]"
+            style={{
+              backgroundImage: "linear-gradient(rgba(16,24,39,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(16,24,39,0.045) 1px, transparent 1px)",
+              backgroundSize: "72px 72px",
+              maskImage: "linear-gradient(180deg, transparent, black 16%, black 78%, transparent)",
+              WebkitMaskImage: "linear-gradient(180deg, transparent, black 16%, black 78%, transparent)",
+            }}
+          />
+          <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-white via-white/88 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-[#eef3f7] via-[#eef3f7]/72 to-transparent" />
+          {[
+            ["18%", "24%", "0.44rem"],
+            ["73%", "29%", "0.36rem"],
+            ["61%", "68%", "0.28rem"],
+          ].map(([left, top, size]) => (
+            <motion.span
+              key={`${left}-${top}`}
+              className="absolute rounded-full bg-[#1447d4]/38"
+              style={{
+                left,
+                top,
+                width: size,
+                height: size,
+                opacity: sparkOpacity,
+                scale: sparkScale,
+                boxShadow: "0 0 22px rgba(20,71,212,0.18)",
+              }}
+            />
+          ))}
+        </motion.div>
+
+        <motion.div
+          className="pointer-events-none absolute inset-x-0 top-[13vh] z-10 mx-auto max-w-5xl px-6 text-center"
+          style={{ opacity: headerOpacity, y: headerY }}
+        >
+          <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.42em] text-[#141a24]/48">
+            Revenue Systems
+          </p>
+          <div className="mx-auto mb-6 h-px w-40 bg-gradient-to-r from-transparent via-[#141a24]/18 to-transparent" />
+          <p className="font-display text-3xl font-semibold leading-tight text-[#141a24] md:text-6xl">
+            The quiet layer that catches what your team misses.
+          </p>
+        </motion.div>
+
+        <div className="pointer-events-none absolute inset-x-0 top-[41%] z-10 flex justify-center px-6">
+          <motion.div
+            className="pointer-events-auto grid w-[min(96rem,97vw)] grid-cols-3 gap-7"
+            style={{ y: cardsY }}
+          >
+            {transitionCards.map((card, index) => (
+              <RisingShowcaseCard
+                key={card.label}
+                card={card}
+                index={index}
+                progress={smoothProgress}
+                onSelect={setSelectedCard}
+              />
+            ))}
+          </motion.div>
+        </div>
+      </motion.div>
+
+      <AnimatePresence>
+        {selectedCard && (
+          <RisingCardDetail
+            card={selectedCard}
+            onClose={() => setSelectedCard(null)}
+          />
+        )}
+      </AnimatePresence>
+    </section>
+  );
+};
 
 const Index = () => {
   const heroRef = useRef<HTMLDivElement>(null);
@@ -420,27 +644,40 @@ const Index = () => {
       </section>
 
       <div className="relative overflow-hidden bg-[#687079] text-white">
-        <GrayStageBackdrop />
-
         <HeroScrollTransition />
-        <DarkStageShowcase />
 
         {/* BUSINESS PAIN */}
-        <section className="relative overflow-hidden py-14 md:py-32">
-            <div className="max-w-7xl mx-auto px-5 md:section-padding relative z-10">
+        <section className="relative overflow-hidden bg-[#f7faff] py-14 text-[#0f1730] md:py-28">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_85%_5%,rgba(210,226,255,0.7),transparent_42%),radial-gradient(ellipse_at_12%_86%,rgba(255,255,255,0.95),transparent_48%),linear-gradient(135deg,#ffffff_0%,#f8fbff_44%,#eef5ff_100%)]" />
+          <div
+            className="pointer-events-none absolute inset-0 opacity-[0.55]"
+            style={{
+              backgroundImage: "linear-gradient(rgba(93,119,174,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(93,119,174,0.045) 1px, transparent 1px)",
+              backgroundSize: "68px 68px",
+              maskImage: "linear-gradient(180deg, transparent 0%, black 10%, black 90%, transparent 100%)",
+              WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 10%, black 90%, transparent 100%)",
+            }}
+          />
+            <div className="mx-auto max-w-[1700px] px-5 md:px-10 lg:px-16 relative z-10">
               <SectionReveal>
-                <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-white/58 mb-2 md:mb-4">Why It Matters</p>
-                <h2 className="font-display font-bold text-xl md:text-5xl leading-tight max-w-3xl mb-8 md:mb-16 text-white">
-                  Every Missed Call Is a <span className="text-white/72">Missed Sale</span>
+                <div className="mb-5 inline-flex items-center gap-3 rounded-full border border-[#d9e4f6]/80 bg-white/68 px-5 py-2.5 shadow-[0_14px_36px_rgba(46,72,125,0.08),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl">
+                  <Zap className="h-3.5 w-3.5 text-[#4358ff]" />
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.34em] text-[#4358ff]">Why It Matters</span>
+                </div>
+                <h2 className="font-display text-[2.3rem] font-extrabold leading-[0.98] tracking-[-0.055em] text-[#101831] md:text-[4.25rem] lg:text-[5.1rem]">
+                  Every Missed Call Is a Missed Sale
                 </h2>
+                <p className="mb-9 mt-5 max-w-[64rem] text-base leading-relaxed text-[#41517d] md:mb-10 md:text-2xl">
+                  AI automation turns missed opportunities into booked appointments and loyal customers.
+                </p>
               </SectionReveal>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
                 {painPoints.map((pp, i) => (
                   <SectionReveal key={i} delay={i * 0.05}>
                     <PainPointCard
-                      icon={pp.icon}
                       pain={pp.pain}
                       solution={pp.solution}
+                      caption={pp.caption}
                       visual={<pp.Visual />}
                     />
                   </SectionReveal>
@@ -635,59 +872,7 @@ const Index = () => {
             </SectionReveal>
 
             <SectionReveal delay={0.1}>
-              <div className="mb-8 md:mb-16 flex justify-center items-end gap-3 md:gap-8">
-                {/* Phone */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: 0.2 }}
-                  className="w-[90px] md:w-[180px] rounded-xl md:rounded-2xl border-2 border-border overflow-hidden"
-                  style={{ background: "hsl(var(--card))" }}
-                >
-                  <div className="h-2.5 md:h-4 border-b border-border flex items-center justify-center">
-                    <div className="w-6 md:w-8 h-0.5 md:h-1 rounded-full bg-border" />
-                  </div>
-                  <div className="p-1.5 md:p-2 space-y-1.5 md:space-y-2">
-                    <div className="h-8 md:h-14 rounded-md md:rounded-lg bg-accent/20" />
-                    <div className="space-y-0.5 md:space-y-1">
-                      <div className="h-1 md:h-1.5 rounded bg-foreground/10 w-3/4" />
-                      <div className="h-1 md:h-1.5 rounded bg-foreground/10 w-1/2" />
-                    </div>
-                    <div className="h-4 md:h-8 rounded bg-primary/25" />
-                  </div>
-                </motion.div>
-
-                {/* Desktop */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  className="flex-1 max-w-[400px] md:max-w-[500px] rounded-lg md:rounded-xl border-2 border-border overflow-hidden"
-                  style={{ background: "hsl(var(--card))" }}
-                >
-                  <div className="h-3 md:h-6 border-b border-border flex items-center gap-1 px-2 md:px-3">
-                    <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-destructive/40" />
-                    <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-yellow-500/40" />
-                    <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-green-500/40" />
-                  </div>
-                  <div className="p-2 md:p-4 space-y-2 md:space-y-3">
-                    <div className="flex gap-2 md:gap-3">
-                      <div className="flex-1 space-y-1 md:space-y-2">
-                        <div className="h-1 md:h-2 rounded bg-foreground/10 w-2/3" />
-                        <div className="h-1 md:h-2 rounded bg-foreground/10 w-full" />
-                        <div className="h-4 md:h-8 rounded bg-accent/25 w-16 md:w-28 mt-1 md:mt-2" />
-                      </div>
-                      <div className="w-16 md:w-40 h-14 md:h-28 rounded-md md:rounded-lg bg-primary/15" />
-                    </div>
-                    <div className="grid grid-cols-3 gap-1 md:gap-2">
-                      <div className="h-8 md:h-16 rounded bg-accent/15" />
-                      <div className="h-8 md:h-16 rounded bg-primary/15" />
-                      <div className="h-8 md:h-16 rounded bg-accent/15" />
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
+              <WebsiteShowcaseCarousel />
             </SectionReveal>
 
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 md:gap-6">
@@ -734,34 +919,7 @@ const Index = () => {
                 Real Systems. <span className="gradient-text">Measurable Impact.</span>
               </h2>
             </SectionReveal>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-8">
-              {caseStudies.map((cs, i) => (
-                <SectionReveal key={cs.title} delay={i * 0.1}>
-                  <TiltCard>
-                    <div
-                      className="group rounded-xl md:rounded-2xl border border-border h-full flex flex-col overflow-hidden hover:border-primary/20 transition-colors duration-500"
-                      style={{ background: "hsl(var(--card))" }}
-                    >
-                      <div className="p-4 md:p-6 border-b border-border relative overflow-hidden">
-                        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700" style={{ background: "radial-gradient(circle at 50% 100%, hsl(var(--primary) / 0.05), transparent)" }} />
-                        <span className="text-[9px] md:text-[10px] font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">{cs.tag}</span>
-                        <div className="mt-3 flex items-baseline gap-1.5">
-                          <span className="font-display font-bold text-3xl md:text-5xl gradient-text">{cs.metric}</span>
-                          <span className="text-[10px] md:text-xs text-muted-foreground">{cs.metricLabel}</span>
-                        </div>
-                      </div>
-                      <div className="p-4 md:p-6 flex flex-col flex-1">
-                        <h3 className="font-display font-semibold text-sm md:text-xl mb-1.5 md:mb-3">{cs.title}</h3>
-                        <p className="text-[10px] md:text-sm text-muted-foreground flex-1">{cs.result}</p>
-                        <Link to="/case-studies" className="inline-flex items-center gap-1.5 mt-3 pt-3 border-t border-border text-[10px] md:text-sm font-medium text-primary hover:underline group/link">
-                          View case study <ArrowRight className="w-3 h-3 transition-transform group-hover/link:translate-x-1" />
-                        </Link>
-                      </div>
-                    </div>
-                  </TiltCard>
-                </SectionReveal>
-              ))}
-            </div>
+            <LiquidCaseStudyCards />
           </div>
         </section>
       </LazySection>

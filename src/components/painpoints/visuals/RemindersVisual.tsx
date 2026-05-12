@@ -1,17 +1,38 @@
-import { Check } from "lucide-react";
+import { Bell, Check } from "lucide-react";
+
+const reminders = [
+  { day: "MON", label: "Upcoming", time: "4:00 PM", active: false },
+  { day: "TUE", label: "Reminder", time: "sent", active: true },
+  { day: "WED", label: "Upcoming", time: "1:00 PM", active: false },
+];
 
 const RemindersVisual = () => (
-  <div className="relative h-full w-full flex items-center justify-center gap-2 px-3">
-    {[0, 1, 2].map((i) => (
+  <div className="relative flex h-full w-full items-center gap-4 px-5">
+    {reminders.map((item) => (
       <div
-        key={i}
-        className="relative flex-1 h-12 md:h-14 rounded-md border border-border bg-background/60 flex flex-col items-center justify-center gap-0.5 animate-[pp-slot-confirm_3s_ease-in-out_infinite]"
-        style={{ animationDelay: `${i * 0.4}s` }}
+        key={item.day}
+        className={`relative flex h-[5.55rem] flex-1 flex-col justify-between rounded-[0.9rem] border px-3 py-3 shadow-[0_14px_32px_rgba(67,85,139,0.1),inset_0_1px_0_rgba(255,255,255,0.92)] ${
+          item.active
+            ? "border-[#bfc7ff] bg-[#eef0ff]/86 text-[#4553d3]"
+            : "border-[#dde6f6] bg-white/72 text-[#142044]"
+        }`}
       >
-        <span className="text-[8px] md:text-[9px] text-muted-foreground font-medium">{["MON", "TUE", "WED"][i]}</span>
-        <Check className="w-3 h-3 md:w-3.5 md:h-3.5 text-primary" />
+        <p className="text-xs font-semibold">{item.day}</p>
+        <div>
+          <p className="text-xs font-medium">{item.label}</p>
+          <p className="mt-1 text-xs font-semibold">{item.time}</p>
+        </div>
+        {item.active ? (
+          <Check className="absolute bottom-3 right-3 h-4 w-4 text-[#5867e7]" strokeWidth={2.4} />
+        ) : (
+          <Bell className="absolute bottom-3 right-3 h-4 w-4 text-[#6c77c8]" strokeWidth={1.8} />
+        )}
       </div>
     ))}
+    <div className="hidden h-[5.55rem] w-[5.2rem] flex-col items-center justify-center rounded-[0.9rem] border border-[#dde6f6] bg-white/58 text-[#66709a] shadow-[0_14px_32px_rgba(67,85,139,0.08),inset_0_1px_0_rgba(255,255,255,0.92)] md:flex">
+      <Bell className="mb-2 h-5 w-5" />
+      <span className="text-xs font-medium">All set</span>
+    </div>
   </div>
 );
 
