@@ -1006,7 +1006,7 @@ const Index = () => {
                 <h2 className="font-display font-bold text-xl md:text-4xl leading-tight mb-3 md:mb-6">
                   Instant Replies. <span className="gradient-text">Zero Wait Times.</span>
                 </h2>
-                <p className="text-xs md:text-base text-muted-foreground mb-4 md:mb-8 leading-relaxed hidden md:block">
+                <p className="text-xs md:text-base text-muted-foreground mb-4 md:mb-8 leading-relaxed">
                   Your chatbot handles FAQs, captures leads, qualifies prospects, and books appointments — while your team closes deals.
                 </p>
                 <div className="grid grid-cols-2 gap-2 md:gap-3 mb-4 md:mb-0">
