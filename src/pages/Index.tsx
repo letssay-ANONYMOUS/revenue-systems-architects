@@ -463,28 +463,24 @@ const WebsiteShowcaseCarousel = () => {
           <div className="relative aspect-[16/10.35] md:aspect-[16/9.7]">
             <AnimatePresence initial={false} custom={direction} mode="sync">
               <motion.div
-                role="button"
-                tabIndex={0}
                 key={active.title}
                 custom={direction}
                 variants={panelVariants}
                 initial="enter"
                 animate="center"
                 exit="exit"
-                aria-label={`Open full ${active.title} website preview`}
-                onClick={() => openPreview(active)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    openPreview(active);
-                  }
-                }}
                 style={{
                   willChange: "transform, opacity, filter",
                   backfaceVisibility: "hidden",
                 }}
-                className="group absolute inset-0 cursor-pointer overflow-hidden rounded-[1.65rem] border border-white/76 bg-white/58 p-2.5 text-left shadow-[0_38px_105px_rgba(24,38,60,0.15),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-1px_0_rgba(17,24,39,0.05)] backdrop-blur-2xl [transform-style:preserve-3d] transition-[filter] duration-500 hover:brightness-[1.025] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1447d4]/50 focus-visible:ring-offset-4 focus-visible:ring-offset-white md:rounded-[2rem] md:p-3"
+                className="group absolute inset-0 overflow-hidden rounded-[1.65rem] border border-white/76 bg-white/58 p-2.5 text-left shadow-[0_38px_105px_rgba(24,38,60,0.15),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-1px_0_rgba(17,24,39,0.05)] backdrop-blur-2xl [transform-style:preserve-3d] transition-[filter] duration-500 hover:brightness-[1.025] md:rounded-[2rem] md:p-3"
               >
+                <button
+                  type="button"
+                  aria-label={`Open full ${active.title} website preview`}
+                  onClick={() => openPreview(active)}
+                  className="absolute inset-0 z-10 cursor-pointer rounded-[1.65rem] bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1447d4]/50 focus-visible:ring-offset-4 focus-visible:ring-offset-white md:rounded-[2rem]"
+                />
                 <div className="flex h-8 items-center justify-between border-b border-[#111827]/8 px-3 md:h-10 md:px-4">
                   <div className="flex items-center gap-1.5">
                     <span className="h-2.5 w-2.5 rounded-full bg-[#efb0a8] shadow-[0_0_10px_rgba(239,176,168,0.45)]" />
@@ -534,7 +530,7 @@ const WebsiteShowcaseCarousel = () => {
                       event.stopPropagation();
                       openPreview(active);
                     }}
-                    className="absolute bottom-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white/70 bg-white/64 text-[#111827] opacity-100 shadow-[0_14px_34px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.92),inset_0_-7px_16px_rgba(17,24,39,0.055)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-white/86 active:translate-y-0.5 active:scale-[0.94] active:shadow-[0_7px_18px_rgba(20,32,50,0.14),inset_0_4px_12px_rgba(17,24,39,0.1)] md:bottom-5 md:right-5"
+                    className="absolute bottom-4 right-4 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-white/70 bg-white/64 text-[#111827] opacity-100 shadow-[0_14px_34px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.92),inset_0_-7px_16px_rgba(17,24,39,0.055)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-white/86 active:translate-y-0.5 active:scale-[0.94] active:shadow-[0_7px_18px_rgba(20,32,50,0.14),inset_0_4px_12px_rgba(17,24,39,0.1)] md:bottom-5 md:right-5"
                   >
                     <Maximize2 className="h-4 w-4" />
                   </button>
