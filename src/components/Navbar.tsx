@@ -15,8 +15,7 @@ const navLinks = [
 
 const SCROLL_ENTER = 56;
 const SCROLL_EXIT = 28;
-const SHELL_TRANSITION = "max-width 700ms cubic-bezier(0.16, 1, 0.3, 1), border-radius 700ms cubic-bezier(0.16, 1, 0.3, 1), background-color 700ms cubic-bezier(0.16, 1, 0.3, 1), border-color 700ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 700ms cubic-bezier(0.16, 1, 0.3, 1), transform 700ms cubic-bezier(0.16, 1, 0.3, 1), padding 700ms cubic-bezier(0.16, 1, 0.3, 1)";
-const INNER_TRANSITION = "padding 700ms cubic-bezier(0.16, 1, 0.3, 1), height 700ms cubic-bezier(0.16, 1, 0.3, 1)";
+const SHELL_TRANSITION = "max-width 760ms cubic-bezier(0.16, 1, 0.3, 1), border-radius 760ms cubic-bezier(0.16, 1, 0.3, 1), background-color 760ms cubic-bezier(0.16, 1, 0.3, 1), border-color 760ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 760ms cubic-bezier(0.16, 1, 0.3, 1), transform 760ms cubic-bezier(0.16, 1, 0.3, 1), padding 760ms cubic-bezier(0.16, 1, 0.3, 1)";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -39,11 +38,11 @@ const Navbar = () => {
     <>
       <motion.nav
         className="fixed top-0 left-0 right-0 z-[1000] transform-gpu"
-        style={{ padding: "0 32px", willChange: "contents" }}
+        style={{ padding: "0 34px", willChange: "transform" }}
       >
         <div
           className="mx-auto flex items-center justify-between"
-          style={{ height: "64px", maxWidth: "1400px" }}
+          style={{ height: "82px", maxWidth: "1400px" }}
         >
           {/* Logo — far left, never morphs */}
           <Link to="/" className="shrink-0 flex items-center">
@@ -54,9 +53,9 @@ const Navbar = () => {
           <div
             className={`hidden lg:flex items-center gap-1 transform-gpu ${scrolled ? "nav-glass" : "bg-transparent"}`}
             style={{
-              padding: scrolled ? "6px 20px" : "6px 8px",
-              borderRadius: scrolled ? "9999px" : "12px",
-              transform: scrolled ? "translateY(6px)" : "translateY(0px)",
+              padding: scrolled ? "13px 38px" : "8px 14px",
+              borderRadius: scrolled ? "9999px" : "14px",
+              transform: scrolled ? "translateY(14px) scale(1.035)" : "translateY(0px) scale(0.985)",
               transition: SHELL_TRANSITION,
               willChange: "background-color, border-color, box-shadow, border-radius, transform",
             }}
@@ -65,7 +64,7 @@ const Navbar = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`nav-link-underline text-xs font-medium px-3 py-1.5 rounded-full whitespace-nowrap ${
+                className={`nav-link-underline rounded-full px-5 py-2.5 text-[14px] font-medium whitespace-nowrap ${
                   scrolled
                     ? location.pathname === link.path ? "nav-text-ink" : "nav-text-muted-ink hover:nav-text-ink"
                     : location.pathname === link.path ? "text-foreground" : "text-muted-foreground hover:text-foreground"
@@ -79,9 +78,12 @@ const Navbar = () => {
 
           {/* Book a Call — far right, never morphs */}
           <div className="hidden lg:block shrink-0">
-            <Link to="/book-a-call" className="premium-btn text-[11px] px-5 py-2 rounded-full">
-              Book a Call
-            </Link>
+            <motion.div data-native-press>
+              <Link to="/book-a-call" data-native-press className="nav-cta-arrow-button">
+                <span>Book a Call</span>
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </motion.div>
           </div>
 
           <button

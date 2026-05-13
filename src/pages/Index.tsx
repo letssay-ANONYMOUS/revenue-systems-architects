@@ -6,7 +6,7 @@ import {
   Bot, UserCheck, BarChart3,
   Zap, Target, Shield, ArrowRight, CheckCircle2, TrendingUp,
   Layers, Database,
-  Headphones, Send, X, ChevronLeft, ChevronRight
+  Headphones, Send, X, ChevronLeft, ChevronRight, Maximize2
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import Navbar from "@/components/Navbar";
@@ -75,12 +75,16 @@ const websiteShowcases = [
   {
     title: "Cafe Orders",
     eyebrow: "Cafe ordering system",
+    imageSrc: "/cafe-website-card.jpg",
   },
   {
     title: "Clinics",
     eyebrow: "Clinic booking system",
+    imageSrc: "/clinic-website-card.jpg",
   },
 ];
+
+type WebsiteShowcase = (typeof websiteShowcases)[number];
 
 const heroHeadlineLines = ["Your Business,", "Answered.", "Automated.", "Accelerated."];
 const heroHeadlineEase = [0.25, 0.46, 0.45, 0.94] as const;
@@ -258,16 +262,10 @@ const RisingCardDetail = ({ card, onClose }: RisingCardDetailProps) => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
     };
-    const originalOverflow = document.body.style.overflow;
-    const originalHtmlOverflow = document.documentElement.style.overflow;
 
-    document.body.style.overflow = "hidden";
-    document.documentElement.style.overflow = "hidden";
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.body.style.overflow = originalOverflow;
-      document.documentElement.style.overflow = originalHtmlOverflow;
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, [onClose]);
@@ -360,95 +358,185 @@ const RisingCardDetail = ({ card, onClose }: RisingCardDetailProps) => {
 };
 
 const WebsiteShowcaseCarousel = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const [[activeIndex, direction], setActiveSlide] = useState<[number, number]>([0, 0]);
+  const [selectedWebsite, setSelectedWebsite] = useState<WebsiteShowcase | null>(null);
   const active = websiteShowcases[activeIndex];
-  const showPrevious = () => setActiveIndex((current) => (current - 1 + websiteShowcases.length) % websiteShowcases.length);
-  const showNext = () => setActiveIndex((current) => (current + 1) % websiteShowcases.length);
+  const showPrevious = () => setActiveSlide(([current]) => [(current - 1 + websiteShowcases.length) % websiteShowcases.length, -1]);
+  const showNext = () => setActiveSlide(([current]) => [(current + 1) % websiteShowcases.length, 1]);
+  const showSlide = (index: number) => {
+    if (index === activeIndex) return;
+    setActiveSlide([index, index > activeIndex ? 1 : -1]);
+  };
+  const openPreview = (showcase: WebsiteShowcase) => {
+    if (!showcase.imageSrc) return;
+    setSelectedWebsite(showcase);
+  };
+
+  useEffect(() => {
+    if (!selectedWebsite) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setSelectedWebsite(null);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [selectedWebsite]);
+
+  const panelVariants = {
+    enter: (travelDirection: number) => ({
+      x: travelDirection >= 0 ? "132%" : "-132%",
+      opacity: 0,
+      scale: 0.68,
+      rotateY: travelDirection >= 0 ? -18 : 18,
+      rotateZ: travelDirection >= 0 ? 1.8 : -1.8,
+      filter: "blur(18px)",
+      transformOrigin: travelDirection >= 0 ? "100% 50%" : "0% 50%",
+    }),
+    center: (travelDirection: number) => ({
+      x: "0%",
+      opacity: 1,
+      scale: 1,
+      rotateY: 0,
+      rotateZ: 0,
+      filter: "blur(0px)",
+      transformOrigin: "50% 50%",
+      transition: {
+        delay: travelDirection === 0 ? 0 : 0.22,
+        duration: 0.98,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    }),
+    exit: (travelDirection: number) => ({
+      x: travelDirection >= 0 ? "-86%" : "86%",
+      opacity: 0,
+      scale: 0.62,
+      rotateY: travelDirection >= 0 ? 16 : -16,
+      rotateZ: travelDirection >= 0 ? -2.2 : 2.2,
+      filter: "blur(16px)",
+      transformOrigin: travelDirection >= 0 ? "0% 50%" : "100% 50%",
+      transition: {
+        duration: 0.68,
+        ease: [0.55, 0, 0.1, 1],
+      },
+    }),
+  };
 
   return (
-    <div className="mb-10 flex justify-center md:mb-18">
-      <div className="relative w-full max-w-[860px]">
-        <div className="pointer-events-none absolute -inset-10 rounded-[3rem] bg-[radial-gradient(ellipse_at_50%_12%,rgba(255,255,255,0.95),transparent_42%),radial-gradient(ellipse_at_70%_52%,rgba(20,71,212,0.07),transparent_45%)] blur-2xl" />
+    <>
+      <div className="mb-10 flex justify-center overflow-hidden py-2 md:mb-18 md:overflow-visible">
+      <div className="relative w-full max-w-[960px]">
+        <div className="pointer-events-none absolute -inset-10 rounded-[3.5rem] bg-[radial-gradient(ellipse_at_50%_12%,rgba(255,255,255,0.96),transparent_44%),radial-gradient(ellipse_at_78%_46%,rgba(20,71,212,0.08),transparent_42%),radial-gradient(ellipse_at_18%_70%,rgba(213,170,90,0.08),transparent_38%)] blur-2xl" />
         <motion.div
-          className="relative overflow-hidden rounded-[1.55rem] border border-white/72 bg-white/58 p-2.5 shadow-[0_36px_95px_rgba(24,38,60,0.14),inset_0_1px_0_rgba(255,255,255,0.92)] backdrop-blur-2xl md:rounded-[1.9rem] md:p-3"
-          initial={{ opacity: 0, y: 22, scale: 0.98 }}
+          className="relative [perspective:1600px]"
+          initial={{ opacity: 0, y: 26, scale: 0.98 }}
           whileInView={{ opacity: 1, y: 0, scale: 1 }}
           viewport={{ once: true, margin: "-8% 0px" }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="flex h-7 items-center justify-between border-b border-[#111827]/8 px-3 md:h-9 md:px-4">
-            <div className="flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-[#efb0a8]" />
-              <span className="h-2.5 w-2.5 rounded-full bg-[#d8bf82]" />
-              <span className="h-2.5 w-2.5 rounded-full bg-[#9dd0a8]" />
-            </div>
-            <div className="hidden rounded-full border border-white/70 bg-white/54 px-3 py-1 text-[9px] font-semibold uppercase tracking-[0.18em] text-[#1d2a3c]/48 md:block">
-              {active.eyebrow}
-            </div>
-          </div>
-
-          <div className="relative aspect-[16/9.4] overflow-hidden rounded-b-[1.2rem] bg-[#07101f] md:rounded-b-[1.55rem]">
-            <AnimatePresence mode="wait" initial={false}>
-              {active.imageSrc ? (
-                <motion.img
-                  key={active.title}
-                  src={active.imageSrc}
-                  alt={`${active.title} website example`}
-                  className="absolute inset-0 h-full w-full object-cover object-top"
-                  loading="lazy"
-                  decoding="async"
-                  initial={{ opacity: 0, x: 72, scale: 1.045, filter: "blur(10px)" }}
-                  animate={{ opacity: 1, x: 0, scale: 1, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, x: -72, scale: 0.985, filter: "blur(10px)" }}
-                  transition={{ duration: 0.78, ease: [0.16, 1, 0.3, 1] }}
-                />
-              ) : (
-                <motion.div
-                  key={active.title}
-                  className="absolute inset-0 bg-[radial-gradient(ellipse_at_72%_12%,rgba(255,255,255,0.18),transparent_34%),linear-gradient(135deg,#0a1322,#111827_46%,#07101f)]"
-                  initial={{ opacity: 0, x: 72, scale: 1.045, filter: "blur(10px)" }}
-                  animate={{ opacity: 1, x: 0, scale: 1, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, x: -72, scale: 0.985, filter: "blur(10px)" }}
-                  transition={{ duration: 0.78, ease: [0.16, 1, 0.3, 1] }}
-                >
-                  <div
-                    className="absolute inset-0 opacity-[0.22]"
-                    style={{
-                      backgroundImage: "linear-gradient(rgba(255,255,255,0.16) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.16) 1px, transparent 1px)",
-                      backgroundSize: "44px 44px",
-                    }}
-                  />
-                  <div className="absolute left-8 top-8 max-w-[23rem]">
-                    <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.28em] text-white/48">{active.eyebrow}</p>
-                    <p className="font-display text-4xl font-semibold leading-[0.96] tracking-[-0.05em] text-white md:text-6xl">
-                      {active.title}
-                    </p>
+          <div className="relative aspect-[16/10.35] md:aspect-[16/9.7]">
+            <AnimatePresence initial={false} custom={direction} mode="sync">
+              <motion.div
+                role="button"
+                tabIndex={0}
+                key={active.title}
+                custom={direction}
+                variants={panelVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                aria-label={`Open full ${active.title} website preview`}
+                onClick={() => openPreview(active)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    openPreview(active);
+                  }
+                }}
+                style={{
+                  willChange: "transform, opacity, filter",
+                  backfaceVisibility: "hidden",
+                }}
+                className="group absolute inset-0 cursor-pointer overflow-hidden rounded-[1.65rem] border border-white/76 bg-white/58 p-2.5 text-left shadow-[0_38px_105px_rgba(24,38,60,0.15),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-1px_0_rgba(17,24,39,0.05)] backdrop-blur-2xl [transform-style:preserve-3d] transition-[filter] duration-500 hover:brightness-[1.025] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1447d4]/50 focus-visible:ring-offset-4 focus-visible:ring-offset-white md:rounded-[2rem] md:p-3"
+              >
+                <div className="flex h-8 items-center justify-between border-b border-[#111827]/8 px-3 md:h-10 md:px-4">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#efb0a8] shadow-[0_0_10px_rgba(239,176,168,0.45)]" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#d8bf82] shadow-[0_0_10px_rgba(216,191,130,0.35)]" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#9dd0a8] shadow-[0_0_10px_rgba(157,208,168,0.35)]" />
                   </div>
-                  <div className="absolute bottom-7 left-7 right-7 h-24 rounded-[1.35rem] border border-white/14 bg-white/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl" />
-                </motion.div>
-              )}
+                  <div className="rounded-full border border-white/76 bg-white/62 px-3 py-1 text-[8px] font-semibold uppercase tracking-[0.22em] text-[#1d2a3c]/62 shadow-[inset_0_1px_0_rgba(255,255,255,0.86)] md:text-[9px]">
+                    {active.eyebrow}
+                  </div>
+                </div>
+
+                <div className="relative h-[calc(100%-2rem)] overflow-hidden rounded-b-[1.25rem] bg-[#07101f] md:h-[calc(100%-2.5rem)] md:rounded-b-[1.6rem]">
+                  {active.imageSrc ? (
+                    <motion.img
+                      src={active.imageSrc}
+                      alt={`${active.title} website example`}
+                      className="absolute inset-0 h-full w-full object-cover object-top"
+                      style={{ objectPosition: active.title === "Real Estate" ? "center 22%" : "center top" }}
+                      loading="lazy"
+                      decoding="async"
+                      initial={false}
+                    />
+                  ) : (
+                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_72%_12%,rgba(255,255,255,0.18),transparent_34%),linear-gradient(135deg,#0a1322,#111827_46%,#07101f)]">
+                      <div
+                        className="absolute inset-0 opacity-[0.22]"
+                        style={{
+                          backgroundImage: "linear-gradient(rgba(255,255,255,0.16) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.16) 1px, transparent 1px)",
+                          backgroundSize: "44px 44px",
+                        }}
+                      />
+                      <div className="absolute left-6 top-7 max-w-[23rem] md:left-9 md:top-9">
+                        <p className="mb-4 text-[9px] font-semibold uppercase tracking-[0.28em] text-white/48 md:text-[10px]">{active.eyebrow}</p>
+                        <p className="font-display text-4xl font-semibold leading-[0.96] tracking-[-0.05em] text-white md:text-6xl">
+                          {active.title}
+                        </p>
+                      </div>
+                      <div className="absolute bottom-7 left-7 right-7 h-24 rounded-[1.35rem] border border-white/14 bg-white/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl" />
+                    </div>
+                  )}
+                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_0%,rgba(255,255,255,0.12),transparent_35%),linear-gradient(180deg,transparent_0%,rgba(7,16,31,0.10)_100%)]" />
+                  <div className="pointer-events-none absolute bottom-4 right-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/70 bg-white/64 text-[#111827] opacity-0 shadow-[0_14px_34px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.92)] backdrop-blur-xl transition-opacity duration-300 group-hover:opacity-100 md:bottom-5 md:right-5">
+                    <Maximize2 className="h-4 w-4" />
+                  </div>
+                </div>
+              </motion.div>
             </AnimatePresence>
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_0%,rgba(255,255,255,0.12),transparent_35%),linear-gradient(180deg,transparent_0%,rgba(7,16,31,0.12)_100%)]" />
           </div>
         </motion.div>
 
-        <div className="absolute right-4 top-1/2 z-20 flex -translate-y-1/2 items-center gap-3 md:-right-16">
-          <button
+        <div className="absolute right-1 top-1/2 z-30 flex -translate-y-1/2 items-center gap-2 p-3 md:-right-[5.25rem] md:gap-3">
+          <motion.button
             type="button"
+            data-native-press
             aria-label="Previous website example"
-            onClick={showPrevious}
-            className="hidden h-11 w-11 items-center justify-center rounded-full border border-white/70 bg-white/62 text-[#111827] shadow-[0_18px_45px_rgba(20,32,50,0.14),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl transition duration-300 hover:-translate-x-0.5 hover:bg-white/82 md:flex"
+            onClick={(event) => {
+              event.stopPropagation();
+              showPrevious();
+            }}
+            className="relative flex h-12 w-12 items-center justify-center rounded-full border border-white/72 bg-white/62 text-[#111827] shadow-[0_18px_45px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-8px_18px_rgba(17,24,39,0.06)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:-translate-x-0.5 hover:bg-white/86 active:translate-y-0.5 active:scale-[0.965] active:shadow-[0_8px_20px_rgba(20,32,50,0.16),inset_0_4px_12px_rgba(17,24,39,0.08),inset_0_1px_0_rgba(255,255,255,0.8)]"
           >
             <ChevronLeft className="h-4 w-4" />
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
+            data-native-press
             aria-label="Next website example"
-            onClick={showNext}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-white/70 bg-white/72 text-[#111827] shadow-[0_20px_52px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.92)] backdrop-blur-xl transition duration-300 hover:translate-x-0.5 hover:bg-white/90"
+            onClick={(event) => {
+              event.stopPropagation();
+              showNext();
+            }}
+            className="relative flex h-[3.25rem] w-[3.25rem] items-center justify-center rounded-full border border-white/72 bg-white/70 text-[#1447d4] shadow-[0_18px_45px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-8px_18px_rgba(17,24,39,0.06)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:translate-x-0.5 hover:bg-white/90 active:translate-y-0.5 active:scale-[0.965] active:shadow-[0_8px_20px_rgba(20,32,50,0.16),inset_0_4px_12px_rgba(17,24,39,0.08),inset_0_1px_0_rgba(255,255,255,0.8)]"
           >
             <ChevronRight className="h-5 w-5" />
-          </button>
+          </motion.button>
         </div>
 
         <div className="mt-5 flex justify-center gap-2">
@@ -457,13 +545,78 @@ const WebsiteShowcaseCarousel = () => {
               key={item.title}
               type="button"
               aria-label={`Show ${item.title} website example`}
-              onClick={() => setActiveIndex(index)}
+              onClick={() => showSlide(index)}
               className={`h-1.5 rounded-full transition-all duration-500 ${index === activeIndex ? "w-8 bg-[#111827]" : "w-1.5 bg-[#111827]/18 hover:bg-[#111827]/34"}`}
             />
           ))}
         </div>
       </div>
-    </div>
+      </div>
+
+      <AnimatePresence>
+        {selectedWebsite?.imageSrc &&
+          createPortal(
+            <motion.div
+              key="website-preview"
+              className="fixed inset-0 z-[1400] flex items-end justify-center px-4 pb-5 pt-16 md:items-center md:px-8 md:py-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              onClick={() => setSelectedWebsite(null)}
+            >
+              <motion.div
+                aria-hidden="true"
+                className="absolute inset-0 bg-[#f8fafc]/68 backdrop-blur-[9px]"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              />
+              <motion.div
+                role="dialog"
+                aria-modal="true"
+                aria-label={`${selectedWebsite.title} full website preview`}
+                className="relative z-10 flex max-h-[92dvh] w-full max-w-[min(94vw,1440px)] flex-col overflow-hidden rounded-[1.8rem] border border-white/76 bg-white/64 p-2.5 shadow-[0_44px_130px_rgba(24,38,60,0.24),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-1px_0_rgba(17,24,39,0.06)] backdrop-blur-2xl md:rounded-[2.2rem] md:p-3"
+                initial={{ y: "104%", opacity: 0, scale: 0.94, filter: "blur(16px)" }}
+                animate={{ y: 0, opacity: 1, scale: 1, filter: "blur(0px)" }}
+                exit={{ y: "104%", opacity: 0, scale: 0.96, filter: "blur(14px)" }}
+                transition={{ duration: 0.82, ease: [0.16, 1, 0.3, 1] }}
+                onClick={(event) => event.stopPropagation()}
+              >
+                <div className="flex h-9 shrink-0 items-center justify-between border-b border-[#111827]/8 px-3 md:h-11 md:px-4">
+                  <div className="flex items-center gap-1.5">
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#efb0a8]" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#d8bf82]" />
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#9dd0a8]" />
+                  </div>
+                  <div className="rounded-full border border-white/76 bg-white/64 px-3 py-1 text-[8px] font-semibold uppercase tracking-[0.22em] text-[#1d2a3c]/62 shadow-[inset_0_1px_0_rgba(255,255,255,0.86)] md:text-[9px]">
+                    {selectedWebsite.eyebrow}
+                  </div>
+                  <button
+                    type="button"
+                    aria-label="Close full website preview"
+                    onClick={() => setSelectedWebsite(null)}
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-white/76 bg-white/66 text-[#111827] shadow-[0_12px_30px_rgba(20,32,50,0.14),inset_0_1px_0_rgba(255,255,255,0.9)] transition duration-300 hover:bg-white/90"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                <div className="max-h-[calc(92dvh-3.25rem)] overflow-auto rounded-b-[1.35rem] bg-[#07101f] md:rounded-b-[1.75rem]">
+                  <img
+                    src={selectedWebsite.imageSrc}
+                    alt={`${selectedWebsite.title} full website design`}
+                    className="h-auto w-full max-w-none"
+                    loading="eager"
+                    decoding="async"
+                  />
+                </div>
+              </motion.div>
+            </motion.div>,
+            document.body
+          )}
+      </AnimatePresence>
+    </>
   );
 };
 
@@ -782,7 +935,7 @@ const Index = () => {
         <section className="py-14 md:py-32 surface-elevated">
           <div className="max-w-7xl mx-auto px-5 md:section-padding">
             <div className="grid lg:grid-cols-2 gap-6 md:gap-16 items-center">
-              <SectionReveal>
+              <div className="relative z-10">
                 <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Chatbots & Automation</p>
                 <h2 className="font-display font-bold text-xl md:text-4xl leading-tight mb-3 md:mb-6">
                   Instant Replies. <span className="gradient-text">Zero Wait Times.</span>
@@ -801,7 +954,7 @@ const Index = () => {
                 <Link to="/chatbots-automation" className="inline-flex items-center gap-2 mt-3 md:mt-8 text-xs md:text-sm font-medium text-primary hover:underline group">
                   Learn more <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                 </Link>
-              </SectionReveal>
+              </div>
 
               <SectionReveal delay={0.2}>
                 <div className="rounded-xl md:rounded-2xl border border-border overflow-hidden transform-gpu" style={{ background: "hsl(var(--card))", boxShadow: "0 20px 60px hsl(var(--primary) / 0.08)" }}>

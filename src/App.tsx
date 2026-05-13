@@ -8,7 +8,6 @@ import { AnimatePresence } from "framer-motion";
 import PageTransition from "@/components/PageTransition";
 import SmoothScroll from "@/components/SmoothScroll";
 import FilmGrain from "@/components/FilmGrain";
-import CustomCursor from "@/components/CustomCursor";
 import Index from "./pages/Index";
 
 const AICallingAgents = lazy(() => import("./pages/AICallingAgents"));
@@ -60,7 +59,6 @@ const App = () => (
       <Sonner />
       <SmoothScroll />
       <FilmGrain />
-      <CustomCursor />
       <BrowserRouter>
         <ScrollToTop />
         <AnimatedRoutes />

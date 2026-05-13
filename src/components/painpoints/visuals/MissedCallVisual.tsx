@@ -1,19 +1,22 @@
 import { Phone, Zap } from "lucide-react";
 
 const MissedCallVisual = () => (
-  <div className="relative flex h-full w-full items-center overflow-hidden px-5">
-    <div className="relative mr-5 flex h-[5.6rem] w-[5.6rem] shrink-0 items-center justify-center">
-      <span className="absolute inset-0 rounded-full border border-[#7480f0]/12 bg-[#6572ed]/5" />
-      <span className="absolute inset-2 rounded-full border border-[#7480f0]/18 bg-[#6572ed]/7" />
-      <span className="absolute inset-4 rounded-full bg-[#6572ed]/12 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]" />
-      <span className="absolute inset-0 rounded-full bg-[#6572ed]/10 animate-[pp-ring_2.8s_ease-out_infinite]" />
-      <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-[#8490ff] to-[#5361d7] text-white shadow-[0_18px_34px_rgba(74,88,213,0.28),inset_0_1px_0_rgba(255,255,255,0.38)]">
+  <div className="relative flex h-full w-full items-center overflow-hidden px-4 md:px-5">
+    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_12%_50%,rgba(101,114,237,0.16),transparent_35%),radial-gradient(ellipse_at_58%_47%,rgba(101,114,237,0.08),transparent_38%),linear-gradient(180deg,rgba(255,255,255,0.74),rgba(246,249,255,0.3))]" />
+
+    <div className="relative mr-4 flex h-[6.55rem] w-[6.55rem] shrink-0 items-center justify-center md:mr-5">
+      <span className="absolute inset-0 rounded-full border border-[#7480f0]/14 bg-white/38 shadow-[0_18px_42px_rgba(91,106,220,0.1),inset_0_1px_0_rgba(255,255,255,0.98)]" />
+      <span className="absolute inset-[0.52rem] rounded-full border border-[#7480f0]/18 bg-white/34" />
+      <span className="absolute inset-[1.05rem] rounded-full border border-white/82 bg-[#6572ed]/10 shadow-[0_16px_36px_rgba(101,114,237,0.13),inset_0_1px_0_rgba(255,255,255,0.9)]" />
+      <span className="absolute inset-1 rounded-full bg-[#6572ed]/10 animate-[pp-ring_3.1s_ease-out_infinite]" />
+      <span className="absolute inset-3 rounded-full bg-[#6572ed]/9 animate-[pp-ring_3.1s_ease-out_infinite] [animation-delay:0.55s]" />
+      <span className="relative flex h-[3.65rem] w-[3.65rem] items-center justify-center rounded-full bg-gradient-to-br from-[#8b96ff] via-[#6875ee] to-[#4d59cc] text-white shadow-[0_18px_34px_rgba(74,88,213,0.34),inset_0_1px_0_rgba(255,255,255,0.5),inset_0_-10px_18px_rgba(41,53,156,0.22)]">
         <Phone className="h-6 w-6" strokeWidth={2.2} />
       </span>
     </div>
 
-    <div className="relative h-[5.2rem] flex-1 overflow-hidden rounded-[1.1rem]">
-      <div className="absolute inset-y-4 left-0 right-0 rounded-full bg-gradient-to-r from-transparent via-[#eef2ff]/80 to-transparent blur-xl" />
+    <div className="relative h-[5.85rem] flex-1 overflow-hidden rounded-[1.15rem]">
+      <div className="absolute inset-y-3 left-0 right-0 rounded-full bg-gradient-to-r from-transparent via-[#eef2ff]/95 to-transparent blur-xl" />
       <svg className="relative h-full w-full" viewBox="0 0 320 84" aria-hidden="true" preserveAspectRatio="none">
         <defs>
           <linearGradient id="missed-call-wave" x1="0" x2="1" y1="0" y2="0">
@@ -59,10 +62,10 @@ const MissedCallVisual = () => (
           strokeWidth="1.6"
         />
       </svg>
-      <span className="pp-voice-sheen absolute left-0 top-1/2 h-10 w-20 -translate-y-1/2 rounded-full bg-[#6572ed]/10 blur-xl" />
+      <span className="pp-voice-sheen absolute left-0 top-1/2 h-12 w-16 -translate-y-1/2 rounded-full bg-[#6572ed]/10 blur-xl" />
     </div>
 
-    <div className="ml-5 min-w-[6.2rem] rounded-[1rem] border border-[#d9e2fa] bg-white/76 px-4 py-3 shadow-[0_14px_34px_rgba(67,85,139,0.12),inset_0_1px_0_rgba(255,255,255,0.92)] backdrop-blur-xl">
+    <div className="ml-4 min-w-[6.15rem] rounded-[1rem] border border-[#d9e2fa] bg-white/86 px-4 py-3 shadow-[0_18px_42px_rgba(67,85,139,0.15),inset_0_1px_0_rgba(255,255,255,0.96),inset_0_-10px_22px_rgba(101,114,237,0.045)] backdrop-blur-xl md:ml-5">
       <p className="mb-1 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-[#5665c8]">Answered</p>
       <div className="flex items-center gap-2">
         <Zap className="h-4 w-4 text-[#6572ed]" fill="currentColor" />
