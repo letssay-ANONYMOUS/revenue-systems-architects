@@ -84,8 +84,6 @@ const websiteShowcases = [
   },
 ];
 
-type WebsiteShowcase = (typeof websiteShowcases)[number];
-
 const heroHeadlineLines = ["Your Business,", "Answered.", "Automated.", "Accelerated."];
 const heroHeadlineEase = [0.25, 0.46, 0.45, 0.94] as const;
 
@@ -382,24 +380,22 @@ const RisingCardDetail = ({ card, onClose }: RisingCardDetailProps) => {
 
 const WebsiteShowcaseCarousel = () => {
   const [[activeIndex, direction], setActiveSlide] = useState<[number, number]>([0, 0]);
-  const [selectedWebsite, setSelectedWebsite] = useState<WebsiteShowcase | null>(null);
+  const [selectedWebsiteIndex, setSelectedWebsiteIndex] = useState<number | null>(null);
   const active = websiteShowcases[activeIndex];
+  const selectedWebsite = selectedWebsiteIndex === null ? null : websiteShowcases[selectedWebsiteIndex];
   const showPrevious = () => setActiveSlide(([current]) => [(current - 1 + websiteShowcases.length) % websiteShowcases.length, -1]);
   const showNext = () => setActiveSlide(([current]) => [(current + 1) % websiteShowcases.length, 1]);
   const showSlide = (index: number) => {
     if (index === activeIndex) return;
     setActiveSlide([index, index > activeIndex ? 1 : -1]);
   };
-  const openPreview = (showcase: WebsiteShowcase) => {
-    if (!showcase.imageSrc) return;
-    setSelectedWebsite(showcase);
-  };
+  const closePreview = useCallback(() => setSelectedWebsiteIndex(null), []);
 
   useEffect(() => {
     if (!selectedWebsite) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setSelectedWebsite(null);
+      if (event.key === "Escape") closePreview();
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -407,7 +403,7 @@ const WebsiteShowcaseCarousel = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [selectedWebsite]);
+  }, [closePreview, selectedWebsite]);
 
   const panelVariants = {
     enter: (travelDirection: number) => ({
@@ -473,14 +469,8 @@ const WebsiteShowcaseCarousel = () => {
                   willChange: "transform, opacity, filter",
                   backfaceVisibility: "hidden",
                 }}
-                className="group absolute inset-0 overflow-hidden rounded-[1.65rem] border border-white/76 bg-white/58 p-2.5 text-left shadow-[0_38px_105px_rgba(24,38,60,0.15),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-1px_0_rgba(17,24,39,0.05)] backdrop-blur-2xl [transform-style:preserve-3d] transition-[filter] duration-500 hover:brightness-[1.025] md:rounded-[2rem] md:p-3"
+                className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.65rem] border border-white/76 bg-white/58 p-2.5 text-left shadow-[0_38px_105px_rgba(24,38,60,0.15),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-1px_0_rgba(17,24,39,0.05)] backdrop-blur-2xl [transform-style:preserve-3d] md:rounded-[2rem] md:p-3"
               >
-                <button
-                  type="button"
-                  aria-label={`Open full ${active.title} website preview`}
-                  onClick={() => openPreview(active)}
-                  className="absolute inset-0 z-10 cursor-pointer rounded-[1.65rem] bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1447d4]/50 focus-visible:ring-offset-4 focus-visible:ring-offset-white md:rounded-[2rem]"
-                />
                 <div className="flex h-8 items-center justify-between border-b border-[#111827]/8 px-3 md:h-10 md:px-4">
                   <div className="flex items-center gap-1.5">
                     <span className="h-2.5 w-2.5 rounded-full bg-[#efb0a8] shadow-[0_0_10px_rgba(239,176,168,0.45)]" />
@@ -522,25 +512,33 @@ const WebsiteShowcaseCarousel = () => {
                     </div>
                   )}
                   <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_0%,rgba(255,255,255,0.12),transparent_35%),linear-gradient(180deg,transparent_0%,rgba(7,16,31,0.10)_100%)]" />
-                  <button
-                    type="button"
-                    aria-label={`Expand ${active.title} website preview`}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      event.stopPropagation();
-                      openPreview(active);
-                    }}
-                    className="absolute bottom-4 right-4 z-30 flex h-10 w-10 items-center justify-center rounded-full border border-white/70 bg-white/64 text-[#111827] opacity-100 shadow-[0_14px_34px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.92),inset_0_-7px_16px_rgba(17,24,39,0.055)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-white/86 active:translate-y-0.5 active:scale-[0.94] active:shadow-[0_7px_18px_rgba(20,32,50,0.14),inset_0_4px_12px_rgba(17,24,39,0.1)] md:bottom-5 md:right-5"
-                  >
-                    <Maximize2 className="h-4 w-4" />
-                  </button>
                 </div>
               </motion.div>
             </AnimatePresence>
+            <button
+              type="button"
+              aria-label={`Open full ${active.title} website preview`}
+              onClick={() => {
+                if (active.imageSrc) setSelectedWebsiteIndex(activeIndex);
+              }}
+              className="absolute inset-0 z-20 cursor-pointer rounded-[1.65rem] bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1447d4]/50 focus-visible:ring-offset-4 focus-visible:ring-offset-white md:rounded-[2rem]"
+            />
+            <button
+              type="button"
+              aria-label={`Expand ${active.title} website preview`}
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                if (active.imageSrc) setSelectedWebsiteIndex(activeIndex);
+              }}
+              className="absolute bottom-5 right-5 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-white/76 bg-white/70 text-[#111827] opacity-100 shadow-[0_16px_38px_rgba(20,32,50,0.18),inset_0_1px_0_rgba(255,255,255,0.95),inset_0_-8px_18px_rgba(17,24,39,0.06)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-white/90 active:translate-y-0.5 active:scale-[0.94] active:shadow-[0_7px_18px_rgba(20,32,50,0.15),inset_0_4px_12px_rgba(17,24,39,0.1)] md:bottom-6 md:right-6"
+            >
+              <Maximize2 className="h-[1.1rem] w-[1.1rem]" />
+            </button>
           </div>
         </motion.div>
 
-        <div className="absolute left-1 top-1/2 z-30 -translate-y-1/2 p-3 md:-left-[4.9rem]">
+        <div className="absolute left-1 top-1/2 z-30 -translate-y-1/2 p-3 md:-left-[5.45rem]">
           <motion.button
             type="button"
             data-native-press
@@ -549,13 +547,13 @@ const WebsiteShowcaseCarousel = () => {
               event.stopPropagation();
               showPrevious();
             }}
-            className="relative flex h-14 w-14 items-center justify-center rounded-full border border-white/76 bg-white/78 text-[#111827] shadow-[0_22px_54px_rgba(20,32,50,0.2),inset_0_1px_0_rgba(255,255,255,0.96),inset_0_-9px_20px_rgba(17,24,39,0.07)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:-translate-x-0.5 hover:bg-white/92 active:translate-y-0.5 active:scale-[0.965] active:shadow-[0_9px_22px_rgba(20,32,50,0.17),inset_0_4px_12px_rgba(17,24,39,0.09),inset_0_1px_0_rgba(255,255,255,0.82)]"
+            className="relative flex h-16 w-16 items-center justify-center rounded-full border border-white/78 bg-white/80 text-[#111827] shadow-[0_24px_60px_rgba(20,32,50,0.21),inset_0_1px_0_rgba(255,255,255,0.97),inset_0_-10px_22px_rgba(17,24,39,0.075)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:-translate-x-0.5 hover:bg-white/94 active:translate-y-0.5 active:scale-[0.965] active:shadow-[0_10px_24px_rgba(20,32,50,0.18),inset_0_4px_12px_rgba(17,24,39,0.1),inset_0_1px_0_rgba(255,255,255,0.84)]"
           >
-            <ChevronLeft className="h-5 w-5" strokeWidth={2.25} />
+            <ChevronLeft className="h-6 w-6" strokeWidth={2.35} />
           </motion.button>
         </div>
 
-        <div className="absolute right-1 top-1/2 z-30 -translate-y-1/2 p-3 md:-right-[5rem]">
+        <div className="absolute right-1 top-1/2 z-30 -translate-y-1/2 p-3 md:-right-[5.55rem]">
           <motion.button
             type="button"
             data-native-press
@@ -564,9 +562,9 @@ const WebsiteShowcaseCarousel = () => {
               event.stopPropagation();
               showNext();
             }}
-            className="relative flex h-14 w-14 items-center justify-center rounded-full border border-white/76 bg-white/78 text-[#1447d4] shadow-[0_22px_54px_rgba(20,32,50,0.2),inset_0_1px_0_rgba(255,255,255,0.96),inset_0_-9px_20px_rgba(17,24,39,0.07)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:translate-x-0.5 hover:bg-white/92 active:translate-y-0.5 active:scale-[0.965] active:shadow-[0_9px_22px_rgba(20,32,50,0.17),inset_0_4px_12px_rgba(17,24,39,0.09),inset_0_1px_0_rgba(255,255,255,0.82)]"
+            className="relative flex h-16 w-16 items-center justify-center rounded-full border border-white/78 bg-white/80 text-[#1447d4] shadow-[0_24px_60px_rgba(20,32,50,0.21),inset_0_1px_0_rgba(255,255,255,0.97),inset_0_-10px_22px_rgba(17,24,39,0.075)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:translate-x-0.5 hover:bg-white/94 active:translate-y-0.5 active:scale-[0.965] active:shadow-[0_10px_24px_rgba(20,32,50,0.18),inset_0_4px_12px_rgba(17,24,39,0.1),inset_0_1px_0_rgba(255,255,255,0.84)]"
           >
-            <ChevronRight className="h-5 w-5" strokeWidth={2.25} />
+            <ChevronRight className="h-6 w-6" strokeWidth={2.35} />
           </motion.button>
         </div>
 
@@ -585,8 +583,7 @@ const WebsiteShowcaseCarousel = () => {
       </div>
 
       <AnimatePresence>
-        {selectedWebsite?.imageSrc &&
-          createPortal(
+        {selectedWebsite?.imageSrc && (
             <motion.div
               key="website-preview"
               className="fixed inset-0 z-[1400] flex items-end justify-center px-4 pb-5 pt-16 md:items-center md:px-8 md:py-8"
@@ -594,7 +591,7 @@ const WebsiteShowcaseCarousel = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-              onClick={() => setSelectedWebsite(null)}
+              onClick={closePreview}
             >
               <motion.div
                 aria-hidden="true"
@@ -627,7 +624,7 @@ const WebsiteShowcaseCarousel = () => {
                   <button
                     type="button"
                     aria-label="Close full website preview"
-                    onClick={() => setSelectedWebsite(null)}
+                    onClick={closePreview}
                     className="flex h-8 w-8 items-center justify-center rounded-full border border-white/76 bg-white/66 text-[#111827] shadow-[0_12px_30px_rgba(20,32,50,0.14),inset_0_1px_0_rgba(255,255,255,0.9)] transition duration-300 hover:bg-white/90"
                   >
                     <X className="h-4 w-4" />
@@ -643,9 +640,8 @@ const WebsiteShowcaseCarousel = () => {
                   />
                 </div>
               </motion.div>
-            </motion.div>,
-            document.body
-          )}
+            </motion.div>
+        )}
       </AnimatePresence>
     </>
   );
