@@ -29,6 +29,8 @@ import WorkflowNodesVisual from "@/components/painpoints/visuals/WorkflowNodesVi
 import ConnectedToolsVisual from "@/components/painpoints/visuals/ConnectedToolsVisual";
 import MobileQuietLayer from "@/components/mobile/MobileQuietLayer";
 import StickyMobileCTA from "@/components/mobile/StickyMobileCTA";
+import MobileDiagnostic from "@/components/mobile/MobileDiagnostic";
+import MobileServiceWorkshop from "@/components/mobile/MobileServiceWorkshop";
 
 const painPoints = [
   { pain: "Missed calls", solution: "AI answers every call", caption: "Every call. Every time. Instantly.", Visual: MissedCallVisual },
