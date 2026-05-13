@@ -971,7 +971,7 @@ const Index = () => {
 
       {/* CHATBOTS & AUTOMATION — lazy loaded */}
       <LazySection rootMargin="300px" minHeight="400px">
-        <section className="py-14 md:py-32 surface-elevated">
+        <section className="hidden md:block py-14 md:py-32 surface-elevated">
           <div className="max-w-7xl mx-auto px-5 md:section-padding">
             <div className="grid lg:grid-cols-2 gap-6 md:gap-16 items-center">
               <div className="relative z-10">
@@ -1054,7 +1054,7 @@ const Index = () => {
 
       {/* WEBSITES & APPS — lazy loaded */}
       <LazySection rootMargin="300px" minHeight="400px">
-        <section className="py-14 md:py-32 relative">
+        <section className="hidden md:block py-14 md:py-32 relative">
           <div className="max-w-7xl mx-auto px-5 md:section-padding">
             <SectionReveal>
               <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Websites & Apps</p>
