@@ -29,6 +29,8 @@ import WorkflowNodesVisual from "@/components/painpoints/visuals/WorkflowNodesVi
 import ConnectedToolsVisual from "@/components/painpoints/visuals/ConnectedToolsVisual";
 import MobileQuietLayer from "@/components/mobile/MobileQuietLayer";
 import StickyMobileCTA from "@/components/mobile/StickyMobileCTA";
+import MobileDiagnostic from "@/components/mobile/MobileDiagnostic";
+import MobileServiceWorkshop from "@/components/mobile/MobileServiceWorkshop";
 
 const painPoints = [
   { pain: "Missed calls", solution: "AI answers every call", caption: "Every call. Every time. Instantly.", Visual: MissedCallVisual },
@@ -868,46 +870,17 @@ const Index = () => {
                 ))}
               </div>
 
-              {/* Mobile: 3 labeled pairs */}
-              <div className="space-y-10 md:hidden">
-                {[
-                  { label: "Speed", indices: [0, 1] },
-                  { label: "Trust", indices: [2, 3] },
-                  { label: "Operations", indices: [4, 5] },
-                ].map((group) => (
-                  <SectionReveal key={group.label}>
-                    <div>
-                      <div className="mb-4 flex items-center gap-3">
-                        <span className="h-px flex-1 bg-gradient-to-r from-transparent via-[#4358ff]/35 to-transparent" />
-                        <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-[#4358ff]">
-                          {group.label}
-                        </p>
-                        <span className="h-px flex-1 bg-gradient-to-r from-transparent via-[#4358ff]/35 to-transparent" />
-                      </div>
-                      <div className="grid grid-cols-1 gap-5">
-                        {group.indices.map((i) => {
-                          const pp = painPoints[i];
-                          return (
-                            <PainPointCard
-                              key={i}
-                              pain={pp.pain}
-                              solution={pp.solution}
-                              caption={pp.caption}
-                              visual={<pp.Visual />}
-                            />
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </SectionReveal>
-                ))}
-              </div>
+              {/* Mobile: single tabbed diagnostic */}
+              <MobileDiagnostic />
             </div>
           </section>
 
-        {/* AI CALLING AGENT SHOWCASE — lazy loaded */}
+        {/* MOBILE: Service Workshop replaces 3 service sections */}
+        <MobileServiceWorkshop />
+
+        {/* AI CALLING AGENT SHOWCASE — desktop/tablet only */}
         <LazySection rootMargin="300px" minHeight="500px">
-          <section className="py-14 md:py-32 relative">
+          <section className="hidden md:block py-14 md:py-32 relative">
             <div className="max-w-7xl mx-auto px-5 md:section-padding relative z-10">
               <SectionReveal>
                 <div className="text-center mb-8 md:mb-16">
@@ -998,7 +971,7 @@ const Index = () => {
 
       {/* CHATBOTS & AUTOMATION — lazy loaded */}
       <LazySection rootMargin="300px" minHeight="400px">
-        <section className="py-14 md:py-32 surface-elevated">
+        <section className="hidden md:block py-14 md:py-32 surface-elevated">
           <div className="max-w-7xl mx-auto px-5 md:section-padding">
             <div className="grid lg:grid-cols-2 gap-6 md:gap-16 items-center">
               <div className="relative z-10">
@@ -1081,7 +1054,7 @@ const Index = () => {
 
       {/* WEBSITES & APPS — lazy loaded */}
       <LazySection rootMargin="300px" minHeight="400px">
-        <section className="py-14 md:py-32 relative">
+        <section className="hidden md:block py-14 md:py-32 relative">
           <div className="max-w-7xl mx-auto px-5 md:section-padding">
             <SectionReveal>
               <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Websites & Apps</p>
