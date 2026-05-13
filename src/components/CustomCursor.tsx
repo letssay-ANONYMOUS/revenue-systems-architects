@@ -85,93 +85,63 @@ const CustomCursor = () => {
 
   return (
     <motion.div
-      className="pointer-events-none fixed left-0 top-0 z-[9998] h-16 w-16"
+      className="pointer-events-none fixed left-0 top-0 z-[9998] h-12 w-12"
       style={{
         x: springX,
         y: springY,
-        translateX: -58,
-        translateY: -30,
         willChange: "transform",
       }}
       animate={{
-        scale: pressed ? 0.96 : hovering ? 1.035 : 1,
+        scale: pressed ? 0.94 : hovering ? 1.06 : 1,
       }}
       transition={{ type: "spring", stiffness: 560, damping: 34, mass: 0.34 }}
       aria-hidden="true"
     >
+      {/* Hotspot is at (0,0) of this SVG — the very tip of the arrow */}
       <svg
-        width="64"
-        height="64"
-        viewBox="0 0 64 64"
+        width="28"
+        height="32"
+        viewBox="0 0 28 32"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
         className="block overflow-visible"
+        shapeRendering="geometricPrecision"
       >
         <defs>
-          <linearGradient id="cursor-matte-face" x1="16" y1="8" x2="48" y2="55" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stopColor="#555656" />
-            <stop offset="0.22" stopColor="#343535" />
-            <stop offset="0.56" stopColor="#181919" />
-            <stop offset="0.84" stopColor="#090a0a" />
-            <stop offset="1" stopColor="#020303" />
+          <linearGradient id="cursor-face" x1="2" y1="2" x2="22" y2="30" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stopColor="#3a3b3c" />
+            <stop offset="0.45" stopColor="#1b1c1d" />
+            <stop offset="1" stopColor="#050606" />
           </linearGradient>
-          <linearGradient id="cursor-matte-edge" x1="12" y1="6" x2="56" y2="58" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stopColor="#8a8b8b" />
-            <stop offset="0.25" stopColor="#414343" />
-            <stop offset="0.55" stopColor="#111212" />
-            <stop offset="0.78" stopColor="#030404" />
-            <stop offset="1" stopColor="#303131" />
+          <linearGradient id="cursor-edge" x1="0" y1="0" x2="24" y2="30" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stopColor="#a8aaab" stopOpacity="0.9" />
+            <stop offset="0.5" stopColor="#2a2b2c" />
+            <stop offset="1" stopColor="#0a0b0b" />
           </linearGradient>
-          <linearGradient id="cursor-matte-rim" x1="15" y1="9" x2="42" y2="54" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stopColor="#9a9b9b" stopOpacity="0.36" />
-            <stop offset="0.42" stopColor="#ffffff" stopOpacity="0.07" />
-            <stop offset="0.78" stopColor="#000000" stopOpacity="0.22" />
-            <stop offset="1" stopColor="#000000" stopOpacity="0.66" />
+          <linearGradient id="cursor-sheen" x1="3" y1="3" x2="14" y2="22" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stopColor="#ffffff" stopOpacity="0.28" />
+            <stop offset="0.6" stopColor="#ffffff" stopOpacity="0.04" />
+            <stop offset="1" stopColor="#000000" stopOpacity="0" />
           </linearGradient>
-          <radialGradient id="cursor-matte-highlight" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(29 18) rotate(48) scale(28 15)">
-            <stop stopColor="#858686" stopOpacity="0.32" />
-            <stop offset="0.54" stopColor="#3a3b3b" stopOpacity="0.08" />
-            <stop offset="1" stopColor="#121313" stopOpacity="0" />
-          </radialGradient>
-          <filter id="cursor-matte-depth" x="-14" y="-12" width="96" height="96" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
-            <feDropShadow dx="0" dy="8" stdDeviation="4.6" floodColor="#020303" floodOpacity="0.28" />
-            <feDropShadow dx="0" dy="2" stdDeviation="1.1" floodColor="#000000" floodOpacity="0.42" />
+          <filter id="cursor-shadow" x="-6" y="-4" width="40" height="44" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+            <feDropShadow dx="0.5" dy="3" stdDeviation="2" floodColor="#000000" floodOpacity="0.35" />
+            <feDropShadow dx="0" dy="1" stdDeviation="0.6" floodColor="#000000" floodOpacity="0.45" />
           </filter>
         </defs>
 
-        <g filter="url(#cursor-matte-depth)">
+        <g filter="url(#cursor-shadow)">
+          {/* Classic arrow pointer, tip exactly at (0,0). Subtle ~12° tilt. */}
           <path
-            d="M14.82 7.6C11.34 5.9 7.64 9.28 9.08 12.88L24.88 52.42C27.08 57.92 34.42 58.88 37.98 54.12L58.08 27.24C61.5 22.66 58.46 16.08 52.77 15.76L14.82 7.6Z"
-            fill="url(#cursor-matte-face)"
-            stroke="url(#cursor-matte-edge)"
-            strokeWidth="2.45"
+            d="M0.6 0.6 L0.6 22.4 L6.4 17.6 L9.9 25.8 L13.0 24.5 L9.6 16.4 L17.0 16.4 Z"
+            fill="url(#cursor-face)"
+            stroke="url(#cursor-edge)"
+            strokeWidth="1.1"
             strokeLinejoin="round"
           />
           <path
-            d="M16.14 11.34C14.64 10.62 13.05 12.06 13.67 13.61L28.45 50.58C29.37 52.88 32.43 53.29 33.92 51.3L55.05 23.05C56.48 21.13 55.21 18.38 52.84 18.22L16.14 11.34Z"
-            fill="url(#cursor-matte-highlight)"
-            opacity="0.82"
-          />
-          <path
-            d="M15.9 11.66C14.64 11.04 13.29 12.26 13.82 13.56L28.08 49.32C28.86 51.27 31.47 51.62 32.72 49.95L53.86 21.7"
-            stroke="url(#cursor-matte-rim)"
-            strokeWidth="1.18"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-          <path
-            d="M19.12 12.98L50.22 19.78C53.02 20.39 53.98 23.86 52.14 26.05"
-            stroke="#9d9f9f"
-            strokeOpacity="0.2"
-            strokeWidth="1.05"
-            strokeLinecap="round"
-          />
-          <path
-            d="M28.52 51.04C29.24 52.88 31.74 53.18 32.92 51.57L51.98 25.8"
-            stroke="#000000"
-            strokeOpacity="0.5"
-            strokeWidth="1.35"
-            strokeLinecap="round"
+            d="M2.0 3.0 L2.0 19.5 L6.2 15.9 L9.4 23.4 L11.2 22.7 L8.0 15.2 L14.4 15.2 Z"
+            fill="url(#cursor-sheen)"
+            opacity="0.85"
           />
         </g>
       </svg>
