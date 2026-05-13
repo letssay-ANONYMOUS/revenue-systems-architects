@@ -875,9 +875,12 @@ const Index = () => {
             </div>
           </section>
 
-        {/* AI CALLING AGENT SHOWCASE — lazy loaded */}
+        {/* MOBILE: Service Workshop replaces 3 service sections */}
+        <MobileServiceWorkshop />
+
+        {/* AI CALLING AGENT SHOWCASE — desktop/tablet only */}
         <LazySection rootMargin="300px" minHeight="500px">
-          <section className="py-14 md:py-32 relative">
+          <section className="hidden md:block py-14 md:py-32 relative">
             <div className="max-w-7xl mx-auto px-5 md:section-padding relative z-10">
               <SectionReveal>
                 <div className="text-center mb-8 md:mb-16">
