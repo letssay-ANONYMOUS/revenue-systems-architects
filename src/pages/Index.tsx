@@ -544,7 +544,7 @@ const WebsiteShowcaseCarousel = () => {
           </div>
         </motion.div>
 
-        <div className="absolute left-1 top-1/2 z-30 -translate-y-1/2 p-3 md:-left-[4.4rem]">
+        <div className="absolute left-1 top-1/2 z-30 -translate-y-1/2 p-3 md:-left-[4.9rem]">
           <motion.button
             type="button"
             data-native-press
@@ -553,13 +553,13 @@ const WebsiteShowcaseCarousel = () => {
               event.stopPropagation();
               showPrevious();
             }}
-            className="relative flex h-12 w-12 items-center justify-center rounded-full border border-white/72 bg-white/62 text-[#111827] shadow-[0_18px_45px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-8px_18px_rgba(17,24,39,0.06)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:-translate-x-0.5 hover:bg-white/86 active:translate-y-0.5 active:scale-[0.965] active:shadow-[0_8px_20px_rgba(20,32,50,0.16),inset_0_4px_12px_rgba(17,24,39,0.08),inset_0_1px_0_rgba(255,255,255,0.8)]"
+            className="relative flex h-14 w-14 items-center justify-center rounded-full border border-white/76 bg-white/78 text-[#111827] shadow-[0_22px_54px_rgba(20,32,50,0.2),inset_0_1px_0_rgba(255,255,255,0.96),inset_0_-9px_20px_rgba(17,24,39,0.07)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:-translate-x-0.5 hover:bg-white/92 active:translate-y-0.5 active:scale-[0.965] active:shadow-[0_9px_22px_rgba(20,32,50,0.17),inset_0_4px_12px_rgba(17,24,39,0.09),inset_0_1px_0_rgba(255,255,255,0.82)]"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-5 w-5" strokeWidth={2.25} />
           </motion.button>
         </div>
 
-        <div className="absolute right-1 top-1/2 z-30 -translate-y-1/2 p-3 md:-right-[4.6rem]">
+        <div className="absolute right-1 top-1/2 z-30 -translate-y-1/2 p-3 md:-right-[5rem]">
           <motion.button
             type="button"
             data-native-press
@@ -568,9 +568,9 @@ const WebsiteShowcaseCarousel = () => {
               event.stopPropagation();
               showNext();
             }}
-            className="relative flex h-[3.25rem] w-[3.25rem] items-center justify-center rounded-full border border-white/72 bg-white/70 text-[#1447d4] shadow-[0_18px_45px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-8px_18px_rgba(17,24,39,0.06)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:translate-x-0.5 hover:bg-white/90 active:translate-y-0.5 active:scale-[0.965] active:shadow-[0_8px_20px_rgba(20,32,50,0.16),inset_0_4px_12px_rgba(17,24,39,0.08),inset_0_1px_0_rgba(255,255,255,0.8)]"
+            className="relative flex h-14 w-14 items-center justify-center rounded-full border border-white/76 bg-white/78 text-[#1447d4] shadow-[0_22px_54px_rgba(20,32,50,0.2),inset_0_1px_0_rgba(255,255,255,0.96),inset_0_-9px_20px_rgba(17,24,39,0.07)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:translate-x-0.5 hover:bg-white/92 active:translate-y-0.5 active:scale-[0.965] active:shadow-[0_9px_22px_rgba(20,32,50,0.17),inset_0_4px_12px_rgba(17,24,39,0.09),inset_0_1px_0_rgba(255,255,255,0.82)]"
           >
-            <ChevronRight className="h-5 w-5" />
+            <ChevronRight className="h-5 w-5" strokeWidth={2.25} />
           </motion.button>
         </div>
 
