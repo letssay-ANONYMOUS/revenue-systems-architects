@@ -854,7 +854,8 @@ const Index = () => {
                   AI automation turns missed opportunities into booked appointments and loyal customers.
                 </p>
               </SectionReveal>
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {/* Desktop: 6-card grid */}
+              <div className="hidden grid-cols-1 gap-5 md:grid md:grid-cols-2 xl:grid-cols-3">
                 {painPoints.map((pp, i) => (
                   <SectionReveal key={i} delay={i * 0.05}>
                     <PainPointCard
@@ -863,6 +864,41 @@ const Index = () => {
                       caption={pp.caption}
                       visual={<pp.Visual />}
                     />
+                  </SectionReveal>
+                ))}
+              </div>
+
+              {/* Mobile: 3 labeled pairs */}
+              <div className="space-y-10 md:hidden">
+                {[
+                  { label: "Speed", indices: [0, 1] },
+                  { label: "Trust", indices: [2, 3] },
+                  { label: "Operations", indices: [4, 5] },
+                ].map((group) => (
+                  <SectionReveal key={group.label}>
+                    <div>
+                      <div className="mb-4 flex items-center gap-3">
+                        <span className="h-px flex-1 bg-gradient-to-r from-transparent via-[#4358ff]/35 to-transparent" />
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-[#4358ff]">
+                          {group.label}
+                        </p>
+                        <span className="h-px flex-1 bg-gradient-to-r from-transparent via-[#4358ff]/35 to-transparent" />
+                      </div>
+                      <div className="grid grid-cols-1 gap-5">
+                        {group.indices.map((i) => {
+                          const pp = painPoints[i];
+                          return (
+                            <PainPointCard
+                              key={i}
+                              pain={pp.pain}
+                              solution={pp.solution}
+                              caption={pp.caption}
+                              visual={<pp.Visual />}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
                   </SectionReveal>
                 ))}
               </div>
