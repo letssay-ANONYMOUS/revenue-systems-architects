@@ -526,16 +526,25 @@ const WebsiteShowcaseCarousel = () => {
                     </div>
                   )}
                   <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_0%,rgba(255,255,255,0.12),transparent_35%),linear-gradient(180deg,transparent_0%,rgba(7,16,31,0.10)_100%)]" />
-                  <div className="pointer-events-none absolute bottom-4 right-4 flex h-10 w-10 items-center justify-center rounded-full border border-white/70 bg-white/64 text-[#111827] opacity-0 shadow-[0_14px_34px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.92)] backdrop-blur-xl transition-opacity duration-300 group-hover:opacity-100 md:bottom-5 md:right-5">
+                  <button
+                    type="button"
+                    aria-label={`Expand ${active.title} website preview`}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      openPreview(active);
+                    }}
+                    className="absolute bottom-4 right-4 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white/70 bg-white/64 text-[#111827] opacity-100 shadow-[0_14px_34px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.92),inset_0_-7px_16px_rgba(17,24,39,0.055)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-white/86 active:translate-y-0.5 active:scale-[0.94] active:shadow-[0_7px_18px_rgba(20,32,50,0.14),inset_0_4px_12px_rgba(17,24,39,0.1)] md:bottom-5 md:right-5"
+                  >
                     <Maximize2 className="h-4 w-4" />
-                  </div>
+                  </button>
                 </div>
               </motion.div>
             </AnimatePresence>
           </div>
         </motion.div>
 
-        <div className="absolute right-1 top-1/2 z-30 flex -translate-y-1/2 items-center gap-2 p-3 md:-right-[5.25rem] md:gap-3">
+        <div className="absolute left-1 top-1/2 z-30 -translate-y-1/2 p-3 md:-left-[4.4rem]">
           <motion.button
             type="button"
             data-native-press
@@ -548,6 +557,9 @@ const WebsiteShowcaseCarousel = () => {
           >
             <ChevronLeft className="h-4 w-4" />
           </motion.button>
+        </div>
+
+        <div className="absolute right-1 top-1/2 z-30 -translate-y-1/2 p-3 md:-right-[4.6rem]">
           <motion.button
             type="button"
             data-native-press
