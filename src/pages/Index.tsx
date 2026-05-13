@@ -27,6 +27,8 @@ import RemindersVisual from "@/components/painpoints/visuals/RemindersVisual";
 import LighthouseVisual from "@/components/painpoints/visuals/LighthouseVisual";
 import WorkflowNodesVisual from "@/components/painpoints/visuals/WorkflowNodesVisual";
 import ConnectedToolsVisual from "@/components/painpoints/visuals/ConnectedToolsVisual";
+import MobileQuietLayer from "@/components/mobile/MobileQuietLayer";
+import StickyMobileCTA from "@/components/mobile/StickyMobileCTA";
 
 const painPoints = [
   { pain: "Missed calls", solution: "AI answers every call", caption: "Every call. Every time. Instantly.", Visual: MissedCallVisual },
@@ -825,6 +827,7 @@ const Index = () => {
 
       <div className="relative overflow-hidden bg-[#687079] text-white">
         <HeroScrollTransition />
+        <MobileQuietLayer cards={transitionCards} />
 
         {/* BUSINESS PAIN */}
         <section className="relative overflow-hidden bg-[#f7faff] py-14 text-[#0f1730] md:py-28">
