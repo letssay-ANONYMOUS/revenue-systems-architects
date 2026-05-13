@@ -27,6 +27,8 @@ import RemindersVisual from "@/components/painpoints/visuals/RemindersVisual";
 import LighthouseVisual from "@/components/painpoints/visuals/LighthouseVisual";
 import WorkflowNodesVisual from "@/components/painpoints/visuals/WorkflowNodesVisual";
 import ConnectedToolsVisual from "@/components/painpoints/visuals/ConnectedToolsVisual";
+import MobileQuietLayer from "@/components/mobile/MobileQuietLayer";
+import StickyMobileCTA from "@/components/mobile/StickyMobileCTA";
 
 const painPoints = [
   { pain: "Missed calls", solution: "AI answers every call", caption: "Every call. Every time. Instantly.", Visual: MissedCallVisual },
@@ -285,9 +287,9 @@ const RisingCardDetail = ({ card, onClose }: RisingCardDetailProps) => {
       <motion.div
         aria-hidden="true"
         className="absolute inset-0 bg-[#07101f]/24"
-        initial={{ opacity: 0, backdropFilter: "blur(0px)", WebkitBackdropFilter: "blur(0px)" }}
-        animate={{ opacity: 1, backdropFilter: "blur(5px)", WebkitBackdropFilter: "blur(5px)" }}
-        exit={{ opacity: 0, backdropFilter: "blur(0px)", WebkitBackdropFilter: "blur(0px)" }}
+        initial={{ opacity: 0, backdropFilter: "blur(0px)" } as any}
+        animate={{ opacity: 1, backdropFilter: "blur(5px)" } as any}
+        exit={{ opacity: 0, backdropFilter: "blur(0px)" } as any}
         transition={{ duration: 0.58, ease: [0.16, 1, 0.3, 1] }}
       />
       <motion.button
@@ -405,7 +407,7 @@ const WebsiteShowcaseCarousel = () => {
     };
   }, [closePreview, selectedWebsite]);
 
-  const panelVariants = {
+  const panelVariants: any = {
     enter: (travelDirection: number) => ({
       x: travelDirection >= 0 ? "132%" : "-132%",
       opacity: 0,
@@ -825,6 +827,7 @@ const Index = () => {
 
       <div className="relative overflow-hidden bg-[#687079] text-white">
         <HeroScrollTransition />
+        <MobileQuietLayer cards={transitionCards} />
 
         {/* BUSINESS PAIN */}
         <section className="relative overflow-hidden bg-[#f7faff] py-14 text-[#0f1730] md:py-28">
@@ -851,7 +854,8 @@ const Index = () => {
                   AI automation turns missed opportunities into booked appointments and loyal customers.
                 </p>
               </SectionReveal>
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {/* Desktop: 6-card grid */}
+              <div className="hidden grid-cols-1 gap-5 md:grid md:grid-cols-2 xl:grid-cols-3">
                 {painPoints.map((pp, i) => (
                   <SectionReveal key={i} delay={i * 0.05}>
                     <PainPointCard
@@ -860,6 +864,41 @@ const Index = () => {
                       caption={pp.caption}
                       visual={<pp.Visual />}
                     />
+                  </SectionReveal>
+                ))}
+              </div>
+
+              {/* Mobile: 3 labeled pairs */}
+              <div className="space-y-10 md:hidden">
+                {[
+                  { label: "Speed", indices: [0, 1] },
+                  { label: "Trust", indices: [2, 3] },
+                  { label: "Operations", indices: [4, 5] },
+                ].map((group) => (
+                  <SectionReveal key={group.label}>
+                    <div>
+                      <div className="mb-4 flex items-center gap-3">
+                        <span className="h-px flex-1 bg-gradient-to-r from-transparent via-[#4358ff]/35 to-transparent" />
+                        <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-[#4358ff]">
+                          {group.label}
+                        </p>
+                        <span className="h-px flex-1 bg-gradient-to-r from-transparent via-[#4358ff]/35 to-transparent" />
+                      </div>
+                      <div className="grid grid-cols-1 gap-5">
+                        {group.indices.map((i) => {
+                          const pp = painPoints[i];
+                          return (
+                            <PainPointCard
+                              key={i}
+                              pain={pp.pain}
+                              solution={pp.solution}
+                              caption={pp.caption}
+                              visual={<pp.Visual />}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
                   </SectionReveal>
                 ))}
               </div>
@@ -967,7 +1006,7 @@ const Index = () => {
                 <h2 className="font-display font-bold text-xl md:text-4xl leading-tight mb-3 md:mb-6">
                   Instant Replies. <span className="gradient-text">Zero Wait Times.</span>
                 </h2>
-                <p className="text-xs md:text-base text-muted-foreground mb-4 md:mb-8 leading-relaxed hidden md:block">
+                <p className="text-xs md:text-base text-muted-foreground mb-4 md:mb-8 leading-relaxed">
                   Your chatbot handles FAQs, captures leads, qualifies prospects, and books appointments — while your team closes deals.
                 </p>
                 <div className="grid grid-cols-2 gap-2 md:gap-3 mb-4 md:mb-0">
@@ -1155,6 +1194,8 @@ const Index = () => {
         <CTASection />
         <Footer />
       </LazySection>
+
+      <StickyMobileCTA />
     </div>
   );
 };
