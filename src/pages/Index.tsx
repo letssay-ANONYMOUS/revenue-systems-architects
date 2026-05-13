@@ -285,9 +285,9 @@ const RisingCardDetail = ({ card, onClose }: RisingCardDetailProps) => {
       <motion.div
         aria-hidden="true"
         className="absolute inset-0 bg-[#07101f]/24"
-        initial={{ opacity: 0, backdropFilter: "blur(0px)", WebkitBackdropFilter: "blur(0px)" }}
-        animate={{ opacity: 1, backdropFilter: "blur(5px)", WebkitBackdropFilter: "blur(5px)" }}
-        exit={{ opacity: 0, backdropFilter: "blur(0px)", WebkitBackdropFilter: "blur(0px)" }}
+        initial={{ opacity: 0, backdropFilter: "blur(0px)" } as any}
+        animate={{ opacity: 1, backdropFilter: "blur(5px)" } as any}
+        exit={{ opacity: 0, backdropFilter: "blur(0px)" } as any}
         transition={{ duration: 0.58, ease: [0.16, 1, 0.3, 1] }}
       />
       <motion.button
@@ -405,7 +405,7 @@ const WebsiteShowcaseCarousel = () => {
     };
   }, [closePreview, selectedWebsite]);
 
-  const panelVariants = {
+  const panelVariants: any = {
     enter: (travelDirection: number) => ({
       x: travelDirection >= 0 ? "132%" : "-132%",
       opacity: 0,
