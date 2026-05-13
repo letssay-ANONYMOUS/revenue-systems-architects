@@ -1158,6 +1158,8 @@ const Index = () => {
         <CTASection />
         <Footer />
       </LazySection>
+
+      <StickyMobileCTA />
     </div>
   );
 };
