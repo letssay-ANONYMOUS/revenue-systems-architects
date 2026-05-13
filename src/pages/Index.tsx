@@ -8,7 +8,7 @@ import {
   Layers, Database,
   Headphones, Send, X, ChevronLeft, ChevronRight, Maximize2
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CTASection from "@/components/CTASection";
@@ -258,9 +258,13 @@ interface RisingCardDetailProps {
 }
 
 const RisingCardDetail = ({ card, onClose }: RisingCardDetailProps) => {
+  const closeDetail = useCallback(() => {
+    onClose();
+  }, [onClose]);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") closeDetail();
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -268,7 +272,7 @@ const RisingCardDetail = ({ card, onClose }: RisingCardDetailProps) => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [onClose]);
+  }, [closeDetail]);
 
   return createPortal(
     <motion.div
@@ -276,39 +280,58 @@ const RisingCardDetail = ({ card, onClose }: RisingCardDetailProps) => {
       role="dialog"
       aria-modal="true"
       aria-label={`${card.label} details`}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ pointerEvents: "auto" }}
+      animate={{ pointerEvents: "auto" }}
+      exit={{ pointerEvents: "none" }}
     >
+      <motion.div
+        aria-hidden="true"
+        className="absolute inset-0 bg-[#07101f]/24"
+        initial={{ opacity: 0, backdropFilter: "blur(0px)", WebkitBackdropFilter: "blur(0px)" }}
+        animate={{ opacity: 1, backdropFilter: "blur(5px)", WebkitBackdropFilter: "blur(5px)" }}
+        exit={{ opacity: 0, backdropFilter: "blur(0px)", WebkitBackdropFilter: "blur(0px)" }}
+        transition={{ duration: 0.58, ease: [0.16, 1, 0.3, 1] }}
+      />
       <motion.button
         type="button"
         aria-label="Close card details"
-        className="absolute inset-0 cursor-default bg-[#07101f]/24 backdrop-blur-[5px]"
-        onClick={onClose}
+        className="absolute inset-0 cursor-default"
+        onClick={closeDetail}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
+        exit={{ opacity: 0, pointerEvents: "none" }}
+        transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
       />
 
       <motion.div
         className="relative w-[min(1320px,95vw)] overflow-hidden rounded-[2.2rem] border border-white/60 bg-white/56 p-4 text-[#111827] shadow-[0_50px_140px_rgba(10,18,30,0.36),inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(17,24,39,0.1)] backdrop-blur-2xl"
         initial={{ y: "104%", scale: 0.96, opacity: 0.96 }}
         animate={{ y: 0, scale: 1, opacity: 1 }}
-        exit={{ y: "108%", scale: 0.98, opacity: 0 }}
-        transition={{ type: "spring", stiffness: 122, damping: 24, mass: 0.88 }}
+        exit={{ y: "104%", scale: 0.985, opacity: 0, pointerEvents: "none" }}
+        transition={{ type: "spring", stiffness: 132, damping: 25, mass: 0.82 }}
+        onClick={(event) => event.stopPropagation()}
       >
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.78),rgba(255,255,255,0.24)_42%,rgba(20,71,212,0.08))]" />
         <div className="pointer-events-none absolute inset-[1px] rounded-[1.9rem] border border-white/44 shadow-[inset_0_26px_80px_rgba(255,255,255,0.24)]" />
 
-        <button
+        <motion.button
           type="button"
           aria-label="Close card details"
-          className="absolute right-6 top-6 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white/60 bg-white/58 text-[#111827]/76 shadow-[0_12px_34px_rgba(14,23,36,0.16),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur-xl transition hover:bg-white/78"
-          onClick={onClose}
+          className="absolute right-6 top-6 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/68 bg-white/64 text-[#111827]/80 shadow-[0_16px_38px_rgba(14,23,36,0.18),inset_0_1px_0_rgba(255,255,255,0.84),inset_0_-8px_18px_rgba(17,24,39,0.055)] backdrop-blur-xl transition-[background-color,box-shadow,color] duration-300 hover:bg-white/84 hover:text-[#111827]"
+          onClick={(event) => {
+            event.stopPropagation();
+            closeDetail();
+          }}
+          whileHover={{ scale: 1.06, y: -1 }}
+          whileTap={{
+            scale: 0.9,
+            y: 2,
+            boxShadow: "0 7px 18px rgba(14,23,36,0.16), inset 0 4px 12px rgba(17,24,39,0.1), inset 0 1px 0 rgba(255,255,255,0.72)",
+          }}
+          transition={{ type: "spring", stiffness: 520, damping: 24, mass: 0.42 }}
         >
           <X className="h-4 w-4" />
-        </button>
+        </motion.button>
 
         <div className="relative z-10 grid gap-5 lg:grid-cols-[1.65fr_0.8fr]">
           <div className="overflow-hidden rounded-[1.65rem] border border-white/64 bg-[#eef3f7]/68 p-2 shadow-[0_28px_80px_rgba(26,39,55,0.18),inset_0_1px_0_rgba(255,255,255,0.8)]">
