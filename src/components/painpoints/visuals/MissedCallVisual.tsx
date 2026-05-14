@@ -48,18 +48,18 @@ const MissedCallVisual = () => (
           fill="none"
           filter="url(#missed-call-wave-glow)"
           stroke="url(#missed-call-wave)"
-          strokeDasharray="72 248"
+          strokeDasharray="44 596"
           strokeLinecap="round"
-          strokeWidth="3"
+          strokeWidth="5"
         />
         <path
           className="pp-voice-flow"
           d="M0 42 C14 42 16 42 26 42 C34 42 36 24 42 24 C50 24 50 61 58 61 C66 61 66 18 75 18 C84 18 84 66 93 66 C102 66 101 30 109 30 C118 30 118 54 126 54 C134 54 134 20 143 20 C153 20 151 68 160 68 C169 68 170 27 178 27 C187 27 187 57 195 57 C204 57 203 21 212 21 C221 21 221 62 230 62 C239 62 238 31 247 31 C257 31 255 52 264 52 C273 52 273 37 282 37 C293 37 296 42 320 42"
           fill="none"
-          stroke="url(#missed-call-wave)"
-          strokeDasharray="36 284"
+          stroke="#5665e8"
+          strokeDasharray="14 626"
           strokeLinecap="round"
-          strokeWidth="1.6"
+          strokeWidth="2.6"
         />
       </svg>
       <span className="pp-voice-sheen absolute left-0 top-1/2 h-12 w-16 -translate-y-1/2 rounded-full bg-[#6572ed]/10 blur-xl" />
