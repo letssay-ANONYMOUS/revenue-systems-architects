@@ -793,9 +793,18 @@
   100% { transform: scale(1.8); opacity: 0; }
 }
 @keyframes pp-voice-flow {
-  0% { stroke-dashoffset: 320; opacity: 0.45; }
-  45% { opacity: 1; }
-  100% { stroke-dashoffset: 0; opacity: 0.5; }
+  0% { stroke-dashoffset: 640; opacity: 0; }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes pp-voice-worm {
+  0% { stroke-dashoffset: 640; }
+  100% { stroke-dashoffset: 0; }
+}
+@keyframes pp-voice-worm-pulse {
+  0%, 100% { stroke-width: 2.4; filter: drop-shadow(0 0 3px rgba(101,114,237,0.55)); }
+  50% { stroke-width: 3.4; filter: drop-shadow(0 0 7px rgba(101,114,237,0.95)); }
 }
 @keyframes pp-voice-breathe {
   0%, 100% { transform: translateY(0) scaleY(0.92); opacity: 0.7; }
