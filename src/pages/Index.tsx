@@ -776,7 +776,7 @@ const Index = () => {
       <Navbar />
 
       {/* HERO — immediate, no lazy loading */}
-      <section ref={heroRef} className="relative min-h-[100dvh] overflow-hidden bg-black md:min-h-[132dvh]">
+      <section ref={heroRef} className="mobile-stable-hero relative overflow-hidden bg-black">
         <video
           className="absolute inset-0 h-full w-full object-cover object-[62%_center] md:object-[64%_center]"
           autoPlay
@@ -790,7 +790,7 @@ const Index = () => {
         </video>
 
         <div className="pointer-events-none absolute inset-0 pt-20 md:pt-0">
-          <div className="mx-auto flex min-h-[100dvh] max-w-[1480px] items-end justify-center px-4 pb-10 sm:px-6 md:min-h-[132dvh] md:items-center md:justify-end md:px-6 md:pb-[20vh] lg:px-8 xl:translate-x-8 2xl:translate-x-12">
+          <div className="mobile-stable-hero mx-auto flex max-w-[1480px] items-end justify-center px-4 pb-10 sm:px-6 md:items-center md:justify-end md:px-6 md:pb-[20vh] lg:px-8 xl:translate-x-8 2xl:translate-x-12">
             <motion.div
               initial={{ opacity: 0, y: 18, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}

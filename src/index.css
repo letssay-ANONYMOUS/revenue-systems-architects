@@ -92,6 +92,22 @@
   }
 }
 
+@layer utilities {
+  .mobile-stable-hero {
+    height: 100vh;
+    min-height: 100vh;
+    height: 100svh;
+    min-height: 100svh;
+  }
+
+  @media (min-width: 768px) {
+    .mobile-stable-hero {
+      height: auto;
+      min-height: 132dvh;
+    }
+  }
+}
+
 @layer components {
   .gradient-text {
     @apply bg-clip-text text-transparent;

@@ -63,18 +63,20 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
       y: 0,
       rotateX: 0,
       rotateY: 0,
-      transition: { type: "spring", stiffness: 520, damping: 28, mass: 0.6 },
+      transition: { duration: 0.22, ease: [0.16, 1, 0.3, 1] },
     });
     if (didTap) {
-      onOpen();
-      openingRef.current = false;
+      requestAnimationFrame(() => {
+        onOpen();
+        openingRef.current = false;
+      });
     }
   };
 
   return (
     <motion.article
       ref={articleRef as React.RefObject<HTMLElement>}
-      className="group relative w-[86vw] shrink-0 snap-start cursor-pointer overflow-hidden rounded-[1.55rem] border border-white/55 bg-white/40 p-2.5 text-left shadow-[0_30px_70px_rgba(20,29,38,0.18),inset_0_1px_0_rgba(255,255,255,0.78)] backdrop-blur-2xl"
+      className="group relative w-[86vw] shrink-0 touch-manipulation snap-start cursor-pointer overflow-hidden rounded-[1.55rem] border border-white/55 bg-white/40 p-2.5 text-left shadow-[0_30px_70px_rgba(20,29,38,0.18),inset_0_1px_0_rgba(255,255,255,0.78)] backdrop-blur-2xl"
       initial={{ opacity: 0, y: 60, scale: 0.92 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-15% 0px" }}
@@ -94,6 +96,7 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
       onPointerUp={() => pressOut(true)}
       onPointerCancel={() => pressOut(false)}
       onPointerLeave={() => pressed && pressOut(false)}
+      onContextMenu={(event) => event.preventDefault()}
     >
       {/* Inner gloss */}
       <div

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, PanInfo } from "framer-motion";
 import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 
 const cases = [
   {
@@ -67,6 +67,14 @@ const MobileCaseRolodex = () => {
 
   const next = () => setActive((i) => (i + 1) % cases.length);
   const prev = () => setActive((i) => (i - 1 + cases.length) % cases.length);
+  const goNext = () => {
+    markInteracted();
+    next();
+  };
+  const goPrev = () => {
+    markInteracted();
+    prev();
+  };
 
   const onDragEnd = (_: unknown, info: PanInfo) => {
     const { offset, velocity } = info;
@@ -234,6 +242,40 @@ const MobileCaseRolodex = () => {
                 </motion.article>
               );
             })}
+
+            <motion.button
+              type="button"
+              aria-label="Previous case"
+              data-native-press
+              onClick={goPrev}
+              whileTap={{
+                y: 1,
+                scale: 0.94,
+                boxShadow:
+                  "0 8px 22px rgba(20,32,50,0.14), inset 0 5px 14px rgba(17,24,39,0.1), inset 0 1px 0 rgba(255,255,255,0.78)",
+              }}
+              transition={{ type: "spring", stiffness: 560, damping: 26, mass: 0.42 }}
+              className="absolute -left-2 top-1/2 z-40 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/75 bg-white/58 text-[#111827] shadow-[0_18px_46px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-9px_18px_rgba(17,24,39,0.06)] backdrop-blur-2xl backdrop-saturate-150"
+            >
+              <ChevronLeft className="h-5 w-5" strokeWidth={2.35} />
+            </motion.button>
+
+            <motion.button
+              type="button"
+              aria-label="Next case"
+              data-native-press
+              onClick={goNext}
+              whileTap={{
+                y: 1,
+                scale: 0.94,
+                boxShadow:
+                  "0 8px 22px rgba(20,32,50,0.14), inset 0 5px 14px rgba(17,24,39,0.1), inset 0 1px 0 rgba(255,255,255,0.78)",
+              }}
+              transition={{ type: "spring", stiffness: 560, damping: 26, mass: 0.42 }}
+              className="absolute -right-2 top-1/2 z-40 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/75 bg-white/58 text-[#111827] shadow-[0_18px_46px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-9px_18px_rgba(17,24,39,0.06)] backdrop-blur-2xl backdrop-saturate-150"
+            >
+              <ChevronRight className="h-5 w-5" strokeWidth={2.35} />
+            </motion.button>
           </div>
         </div>
 
