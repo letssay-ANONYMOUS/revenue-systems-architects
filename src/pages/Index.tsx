@@ -1074,7 +1074,10 @@ const Index = () => {
                 Real Systems. <span className="gradient-text">Measurable Impact.</span>
               </h2>
             </SectionReveal>
-            <LiquidCaseStudyCards />
+            <MobileCaseRolodex />
+            <div className="hidden md:block">
+              <LiquidCaseStudyCards />
+            </div>
           </div>
         </section>
       </LazySection>
