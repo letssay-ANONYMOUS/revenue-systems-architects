@@ -148,23 +148,23 @@ const MobileCaseRolodex = () => {
                     }}
                   />
 
-                  {/* Color blob behind the glass */}
+                  {/* Glass surface — truly translucent so the page shows through */}
                   <div
                     aria-hidden
-                    className="absolute -inset-10 blur-2xl"
-                    style={{ background: c.blob }}
+                    className="absolute inset-0 rounded-[28px] bg-white/15 backdrop-blur-2xl backdrop-saturate-150"
                   />
 
-                  {/* Glass surface */}
+                  {/* Faint per-card color tint (kept very low so it stays clear) */}
                   <div
                     aria-hidden
-                    className="absolute inset-0 rounded-[28px] bg-white/55 backdrop-blur-2xl backdrop-saturate-150"
+                    className="absolute inset-0 rounded-[28px] opacity-25"
+                    style={{ background: c.blob }}
                   />
 
                   {/* Top specular highlight */}
                   <div
                     aria-hidden
-                    className="absolute inset-x-0 top-0 h-1/2 rounded-t-[28px] bg-gradient-to-b from-white/70 via-white/15 to-transparent"
+                    className="absolute inset-x-0 top-0 h-1/2 rounded-t-[28px] bg-gradient-to-b from-white/40 via-white/5 to-transparent"
                   />
 
                   {/* Refractive gradient border */}
