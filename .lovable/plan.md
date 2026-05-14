@@ -1,76 +1,58 @@
-## Two effects from your video, applied cleanly
+# Mobile Home — Round 2 Polish
 
-**1. Stacked card deck (replaces the current "rising cards" under the hero)**
-Cards become a sticky deck. Each card slides up into the viewport as you scroll, lands at center with a subtle rotation, then the next card slides up over it — previous cards stay visible underneath, peeking out with their tilt. Same content as today (Calls captured / Bookings lifted / Admin reduced), only the motion changes.
+Goal: push the mobile home page from "good" to "Awwwards-grade phone experience." Focus on density, motion realism, tactility, and visual storytelling. Desktop untouched.
 
-**2. B&W liquid-glass band reveal (new section between hero-deck and DarkStageShowcase)**
-Three horizontal glass bands stack vertically and slide up from below in a staggered sequence as you scroll, like blinds closing upward. Pure black & white liquid-glass styling (frosted dark surfaces, inner highlights, soft sheen). Easy to upgrade to refractive 3D liquid glass later without changing structure.
+## 1. Hero (mobile-only upgrades)
+- Tighten headline to fit on one screen above the fold (no scroll to see CTA).
+- Add a subtle **scroll-linked parallax** on the headline (drifts up + fades) and a **floating glass status pill** ("● Live · 12 calls handled today") that animates in after the headline.
+- Replace the long sub-paragraph with **2 short kinetic lines** that swap every 3s (revenue-focused).
+- Primary CTA becomes a **liquid-glass button** matching the new sticky bar (same material language).
 
-Nothing else on the page is touched.
+## 2. MobileDiagnostic — make it feel alive
+- Add a **morphing "Before → After" toggle** inside each card (swipe left/right on the visual to flip states with a fluid mask wipe, not just fade).
+- Animated **metric counter** (counts up from 0 → target when card enters view).
+- **Haptic-feel tap** on tabs (spring + tiny scale + soft shadow press).
+- Tab indicator gets a **moving glow trail** (gradient that lags 80ms behind).
+- Add a "Next →" affordance so users know to swipe between items inside a tab.
 
-## Implementation
+## 3. MobileServiceWorkshop — phone mockup density
+- Increase phone frame realism: **dynamic island, status bar, rounded bezel highlight, subtle reflection sweep**.
+- Each scene gets **one extra micro-detail**:
+  - Call: live waveform pulsing with audio-style bars + caller name typing in
+  - Chat: typing indicator, then message lands with a soft bounce, then "Booked ✓" toast
+  - Web: Lighthouse score animates 0→100 with a green ring sweep, plus a fake browser scroll
+- Add **scene labels with progress** ("Scene 2 of 3 · Chat") and a tap-to-pause/play.
+- Allow **swipe left/right** to switch scenes manually (currently auto-only).
 
-### Part 1 — Stacked deck
+## 4. New mobile section: "Proof Strip"
+Replace the stat-card row with a **horizontal auto-scrolling marquee** of 5 metrics + 3 client logos, pausing on touch. Single line, full bleed, no scroll cost.
 
-File: `src/pages/Index.tsx` → rewrite `HeroScrollTransition` and `RisingShowcaseCard`.
+## 5. Transition cards (RisingShowcase) — mobile variant
+- Currently desktop-tuned 3D 3-up. On mobile, render as a **vertical stack of 3 liquid-glass cards** that rise + tilt-in on scroll (one at a time), each with the shimmer sweep preserved. Tap opens a **bottom-sheet detail** (same as MobileQuietLayer's sheet) instead of the desktop modal.
 
-- Section height `~360vh`, one sticky `100dvh` stage inside
-- Cards rendered absolutely-centered, stacked in z-order
-- Per-card scroll range: card N active in `[N/3, (N+1)/3]` of `scrollYProgress`
-- Card animation in its range:
-  - `y`: `70vh → 0`
-  - `scale`: `0.92 → 1`
-  - `rotate`: locked tilt per card (`-3°`, `+2°`, `-2°`)
-  - `opacity`: `0 → 1`
-- Once landed, card stays pinned; next card slides up on top, slightly offset down so previous tilt peeks
-- `useSpring` (stiffness 90, damping 28, mass 0.5, restDelta 0.001) wrapping `scrollYProgress` for smoothness
-- All transforms GPU-only (`transform-gpu`, `will-change: transform`)
-- Headline ("The quiet layer…") fades in/out as today
-- Off-brand orange grid overlay removed; keeps the existing glass card styling
+## 6. Sticky CTA bar — minor polish
+- Add a **thin animated gradient hairline** on top edge (breathing).
+- Add **safe-area padding** for iPhone home indicator.
+- Subtle **icon (phone) on the left** that pulses every 6s.
 
-### Part 2 — Band reveal
+## 7. Global mobile polish
+- **Section dividers**: add a 1px gradient hairline + soft glow between sections so the page reads as chapters, not a wall.
+- **Scroll-snap** on the main sections so each one centers cleanly.
+- **Reduce motion** respect: wrap heavy effects in `prefers-reduced-motion` checks.
+- Lazy-mount Workshop + Diagnostic visuals via `IntersectionObserver` for first-paint speed.
 
-New file: `src/components/BandReveal.tsx`. Inserted in `Index.tsx` between `<HeroScrollTransition />` and `<DarkStageShowcase />`.
+## Files to touch
+- `src/pages/Index.tsx` — hero mobile branch, mobile transition stack, proof strip, dividers
+- `src/components/mobile/MobileDiagnostic.tsx` — swipe flip, counters, glow trail
+- `src/components/mobile/MobileServiceWorkshop.tsx` — scene density, manual swipe, pause control
+- `src/components/mobile/StickyMobileCTA.tsx` — hairline + safe area + pulse icon
+- New: `src/components/mobile/MobileProofStrip.tsx`
+- New: `src/components/mobile/MobileTransitionStack.tsx`
+- New: `src/components/mobile/MobileHeroExtras.tsx` (status pill + kinetic sub-lines)
 
-- Section height `~220vh`, sticky `100dvh` inner stage
-- 3 bands stacked vertically, each `33.34dvh`
-- Each band starts at `y: 100%`, slides to its slot
-- Stagger: band 1 `[0, 0.35]`, band 2 `[0.18, 0.55]`, band 3 `[0.36, 0.75]`
-- Spring smoothing on `scrollYProgress` (same constants as above)
-- Band content (placeholders, swappable any time):
-  - 01 — "Answers" / "AI inbound that picks up every call"
-  - 02 — "Automates" / "Workflows that run while you sleep"
-  - 03 — "Accelerates" / "Web & apps engineered to convert"
+## Out of scope
+- Desktop layout (zero changes)
+- Copy rewrites beyond hero sub-lines
+- Backend / data work
 
-B&W liquid-glass styling per band:
-- Surface: `rgba(12,14,18,0.78)` + `backdrop-filter: blur(28px) saturate(140%)`
-- Inner highlight: `inset 0 1px 0 rgba(255,255,255,0.18)`
-- Bottom hairline: `inset 0 -1px 0 rgba(255,255,255,0.06)`
-- Top sheen: `linear-gradient(180deg, rgba(255,255,255,0.10), transparent 40%)`
-- FilmGrain (existing component) at low opacity for depth
-- Serif white headline, `white/55` eyebrow, no color
-
-### Performance & safety
-
-- Both sections `hidden md:block` — mobile keeps a static fallback (cards as the existing grid; band reveal omitted)
-- One `useScroll` per section, springs reused across children
-- No layout thrash: only `transform` + `opacity` animated
-- No new dependencies
-
-### Final page order
-
-```text
-Hero
-HeroScrollTransition  (sticky stacked deck)
-BandReveal            (NEW — B&W liquid glass)
-DarkStageShowcase
-Pain points grid
-… rest of page
-```
-
-### Files touched
-
-- `src/pages/Index.tsx` — rewrite `HeroScrollTransition` + `RisingShowcaseCard`; insert `<BandReveal />`
-- `src/components/BandReveal.tsx` — new
-
-No other files, copy, or sections modified.
+Approve and I'll build it in one pass.
