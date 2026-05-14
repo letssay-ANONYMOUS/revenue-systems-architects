@@ -1059,50 +1059,6 @@ const Index = () => {
         </section>
       </LazySection>
 
-      {/* WEBSITES & APPS — lazy loaded */}
-      <LazySection rootMargin="300px" minHeight="400px">
-        <section className="hidden md:block py-14 md:py-32 relative">
-          <div className="max-w-7xl mx-auto px-5 md:section-padding">
-            <SectionReveal>
-              <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Websites & Apps</p>
-              <h2 className="font-display font-bold text-xl md:text-5xl leading-tight max-w-3xl mb-3 md:mb-6">
-                Built to <span className="gradient-text">Convert</span>
-              </h2>
-            </SectionReveal>
-
-            <SectionReveal delay={0.1}>
-              <WebsiteShowcaseCarousel />
-            </SectionReveal>
-
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 md:gap-6">
-              {[
-                { icon: Globe, title: "Websites", desc: "Premium sites that convert", color: "primary" },
-                { icon: Target, title: "Landing Pages", desc: "Campaign-ready pages", color: "accent" },
-                { icon: CalendarCheck, title: "Booking", desc: "Scheduling with payments", color: "primary" },
-                { icon: BarChart3, title: "Dashboards", desc: "Real-time operations", color: "accent" },
-                { icon: Smartphone, title: "Apps", desc: "Customer-facing apps", color: "primary" },
-                { icon: Database, title: "Backend", desc: "APIs & automation", color: "accent" },
-              ].map((item, i) => (
-                <SectionReveal key={item.title} delay={i * 0.05}>
-                  <TiltCard>
-                    <div
-                      className={`group rounded-xl md:rounded-2xl border border-border p-3.5 md:p-6 h-full transition-colors duration-500 ${item.color === "accent" ? "hover:border-accent/30" : "hover:border-primary/30"}`}
-                      style={{ background: "hsl(var(--card))" }}
-                    >
-                      <div className={`w-9 h-9 md:w-12 md:h-12 rounded-lg md:rounded-xl flex items-center justify-center mb-2.5 md:mb-5 ${item.color === "accent" ? "bg-accent/15 group-hover:bg-accent/25" : "bg-primary/10 group-hover:bg-primary/20"} transition-colors`}>
-                        <item.icon className={`w-4 h-4 md:w-6 md:h-6 ${item.color === "accent" ? "text-accent" : "text-primary"}`} />
-                      </div>
-                      <h3 className="font-display font-semibold text-xs md:text-base mb-0.5 md:mb-2">{item.title}</h3>
-                      <p className="text-[9px] md:text-sm text-muted-foreground">{item.desc}</p>
-                    </div>
-                  </TiltCard>
-                </SectionReveal>
-              ))}
-            </div>
-          </div>
-        </section>
-      </LazySection>
-
       {/* PROCESS — lazy loaded */}
       <LazySection rootMargin="300px" minHeight="300px">
         <ProcessGraph />
