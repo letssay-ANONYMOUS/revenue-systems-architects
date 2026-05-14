@@ -1,5 +1,5 @@
-import { useRef } from "react";
-import { motion, useScroll, useSpring, useTransform, type MotionValue } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useMotionValue, useScroll, useSpring, useTransform, type MotionValue } from "framer-motion";
 import { Target, Layers, Code2, Workflow, Zap, LineChart } from "lucide-react";
 
 const steps = [
@@ -11,31 +11,29 @@ const steps = [
   { step: "06", title: "Launch", desc: "Deploy, monitor, iterate based on real data", icon: Zap },
 ];
 
-const timelineCore = "#fff9fc";
-const timelineGlass = "#f7e3ef";
-const timelineEdge = "#eac0d7";
-const timelineAura = "rgba(255, 224, 240, 0.74)";
 const timelineInk = "#3d3140";
 
 const ProcessGraph = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ["start 0.8", "end 0.3"],
+    offset: ["start 0.85", "end 0.25"],
   });
 
-  const lineScaleY = useTransform(scrollYProgress, [0, 1], [0, 1]);
+  const lineScaleY = useSpring(useTransform(scrollYProgress, [0, 1], [0, 1]), {
+    stiffness: 80,
+    damping: 22,
+    mass: 0.6,
+  });
 
   return (
     <section ref={containerRef} className="py-14 md:py-32 surface-elevated relative overflow-hidden">
-      {/* Subtle radial glow */}
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse at 30% 50%, hsl(var(--primary) / 0.04), transparent 60%)" }}
+        style={{ background: "radial-gradient(ellipse at 30% 50%, hsl(var(--primary) / 0.05), transparent 60%)" }}
       />
 
       <div className="max-w-7xl mx-auto px-5 md:section-padding relative z-10">
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -49,26 +47,32 @@ const ProcessGraph = () => {
           </h2>
         </motion.div>
 
-        {/* Timeline graph */}
-        <div className="relative max-w-4xl mx-auto">
-          {/* Vertical track line (background) */}
-          <div className="absolute left-5 md:left-1/2 top-0 bottom-0 w-px md:-translate-x-px">
-            <div className="w-full h-full bg-border/40" />
-            {/* Animated fill */}
-            <motion.div
-              className="absolute top-0 left-0 h-full w-full origin-top"
-              style={{
-                scaleY: lineScaleY,
-                background: `linear-gradient(180deg, rgba(255,249,252,0.98), ${timelineGlass} 46%, ${timelineEdge})`,
-                boxShadow: `0 0 18px ${timelineAura}, 0 0 42px rgba(255,245,250,0.42)`,
-              }}
+        <div className="relative max-w-4xl mx-auto" style={{ perspective: "1400px" }}>
+          {/* Glass tube spine */}
+          <div className="absolute left-5 md:left-1/2 top-0 bottom-0 w-[10px] md:-translate-x-1/2 pointer-events-none">
+            {/* Aura */}
+            <div
+              className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[22px] rounded-full blur-[10px] opacity-70"
+              style={{ background: "linear-gradient(180deg, rgba(255,224,240,0.0), rgba(247,227,239,0.55), rgba(217,193,234,0.45), rgba(255,224,240,0.0))" }}
             />
+            {/* Tube body (track) */}
+            <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[6px] rounded-full border border-white/70 bg-white/40 backdrop-blur-md shadow-[inset_0_1px_0_rgba(255,255,255,0.95),inset_0_-1px_0_rgba(120,90,120,0.18),0_0_12px_rgba(234,192,215,0.25)]" />
+            {/* Inner highlight */}
+            <div className="pg-glass-tube absolute inset-y-0 left-1/2 -translate-x-1/2 w-[6px] rounded-full" />
+            {/* Liquid fill */}
+            <motion.div
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-[6px] origin-top rounded-full overflow-hidden"
+              style={{ scaleY: lineScaleY, height: "100%" }}
+            >
+              <div className="pg-liquid-fill absolute inset-0 rounded-full shadow-[0_0_18px_rgba(217,193,234,0.55),0_0_42px_rgba(255,224,240,0.35)]" />
+              {/* Specular highlight inside the liquid */}
+              <div className="absolute inset-y-0 left-[1px] w-[2px] rounded-full bg-white/85 blur-[0.6px]" />
+            </motion.div>
           </div>
 
           {/* Steps */}
           <div className="space-y-8 md:space-y-0">
             {steps.map((s, i) => {
-              const isLeft = i % 2 === 0;
               const stepPoint = steps.length === 1 ? 0 : i / (steps.length - 1);
               const revealStart = Math.max(0, stepPoint - 0.13);
               const revealEnd = Math.min(1, stepPoint + 0.08);
@@ -77,7 +81,7 @@ const ProcessGraph = () => {
                 <StepNode
                   key={s.step}
                   step={s}
-                  isLeft={isLeft}
+                  isLeft={i % 2 === 0}
                   scrollYProgress={scrollYProgress}
                   revealStart={revealStart}
                   revealEnd={revealEnd}
@@ -103,80 +107,161 @@ interface StepNodeProps {
 
 const StepNode = ({ step, isLeft, scrollYProgress, revealStart, revealEnd, stepPoint }: StepNodeProps) => {
   const nodeOpacity = useTransform(scrollYProgress, [revealStart, revealEnd], [0, 1]);
-  const nodeY = useTransform(scrollYProgress, [revealStart, revealEnd], [30, 0]);
-  const nodeScale = useTransform(scrollYProgress, [revealStart, revealEnd], [0.96, 1]);
+  const nodeY = useTransform(scrollYProgress, [revealStart, revealEnd], [42, 0]);
+  const nodeRotateX = useTransform(scrollYProgress, [revealStart, revealEnd], [10, 0]);
+  const nodeScale = useTransform(scrollYProgress, [revealStart, revealEnd], [0.95, 1]);
 
   const activePeak = Math.min(0.96, Math.max(0.04, stepPoint));
   const activeStart = Math.max(0, activePeak - 0.08);
   const activeEnd = Math.min(1, activePeak + 0.1);
-  const rawDotScale = useTransform(scrollYProgress, [activeStart, activePeak, activeEnd], [0.9, 1.44, 1]);
-  const dotScale = useSpring(rawDotScale, {
-    stiffness: 170,
-    damping: 18,
-    mass: 0.72,
-    restDelta: 0.001,
-  });
-  const glowOpacity = useTransform(scrollYProgress, [activeStart, activePeak, activeEnd], [0.18, 1, 0.32]);
-  const glowScale = useTransform(scrollYProgress, [activeStart, activePeak, activeEnd], [0.8, 2.05, 1.18]);
-  const dotShadow = useTransform(glowOpacity, (value) => `0 10px ${18 + value * 22}px rgba(177, 129, 158, ${0.12 + value * 0.18}), inset 0 1px 0 rgba(255,255,255,0.94), inset 0 -7px 14px rgba(117,76,101,${0.07 + value * 0.05})`);
+
+  const rawOrbScale = useTransform(scrollYProgress, [activeStart, activePeak, activeEnd], [0.92, 1.42, 1.04]);
+  const orbScale = useSpring(rawOrbScale, { stiffness: 180, damping: 18, mass: 0.7 });
+  const haloOpacity = useTransform(scrollYProgress, [activeStart, activePeak, activeEnd], [0.18, 1, 0.36]);
+  const haloScale = useTransform(scrollYProgress, [activeStart, activePeak, activeEnd], [0.7, 2.2, 1.25]);
+  const specRotate = useTransform(scrollYProgress, [0, 1], [0, 360]);
+
+  // Active state for ripple + sheen
+  const [isActive, setIsActive] = useState(false);
+  const [rippleKey, setRippleKey] = useState(0);
+  useEffect(() => {
+    const unsub = scrollYProgress.on("change", (v) => {
+      const inside = v >= activeStart && v <= activeEnd;
+      setIsActive((prev) => {
+        if (inside && !prev) setRippleKey((k) => k + 1);
+        return inside;
+      });
+    });
+    return () => unsub();
+  }, [scrollYProgress, activeStart, activeEnd]);
+
+  // Mouse tilt (desktop only, no reduced motion)
+  const cardRef = useRef<HTMLDivElement>(null);
+  const tiltX = useMotionValue(0);
+  const tiltY = useMotionValue(0);
+  const sTiltX = useSpring(tiltX, { stiffness: 220, damping: 18 });
+  const sTiltY = useSpring(tiltY, { stiffness: 220, damping: 18 });
+
+  const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (typeof window === "undefined") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.matchMedia("(pointer: coarse)").matches) return;
+    const el = cardRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width - 0.5;
+    const py = (e.clientY - rect.top) / rect.height - 0.5;
+    tiltY.set(px * 8);
+    tiltX.set(-py * 6);
+    el.style.setProperty("--mx", `${(px + 0.5) * 100}%`);
+    el.style.setProperty("--my", `${(py + 0.5) * 100}%`);
+  };
+  const onLeave = () => {
+    tiltX.set(0);
+    tiltY.set(0);
+  };
 
   return (
     <div className={`relative flex items-start md:items-center gap-6 md:gap-0 ${isLeft ? "md:flex-row" : "md:flex-row-reverse"}`}>
-      {/* Dot on the line */}
+      {/* Glass orb on the spine */}
       <div className="absolute left-5 md:left-1/2 top-1 md:top-1/2 -translate-x-1/2 md:-translate-y-1/2 z-20">
         <motion.div
-          style={{ scale: dotScale }}
-          className="relative flex h-8 w-8 items-center justify-center rounded-full md:h-9 md:w-9"
+          style={{ scale: orbScale }}
+          className="relative flex h-9 w-9 items-center justify-center rounded-full md:h-11 md:w-11"
         >
+          {/* Outer halo */}
           <motion.div
             style={{
-              opacity: glowOpacity,
-              scale: glowScale,
-              background: "radial-gradient(circle, rgba(255,255,255,0.76), rgba(255,224,240,0.3) 34%, rgba(234,192,215,0.1) 56%, transparent 74%)",
+              opacity: haloOpacity,
+              scale: haloScale,
+              background: "radial-gradient(circle, rgba(255,255,255,0.85), rgba(255,224,240,0.36) 32%, rgba(217,193,234,0.16) 56%, transparent 76%)",
             }}
-            className="absolute -inset-5 rounded-full blur-[0.5px]"
+            className="absolute -inset-6 rounded-full blur-[1px]"
             aria-hidden
           />
+          {/* Refraction ring */}
           <motion.div
-            className="relative flex h-6 w-6 items-center justify-center rounded-full border border-white/70 bg-white/28 backdrop-blur-xl md:h-7 md:w-7"
+            style={{ opacity: haloOpacity, scale: haloScale }}
+            className="absolute -inset-2 rounded-full border border-white/70 shadow-[0_0_22px_rgba(255,224,240,0.55),inset_0_1px_0_rgba(255,255,255,0.85)]"
+            aria-hidden
+          />
+          {/* Caustic ripple (one-shot on enter) */}
+          {isActive && <span key={rippleKey} className="pg-ripple" aria-hidden />}
+
+          {/* Glass sphere */}
+          <div
+            className="relative h-7 w-7 md:h-8 md:w-8 rounded-full border border-white/80 backdrop-blur-xl"
             style={{
-              boxShadow: dotShadow,
+              background:
+                "radial-gradient(circle at 32% 28%, rgba(255,255,255,0.98) 0%, rgba(255,249,252,0.88) 28%, rgba(247,227,239,0.7) 60%, rgba(217,193,234,0.55) 100%)",
+              boxShadow:
+                "inset 0 1px 0 rgba(255,255,255,0.95), inset 0 -6px 12px rgba(120,80,110,0.18), 0 8px 22px rgba(177,129,158,0.18), 0 0 18px rgba(255,224,240,0.5)",
             }}
           >
-            <span className="absolute inset-[2px] rounded-full border border-white/52 bg-[linear-gradient(135deg,rgba(255,255,255,0.88),rgba(247,227,239,0.5)_46%,rgba(255,255,255,0.24))] shadow-[inset_0_1px_0_rgba(255,255,255,0.95),inset_0_-5px_10px_rgba(117,76,101,0.075)]" />
+            {/* Top specular highlight (rotates with scroll for liquid feel) */}
+            <motion.span
+              style={{ rotate: specRotate }}
+              className="absolute inset-0 rounded-full"
+              aria-hidden
+            >
+              <span className="absolute top-[12%] left-[22%] h-[34%] w-[44%] rounded-full bg-white/85 blur-[2px]" />
+            </motion.span>
+            {/* Bottom caustic glow */}
             <span
-              className="relative h-2.5 w-2.5 rounded-full md:h-3 md:w-3"
+              className="absolute inset-[2px] rounded-full"
               style={{
-                background: `radial-gradient(circle at 34% 28%, #ffffff 0%, ${timelineCore} 32%, ${timelineGlass} 72%, ${timelineEdge} 100%)`,
-                boxShadow: "0 0 16px rgba(255,249,252,0.92), 0 0 28px rgba(247,227,239,0.54), inset 0 1px 2px rgba(255,255,255,0.96)",
+                background: "radial-gradient(circle at 60% 92%, rgba(217,193,234,0.55), transparent 55%)",
+              }}
+              aria-hidden
+            />
+            {/* Core dot */}
+            <span
+              className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full md:h-2.5 md:w-2.5"
+              style={{
+                background: "radial-gradient(circle at 35% 30%, #ffffff, #fff9fc 40%, #eac0d7 100%)",
+                boxShadow: "0 0 10px rgba(255,249,252,0.95), 0 0 18px rgba(247,227,239,0.6)",
               }}
             />
-          </motion.div>
-          <motion.div
-            style={{
-              opacity: glowOpacity,
-              scale: glowScale,
-              borderColor: "rgba(255, 225, 242, 0.58)",
-              boxShadow: "0 0 18px rgba(255,224,240,0.46), inset 0 1px 0 rgba(255,255,255,0.7)",
-            }}
-            className="absolute -inset-2 rounded-full border"
-            aria-hidden
-          />
+          </div>
         </motion.div>
       </div>
 
-      {/* Content card — mobile: always right side; desktop: alternating */}
+      {/* Card slot spacer */}
       <div className="md:w-1/2" />
       <motion.div
-        style={{ opacity: nodeOpacity, y: nodeY, scale: nodeScale }}
-        className={`ml-10 md:ml-0 md:w-1/2 ${isLeft ? "md:pr-12 lg:pr-16" : "md:pl-12 lg:pl-16"}`}
+        style={{ opacity: nodeOpacity, y: nodeY, scale: nodeScale, rotateX: nodeRotateX, transformPerspective: 1200 }}
+        className={`ml-10 md:ml-0 md:w-1/2 ${isLeft ? "md:pr-12 lg:pr-16" : "md:pl-12 lg:pl-16"} ${isActive ? "pg-card-active" : ""}`}
       >
-        <div
-          className="group rounded-xl md:rounded-2xl border border-border p-4 md:p-6 transition-all duration-500 hover:border-primary/20"
-          style={{ background: "hsl(var(--card))" }}
+        <motion.div
+          ref={cardRef}
+          onMouseMove={onMove}
+          onMouseLeave={onLeave}
+          style={{
+            rotateX: sTiltX,
+            rotateY: sTiltY,
+            transformStyle: "preserve-3d",
+            background:
+              "linear-gradient(150deg, rgba(255,255,255,0.78), rgba(255,249,252,0.62) 60%, rgba(247,227,239,0.5))",
+          }}
+          className="pg-card-sheen group relative overflow-hidden rounded-xl md:rounded-2xl border border-white/70 p-4 md:p-6 backdrop-blur-2xl shadow-[0_18px_48px_-18px_rgba(120,90,120,0.28),inset_0_1px_0_rgba(255,255,255,0.92),inset_0_-1px_0_rgba(120,90,120,0.08)] transition-shadow duration-500 hover:shadow-[0_30px_60px_-22px_rgba(120,90,120,0.35),inset_0_1px_0_rgba(255,255,255,0.95)]"
         >
-          <div className="flex items-center gap-3 mb-2 md:mb-3">
-            <div className="w-9 h-9 md:w-11 md:h-11 rounded-xl border border-white/60 bg-white/38 flex items-center justify-center shadow-[0_12px_34px_rgba(49,64,82,0.08),inset_0_1px_0_rgba(255,255,255,0.78),inset_0_-1px_0_rgba(49,64,82,0.06)] backdrop-blur-xl transition-colors group-hover:bg-white/52">
+          {/* Cursor-tracked highlight */}
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+            style={{
+              background:
+                "radial-gradient(220px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,0.55), transparent 60%)",
+            }}
+          />
+          {/* Top rim light */}
+          <span aria-hidden className="pointer-events-none absolute inset-x-3 top-0 h-px bg-gradient-to-r from-transparent via-white/90 to-transparent" />
+
+          <div className="relative flex items-center gap-3 mb-2 md:mb-3">
+            <div
+              className="w-9 h-9 md:w-11 md:h-11 rounded-xl border border-white/75 flex items-center justify-center backdrop-blur-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-4px_10px_rgba(120,80,110,0.1),0_8px_22px_-10px_rgba(120,90,120,0.35)]"
+              style={{ background: "linear-gradient(140deg, rgba(255,255,255,0.85), rgba(247,227,239,0.55))" }}
+            >
               <step.icon className="w-4 h-4 md:w-5 md:h-5" style={{ color: timelineInk }} />
             </div>
             <div>
@@ -184,8 +269,8 @@ const StepNode = ({ step, isLeft, scrollYProgress, revealStart, revealEnd, stepP
               <h3 className="font-display font-semibold text-sm md:text-lg leading-tight">{step.title}</h3>
             </div>
           </div>
-          <p className="text-[10px] md:text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
-        </div>
+          <p className="relative text-[10px] md:text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+        </motion.div>
       </motion.div>
     </div>
   );
