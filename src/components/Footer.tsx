@@ -31,7 +31,7 @@ const Footer = () => {
             <ul className="space-y-2.5">
               <li><Link to="/ai-calling-agents" className="text-xs md:text-sm text-[#314052]/78 hover:text-primary transition-colors">AI Calling Agents</Link></li>
               <li><Link to="/chatbots-automation" className="text-xs md:text-sm text-[#314052]/78 hover:text-primary transition-colors">Chatbots & Automation</Link></li>
-              <li><Link to="/websites-apps" className="text-xs md:text-sm text-[#314052]/78 hover:text-primary transition-colors">Websites & Apps</Link></li>
+              
             </ul>
           </div>
 
