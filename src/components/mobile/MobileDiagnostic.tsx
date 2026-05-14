@@ -164,13 +164,18 @@ const MobileDiagnostic = () => {
           }}
           onTap={() => setShowSolution((v) => !v)}
         >
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="popLayout" initial={false}>
             <motion.div
               key={`${group.key}-${activeItem}-${showSolution ? "sol" : "pain"}`}
-              initial={{ opacity: 0, scale: 0.94, x: showSolution ? 30 : -30 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              exit={{ opacity: 0, scale: 0.96, x: showSolution ? -30 : 30 }}
-              transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ opacity: 0, x: 60, scale: 0.96, filter: "blur(6px)" }}
+              animate={{ opacity: 1, x: 0, scale: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, x: -60, scale: 0.96, filter: "blur(6px)" }}
+              transition={{
+                opacity: { duration: 0.32, ease: [0.32, 0.72, 0, 1] },
+                x: { type: "spring", stiffness: 320, damping: 34, mass: 0.85 },
+                scale: { duration: 0.5, ease: [0.32, 0.72, 0, 1] },
+                filter: { duration: 0.28, ease: [0.32, 0.72, 0, 1] },
+              }}
               className="absolute inset-0"
             >
               <Visual />
@@ -187,7 +192,7 @@ const MobileDiagnostic = () => {
           </AnimatePresence>
 
           {/* State badge */}
-          <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full border border-white/70 bg-white/80 px-2.5 py-1 backdrop-blur">
+          <div className="absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full border border-white/70 bg-white/80 px-2.5 py-1 backdrop-blur">
             <span
               className={`h-1.5 w-1.5 rounded-full transition-colors ${
                 showSolution ? "bg-emerald-500" : "bg-[#ff474d]"
@@ -199,7 +204,7 @@ const MobileDiagnostic = () => {
           </div>
 
           {/* Swipe hint */}
-          <div className="absolute bottom-2 right-3 flex items-center gap-1 text-[8.5px] font-semibold uppercase tracking-[0.18em] text-[#101831]/45">
+          <div className="absolute bottom-2 right-3 z-10 flex items-center gap-1 text-[8.5px] font-semibold uppercase tracking-[0.18em] text-[#101831]/45">
             Tap to flip
             <ChevronRight className="h-3 w-3" />
           </div>
@@ -207,13 +212,17 @@ const MobileDiagnostic = () => {
 
         {/* Problem -> Solution */}
         <div className="relative px-5 py-5">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="popLayout" initial={false}>
             <motion.div
               key={`${group.key}-${activeItem}-text-${showSolution}`}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ opacity: 0, x: 40, filter: "blur(4px)" }}
+              animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, x: -40, filter: "blur(4px)" }}
+              transition={{
+                opacity: { duration: 0.28, ease: [0.32, 0.72, 0, 1] },
+                x: { type: "spring", stiffness: 340, damping: 36, mass: 0.8 },
+                filter: { duration: 0.24 },
+              }}
             >
               {!showSolution ? (
                 <div className="flex items-start gap-3">
