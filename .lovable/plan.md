@@ -1,58 +1,27 @@
-# Mobile Home — Round 2 Polish
+## Mobile section-2 cards + realistic 3D iPhone
 
-Goal: push the mobile home page from "good" to "Awwwards-grade phone experience." Focus on density, motion realism, tactility, and visual storytelling. Desktop untouched.
+### 1. Section-2 cards (`MobileQuietLayer.tsx`)
+Currently only the first card feels tactile because `whileTap` gets eaten by horizontal scroll inertia on cards 2/3.
 
-## 1. Hero (mobile-only upgrades)
-- Tighten headline to fit on one screen above the fold (no scroll to see CTA).
-- Add a subtle **scroll-linked parallax** on the headline (drifts up + fades) and a **floating glass status pill** ("● Live · 12 calls handled today") that animates in after the headline.
-- Replace the long sub-paragraph with **2 short kinetic lines** that swap every 3s (revenue-focused).
-- Primary CTA becomes a **liquid-glass button** matching the new sticky bar (same material language).
+- Replace `whileTap` with a **manual press state** driven by `onPointerDown / Up / Cancel` (fires reliably mid-scroll).
+- New **3D pushback**: `scale 0.94`, `y: 4`, `rotateX: 4°`, perspective 800, shadow squash. Spring `stiffness 420, damping 22`. Identical on all 3 cards.
+- **Two-stage open**: tap → card auto-snaps to center → expands in place (scale 1.06, image zoom 1.08, soft glow ring, ~220ms) → bottom-sheet rises. Feels like the card lifts up before opening.
+- One shared `PressableCard` wrapper so behavior is guaranteed identical across all three.
 
-## 2. MobileDiagnostic — make it feel alive
-- Add a **morphing "Before → After" toggle** inside each card (swipe left/right on the visual to flip states with a fluid mask wipe, not just fade).
-- Animated **metric counter** (counts up from 0 → target when card enters view).
-- **Haptic-feel tap** on tabs (spring + tiny scale + soft shadow press).
-- Tab indicator gets a **moving glow trail** (gradient that lags 80ms behind).
-- Add a "Next →" affordance so users know to swipe between items inside a tab.
+### 2. 3D iPhone frame (`MobileServiceWorkshop.tsx`)
+Rebuild the phone so it reads as a real device, not a flat rectangle.
 
-## 3. MobileServiceWorkshop — phone mockup density
-- Increase phone frame realism: **dynamic island, status bar, rounded bezel highlight, subtle reflection sweep**.
-- Each scene gets **one extra micro-detail**:
-  - Call: live waveform pulsing with audio-style bars + caller name typing in
-  - Chat: typing indicator, then message lands with a soft bounce, then "Booked ✓" toast
-  - Web: Lighthouse score animates 0→100 with a green ring sweep, plus a fake browser scroll
-- Add **scene labels with progress** ("Scene 2 of 3 · Chat") and a tap-to-pause/play.
-- Allow **swipe left/right** to switch scenes manually (currently auto-only).
+- **Titanium side rail** layer: vertical metallic gradient (`#e8eaed → #6b7280 → #1a1d24 → #6b7280 → #e8eaed`) with 1px specular edges.
+- **Power + volume buttons** as small gradient nubs on left/right rails.
+- **Curved OLED edge** via inset shadows on screen left/right.
+- **Floating ground shadow** (large blurred ellipse) under the phone.
+- **Live 3D tilt**: scroll-driven `rotateY ±6° / rotateX ±3°` via `useScroll`, plus `DeviceOrientationEvent` gyro parallax when available. `transform-style: preserve-3d`, `perspective: 1400`.
+- **Specular sweep anchored to tilt angle** (not just time), so reflections feel light-sourced.
+- Screen gets subtle inner glow + vignette to read as emissive.
+- Respects `prefers-reduced-motion` (static tilt only).
 
-## 4. New mobile section: "Proof Strip"
-Replace the stat-card row with a **horizontal auto-scrolling marquee** of 5 metrics + 3 client logos, pausing on touch. Single line, full bleed, no scroll cost.
+### Files
+- `src/components/mobile/MobileQuietLayer.tsx`
+- `src/components/mobile/MobileServiceWorkshop.tsx`
 
-## 5. Transition cards (RisingShowcase) — mobile variant
-- Currently desktop-tuned 3D 3-up. On mobile, render as a **vertical stack of 3 liquid-glass cards** that rise + tilt-in on scroll (one at a time), each with the shimmer sweep preserved. Tap opens a **bottom-sheet detail** (same as MobileQuietLayer's sheet) instead of the desktop modal.
-
-## 6. Sticky CTA bar — minor polish
-- Add a **thin animated gradient hairline** on top edge (breathing).
-- Add **safe-area padding** for iPhone home indicator.
-- Subtle **icon (phone) on the left** that pulses every 6s.
-
-## 7. Global mobile polish
-- **Section dividers**: add a 1px gradient hairline + soft glow between sections so the page reads as chapters, not a wall.
-- **Scroll-snap** on the main sections so each one centers cleanly.
-- **Reduce motion** respect: wrap heavy effects in `prefers-reduced-motion` checks.
-- Lazy-mount Workshop + Diagnostic visuals via `IntersectionObserver` for first-paint speed.
-
-## Files to touch
-- `src/pages/Index.tsx` — hero mobile branch, mobile transition stack, proof strip, dividers
-- `src/components/mobile/MobileDiagnostic.tsx` — swipe flip, counters, glow trail
-- `src/components/mobile/MobileServiceWorkshop.tsx` — scene density, manual swipe, pause control
-- `src/components/mobile/StickyMobileCTA.tsx` — hairline + safe area + pulse icon
-- New: `src/components/mobile/MobileProofStrip.tsx`
-- New: `src/components/mobile/MobileTransitionStack.tsx`
-- New: `src/components/mobile/MobileHeroExtras.tsx` (status pill + kinetic sub-lines)
-
-## Out of scope
-- Desktop layout (zero changes)
-- Copy rewrites beyond hero sub-lines
-- Backend / data work
-
-Approve and I'll build it in one pass.
+Desktop untouched.
