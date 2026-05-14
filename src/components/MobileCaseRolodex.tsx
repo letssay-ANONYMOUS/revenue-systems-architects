@@ -191,8 +191,12 @@ const MobileCaseRolodex = () => {
                     }}
                   />
 
-                  {/* Content */}
-                  <div className="relative z-10 flex h-full flex-col p-7 text-foreground">
+                  {/* Content — only visible on the active card so back cards don't bleed through */}
+                  <div
+                    className="relative z-10 flex h-full flex-col p-7 text-foreground transition-opacity duration-200"
+                    style={{ opacity: isActive ? 1 : 0 }}
+                    aria-hidden={!isActive}
+                  >
                     <span className="w-fit rounded-full border border-white/60 bg-white/40 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/75 backdrop-blur-md">
                       {c.tag}
                     </span>
