@@ -31,6 +31,8 @@ import MobileQuietLayer from "@/components/mobile/MobileQuietLayer";
 import StickyMobileCTA from "@/components/mobile/StickyMobileCTA";
 import MobileDiagnostic from "@/components/mobile/MobileDiagnostic";
 import MobileServiceWorkshop from "@/components/mobile/MobileServiceWorkshop";
+import MobileHeroExtras from "@/components/mobile/MobileHeroExtras";
+import MobileProofStrip from "@/components/mobile/MobileProofStrip";
 
 const painPoints = [
   { pain: "Missed calls", solution: "AI answers every call", caption: "Every call. Every time. Instantly.", Visual: MissedCallVisual },
