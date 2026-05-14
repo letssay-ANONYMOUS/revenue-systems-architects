@@ -10,12 +10,12 @@ const MissedCallVisual = () => (
       <span className="absolute inset-[1.05rem] rounded-full border border-white/82 bg-[#6572ed]/10 shadow-[0_16px_36px_rgba(101,114,237,0.13),inset_0_1px_0_rgba(255,255,255,0.9)]" />
       <span className="absolute inset-1 rounded-full bg-[#6572ed]/10 animate-[pp-ring_3.1s_ease-out_infinite]" />
       <span className="absolute inset-3 rounded-full bg-[#6572ed]/9 animate-[pp-ring_3.1s_ease-out_infinite] [animation-delay:0.55s]" />
-      <span className="relative flex h-[3.65rem] w-[3.65rem] items-center justify-center rounded-full bg-gradient-to-br from-[#8b96ff] via-[#6875ee] to-[#4d59cc] text-white shadow-[0_18px_34px_rgba(74,88,213,0.34),inset_0_1px_0_rgba(255,255,255,0.5),inset_0_-10px_18px_rgba(41,53,156,0.22)]">
-        <Phone className="h-6 w-6" strokeWidth={2.2} />
+      <span className="relative flex h-[2.6rem] w-[2.6rem] items-center justify-center rounded-full bg-gradient-to-br from-[#8b96ff] via-[#6875ee] to-[#4d59cc] text-white shadow-[0_18px_34px_rgba(74,88,213,0.34),inset_0_1px_0_rgba(255,255,255,0.5),inset_0_-10px_18px_rgba(41,53,156,0.22)] md:h-[3.65rem] md:w-[3.65rem]">
+        <Phone className="h-4 w-4 md:h-6 md:w-6" strokeWidth={2.2} />
       </span>
     </div>
 
-    <div className="relative h-[5.85rem] flex-1 overflow-hidden rounded-[1.15rem]">
+    <div className="relative h-[4rem] flex-1 min-w-[60px] overflow-hidden rounded-[1.15rem] md:h-[5.85rem]">
       <div className="absolute inset-y-3 left-0 right-0 rounded-full bg-gradient-to-r from-transparent via-[#eef2ff]/95 to-transparent blur-xl" />
       <svg className="relative h-full w-full" viewBox="0 0 320 84" aria-hidden="true" preserveAspectRatio="none">
         <defs>
