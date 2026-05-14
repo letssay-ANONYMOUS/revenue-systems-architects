@@ -18,6 +18,7 @@ import TiltCard from "@/components/TiltCard";
 import LazySection from "@/components/LazySection";
 import ProcessGraph from "@/components/ProcessGraph";
 import LiquidCaseStudyCards from "@/components/LiquidCaseStudyCards";
+import MobileCaseRolodex from "@/components/MobileCaseRolodex";
 import InboundCallingConsole from "@/components/calling/InboundCallingConsole";
 import OutboundAnalyticsPanel from "@/components/calling/OutboundAnalyticsPanel";
 import PainPointCard from "@/components/painpoints/PainPointCard";
