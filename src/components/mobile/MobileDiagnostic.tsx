@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Check, X, ArrowRight } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence, useInView, useMotionValue, useTransform, animate } from "framer-motion";
+import { Check, X, ArrowRight, ChevronRight } from "lucide-react";
 import MissedCallVisual from "@/components/painpoints/visuals/MissedCallVisual";
 import InstantReplyVisual from "@/components/painpoints/visuals/InstantReplyVisual";
 import RemindersVisual from "@/components/painpoints/visuals/RemindersVisual";
@@ -16,11 +16,13 @@ type Item = {
   Visual: React.ComponentType;
 };
 
-const groups: { key: string; label: string; metric: string; items: Item[] }[] = [
+const groups: { key: string; label: string; metricValue: number; metricSuffix: string; metricPrefix: string; items: Item[] }[] = [
   {
     key: "speed",
     label: "Speed",
-    metric: "+38% bookings",
+    metricPrefix: "+",
+    metricValue: 38,
+    metricSuffix: "% bookings",
     items: [
       { pain: "Missed calls", solution: "AI answers every call", caption: "Every call. Every time. Instantly.", metric: "97% pickup", Visual: MissedCallVisual },
       { pain: "Slow responses", solution: "Instant voice & chat", caption: "Respond in seconds. Book more.", metric: "<3s reply", Visual: InstantReplyVisual },
@@ -29,7 +31,9 @@ const groups: { key: string; label: string; metric: string; items: Item[] }[] = 
   {
     key: "trust",
     label: "Trust",
-    metric: "+24% conversions",
+    metricPrefix: "+",
+    metricValue: 24,
+    metricSuffix: "% conversions",
     items: [
       { pain: "No-show chaos", solution: "Automated reminders", caption: "Reduce no-shows. Increase show-ups.", metric: "-62% no-shows", Visual: RemindersVisual },
       { pain: "Weak web presence", solution: "Premium conversion site", caption: "Beautiful. Fast. Built to convert.", metric: "100/100 score", Visual: LighthouseVisual },
@@ -38,7 +42,9 @@ const groups: { key: string; label: string; metric: string; items: Item[] }[] = 
   {
     key: "ops",
     label: "Operations",
-    metric: "60% admin saved",
+    metricPrefix: "",
+    metricValue: 60,
+    metricSuffix: "% admin saved",
     items: [
       { pain: "Manual admin", solution: "Automated workflows", caption: "Save time. Eliminate busywork.", metric: "12h/wk back", Visual: WorkflowNodesVisual },
       { pain: "Fragmented tools", solution: "One connected system", caption: "All your tools. One intelligent hub.", metric: "1 source of truth", Visual: ConnectedToolsVisual },
@@ -46,9 +52,22 @@ const groups: { key: string; label: string; metric: string; items: Item[] }[] = 
   },
 ];
 
+const CountUp = ({ value, prefix, suffix }: { value: number; prefix: string; suffix: string }) => {
+  const mv = useMotionValue(0);
+  const display = useTransform(mv, (v) => `${prefix}${Math.round(v)}${suffix}`);
+  useEffect(() => {
+    const ctrl = animate(mv, value, { duration: 1.1, ease: [0.16, 1, 0.3, 1] });
+    return () => ctrl.stop();
+  }, [value, mv]);
+  return <motion.span>{display}</motion.span>;
+};
+
 const MobileDiagnostic = () => {
   const [activeGroup, setActiveGroup] = useState(0);
   const [activeItem, setActiveItem] = useState(0);
+  const [showSolution, setShowSolution] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(containerRef, { once: true, margin: "-15% 0px" });
   const group = groups[activeGroup];
   const item = group.items[activeItem];
   const Visual = item.Visual;
@@ -56,25 +75,38 @@ const MobileDiagnostic = () => {
   const selectGroup = (i: number) => {
     setActiveGroup(i);
     setActiveItem(0);
+    setShowSolution(false);
+  };
+
+  const nextItem = () => {
+    setActiveItem((v) => (v + 1) % group.items.length);
+    setShowSolution(false);
   };
 
   return (
-    <div className="md:hidden">
-      {/* Tabs */}
-      <div className="mb-5 grid grid-cols-3 gap-2 rounded-full border border-[#bdd0ee]/70 bg-white/60 p-1.5 shadow-[0_14px_36px_rgba(46,72,125,0.08),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl">
+    <div ref={containerRef} className="md:hidden">
+      {/* Tabs with glow trail */}
+      <div className="relative mb-5 grid grid-cols-3 gap-2 rounded-full border border-[#bdd0ee]/70 bg-white/60 p-1.5 shadow-[0_14px_36px_rgba(46,72,125,0.08),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-xl">
         {groups.map((g, i) => (
           <button
             key={g.key}
             type="button"
             onClick={() => selectGroup(i)}
-            className="relative rounded-full py-2 text-[11px] font-bold uppercase tracking-[0.18em] transition-colors"
+            className="relative rounded-full py-2.5 text-[11px] font-bold uppercase tracking-[0.18em] transition-transform active:scale-[0.96]"
           >
             {activeGroup === i && (
-              <motion.span
-                layoutId="diagnostic-tab"
-                className="absolute inset-0 rounded-full bg-[#101831] shadow-[0_8px_22px_rgba(16,24,49,0.28)]"
-                transition={{ type: "spring", stiffness: 380, damping: 32 }}
-              />
+              <>
+                <motion.span
+                  layoutId="diagnostic-tab-glow"
+                  className="absolute -inset-1 rounded-full bg-[#4358ff]/25 blur-md"
+                  transition={{ type: "spring", stiffness: 300, damping: 28 }}
+                />
+                <motion.span
+                  layoutId="diagnostic-tab"
+                  className="absolute inset-0 rounded-full bg-[#101831] shadow-[0_8px_22px_rgba(16,24,49,0.32)]"
+                  transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                />
+              </>
             )}
             <span className={`relative ${activeGroup === i ? "text-white" : "text-[#41517d]"}`}>
               {g.label}
@@ -98,7 +130,16 @@ const MobileDiagnostic = () => {
               {group.label} layer
             </p>
             <p className="mt-1 text-[1.4rem] font-bold tracking-[-0.02em] text-[#101831]">
-              {group.metric}
+              {inView ? (
+                <CountUp
+                  key={group.key}
+                  value={group.metricValue}
+                  prefix={group.metricPrefix}
+                  suffix={group.metricSuffix}
+                />
+              ) : (
+                <span>{group.metricPrefix}0{group.metricSuffix}</span>
+              )}
             </p>
           </div>
           <motion.div
@@ -112,80 +153,131 @@ const MobileDiagnostic = () => {
           </motion.div>
         </div>
 
-        {/* Visual area */}
-        <div className="relative h-[10rem] overflow-hidden border-b border-[#e3e8f1]/80 bg-white/45">
+        {/* Visual area with swipe-to-flip */}
+        <motion.div
+          className="relative h-[10rem] cursor-grab touch-pan-y overflow-hidden border-b border-[#e3e8f1]/80 bg-white/45 active:cursor-grabbing"
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.18}
+          onDragEnd={(_, info) => {
+            if (Math.abs(info.offset.x) > 50) setShowSolution((v) => !v);
+          }}
+          onTap={() => setShowSolution((v) => !v)}
+        >
           <AnimatePresence mode="wait">
             <motion.div
-              key={`${group.key}-${activeItem}`}
-              initial={{ opacity: 0, scale: 0.94, y: 14 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.96, y: -10 }}
+              key={`${group.key}-${activeItem}-${showSolution ? "sol" : "pain"}`}
+              initial={{ opacity: 0, scale: 0.94, x: showSolution ? 30 : -30 }}
+              animate={{ opacity: 1, scale: 1, x: 0 }}
+              exit={{ opacity: 0, scale: 0.96, x: showSolution ? -30 : 30 }}
               transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
               className="absolute inset-0"
             >
               <Visual />
+              <div
+                className={`pointer-events-none absolute inset-0 transition-opacity duration-500 ${
+                  showSolution ? "opacity-0" : "opacity-100"
+                }`}
+                style={{
+                  background:
+                    "linear-gradient(135deg, rgba(255,71,77,0.12), rgba(255,71,77,0.02) 60%, transparent)",
+                }}
+              />
             </motion.div>
           </AnimatePresence>
-        </div>
+
+          {/* State badge */}
+          <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full border border-white/70 bg-white/80 px-2.5 py-1 backdrop-blur">
+            <span
+              className={`h-1.5 w-1.5 rounded-full transition-colors ${
+                showSolution ? "bg-emerald-500" : "bg-[#ff474d]"
+              }`}
+            />
+            <span className="text-[8.5px] font-bold uppercase tracking-[0.22em] text-[#101831]">
+              {showSolution ? "After" : "Before"}
+            </span>
+          </div>
+
+          {/* Swipe hint */}
+          <div className="absolute bottom-2 right-3 flex items-center gap-1 text-[8.5px] font-semibold uppercase tracking-[0.18em] text-[#101831]/45">
+            Tap to flip
+            <ChevronRight className="h-3 w-3" />
+          </div>
+        </motion.div>
 
         {/* Problem -> Solution */}
         <div className="relative px-5 py-5">
           <AnimatePresence mode="wait">
             <motion.div
-              key={`${group.key}-${activeItem}-text`}
+              key={`${group.key}-${activeItem}-text-${showSolution}`}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
             >
-              <div className="mb-3 flex items-start gap-3">
-                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#ffb5b9]/90 bg-white/70 text-[#ff474d]">
-                  <X className="h-4 w-4" strokeWidth={2.6} />
+              {!showSolution ? (
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[#ffb5b9]/90 bg-white/70 text-[#ff474d]">
+                    <X className="h-4 w-4" strokeWidth={2.6} />
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#f04d56]">Problem</p>
+                    <p className="text-base font-semibold leading-tight tracking-[-0.015em] text-[#101831]">
+                      {item.pain}
+                    </p>
+                    <p className="mt-1 text-xs text-[#41517d]/80">Tap the visual to see the fix →</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#f04d56]">Problem</p>
-                  <p className="text-base font-semibold leading-tight tracking-[-0.015em] text-[#101831]">
-                    {item.pain}
-                  </p>
+              ) : (
+                <div className="flex items-start gap-3">
+                  <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#6472ed] text-white shadow-[0_8px_18px_rgba(76,91,218,0.3)]">
+                    <Check className="h-4 w-4" strokeWidth={2.7} />
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#4057d7]">Solution</p>
+                    <p className="text-base font-semibold leading-tight tracking-[-0.015em] text-[#111936]">
+                      {item.solution}
+                    </p>
+                    <p className="mt-1 text-xs text-[#41517d]">{item.caption}</p>
+                    <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-emerald-500/12 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+                      {item.metric}
+                    </p>
+                  </div>
                 </div>
-              </div>
-
-              <div className="mb-4 flex items-center justify-center">
-                <ArrowRight className="h-4 w-4 rotate-90 text-[#4358ff]/50" />
-              </div>
-
-              <div className="flex items-start gap-3">
-                <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#6472ed] text-white shadow-[0_8px_18px_rgba(76,91,218,0.3)]">
-                  <Check className="h-4 w-4" strokeWidth={2.7} />
-                </div>
-                <div>
-                  <p className="text-[9px] font-bold uppercase tracking-[0.3em] text-[#4057d7]">Solution</p>
-                  <p className="text-base font-semibold leading-tight tracking-[-0.015em] text-[#111936]">
-                    {item.solution}
-                  </p>
-                  <p className="mt-1 text-xs text-[#41517d]">{item.caption}</p>
-                </div>
-              </div>
+              )}
             </motion.div>
           </AnimatePresence>
 
-          {/* Item dots */}
-          <div className="mt-5 flex items-center justify-center gap-2">
-            {group.items.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setActiveItem(i)}
-                aria-label={`Show item ${i + 1}`}
-                className="group/dot p-1"
-              >
-                <span
-                  className={`block h-1.5 rounded-full transition-all duration-300 ${
-                    activeItem === i ? "w-6 bg-[#101831]" : "w-1.5 bg-[#101831]/25 group-hover/dot:bg-[#101831]/45"
-                  }`}
-                />
-              </button>
-            ))}
+          {/* Item dots + Next */}
+          <div className="mt-5 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {group.items.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => {
+                    setActiveItem(i);
+                    setShowSolution(false);
+                  }}
+                  aria-label={`Show item ${i + 1}`}
+                  className="group/dot p-1"
+                >
+                  <span
+                    className={`block h-1.5 rounded-full transition-all duration-300 ${
+                      activeItem === i ? "w-6 bg-[#101831]" : "w-1.5 bg-[#101831]/25 group-hover/dot:bg-[#101831]/45"
+                    }`}
+                  />
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={nextItem}
+              className="flex items-center gap-1 rounded-full border border-[#101831]/15 bg-white/60 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#101831] backdrop-blur transition-transform active:scale-95"
+            >
+              Next
+              <ArrowRight className="h-3 w-3" />
+            </button>
           </div>
         </div>
       </motion.div>
