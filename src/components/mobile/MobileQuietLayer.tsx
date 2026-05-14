@@ -322,14 +322,22 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
               {card.value}
             </p>
           </div>
-          <button
+          <motion.button
             type="button"
             aria-label="Close"
             onClick={close}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/70 bg-white/70 text-[#111827]/80 shadow-[0_10px_24px_rgba(14,23,36,0.16),inset_0_1px_0_rgba(255,255,255,0.85)] backdrop-blur-xl active:scale-95"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/70 bg-white/70 text-[#111827]/80 shadow-[0_10px_24px_rgba(14,23,36,0.16),inset_0_1px_0_rgba(255,255,255,0.85)] backdrop-blur-xl"
+            whileHover={{ scale: 1.06, y: -1 }}
+            whileTap={{
+              scale: 0.88,
+              y: 2,
+              boxShadow:
+                "0 6px 14px rgba(14,23,36,0.14), inset 0 4px 12px rgba(17,24,39,0.1), inset 0 1px 0 rgba(255,255,255,0.7)",
+            }}
+            transition={{ type: "spring", stiffness: 520, damping: 24, mass: 0.42 }}
           >
             <X className="h-4 w-4" />
-          </button>
+          </motion.button>
         </div>
 
         <div className="mt-5 overflow-hidden rounded-2xl border border-white/60 bg-[#eef3f7]/70 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
