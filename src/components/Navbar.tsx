@@ -8,7 +8,6 @@ const navLinks = [
   { label: "Home", path: "/" },
   { label: "AI Calling", path: "/ai-calling-agents" },
   { label: "Automation", path: "/chatbots-automation" },
-  { label: "Web & Apps", path: "/websites-apps" },
   { label: "Results", path: "/case-studies" },
   { label: "About", path: "/about" },
 ];
