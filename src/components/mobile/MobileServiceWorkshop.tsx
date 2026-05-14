@@ -397,7 +397,7 @@ const MobileServiceWorkshop = () => {
                   {/* Tilt-anchored specular sweep */}
                   <motion.div
                     className="pointer-events-none absolute -inset-y-10 z-20 w-1/3 rotate-12 bg-gradient-to-r from-transparent via-white/14 to-transparent blur-md"
-                    style={{ left: useTransform(specularX, (v) => `${v}%`) }}
+                    style={{ left: specularLeft }}
                   />
 
                   {/* Dynamic island */}
