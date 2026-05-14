@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, X } from "lucide-react";
+import { ArrowRight, X, Phone } from "lucide-react";
 
 const StickyMobileCTA = () => {
   const location = useLocation();
@@ -36,9 +36,16 @@ const StickyMobileCTA = () => {
           transition={{ type: "spring", stiffness: 320, damping: 30, mass: 0.7 }}
         >
           <div
-            className="relative flex w-full max-w-[28rem] items-center gap-2 overflow-hidden rounded-full border border-white/65 bg-white/55 p-1.5 pl-5 shadow-[0_24px_60px_rgba(11,31,79,0.28),inset_0_1px_0_rgba(255,255,255,0.95),inset_0_-2px_8px_rgba(17,24,39,0.06)] backdrop-blur-2xl"
+            className="relative flex w-full max-w-[28rem] items-center gap-2 overflow-hidden rounded-full border border-white/65 bg-white/55 p-1.5 pl-3 shadow-[0_24px_60px_rgba(11,31,79,0.28),inset_0_1px_0_rgba(255,255,255,0.95),inset_0_-2px_8px_rgba(17,24,39,0.06)] backdrop-blur-2xl"
             style={{ backdropFilter: "blur(28px) saturate(170%)", WebkitBackdropFilter: "blur(28px) saturate(170%)" }}
           >
+            {/* Animated breathing hairline on top edge */}
+            <motion.div
+              className="pointer-events-none absolute inset-x-6 top-0 h-px"
+              style={{ background: "linear-gradient(90deg, transparent, rgba(20,71,212,0.65), transparent)" }}
+              animate={{ opacity: [0.3, 0.85, 0.3] }}
+              transition={{ duration: 3.2, repeat: Infinity, ease: "easeInOut" }}
+            />
             {/* Reflective top sheen */}
             <div
               className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-t-full"
@@ -51,13 +58,23 @@ const StickyMobileCTA = () => {
               transition={{ duration: 4.2, repeat: Infinity, ease: [0.16, 1, 0.3, 1], repeatDelay: 1.6 }}
             />
 
+            {/* Pulsing phone icon */}
+            <motion.div
+              className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#0f1730]/8"
+              animate={{ scale: [1, 1.08, 1] }}
+              transition={{ duration: 2.4, repeat: Infinity, repeatDelay: 3.6, ease: "easeInOut" }}
+            >
+              <Phone className="h-3.5 w-3.5 text-[#0f1730]" strokeWidth={2.4} />
+              <motion.span
+                className="absolute inset-0 rounded-full border border-[#1447d4]/40"
+                animate={{ scale: [1, 1.4], opacity: [0.6, 0] }}
+                transition={{ duration: 2.2, repeat: Infinity, repeatDelay: 3.8, ease: "easeOut" }}
+              />
+            </motion.div>
+
             <div className="relative flex flex-1 items-center gap-2 py-1.5">
-              <span className="relative flex h-2.5 w-2.5 items-center justify-center">
-                <span className="absolute inset-0 animate-ping rounded-full bg-[#1447d4]/40" />
-                <span className="relative h-1.5 w-1.5 rounded-full bg-[#1447d4]" />
-              </span>
               <p className="text-[12px] font-semibold tracking-tight text-[#0f1730]">
-                Ready to capture every lead?
+                Capture every lead.
               </p>
             </div>
 

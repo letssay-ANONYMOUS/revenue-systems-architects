@@ -31,6 +31,8 @@ import MobileQuietLayer from "@/components/mobile/MobileQuietLayer";
 import StickyMobileCTA from "@/components/mobile/StickyMobileCTA";
 import MobileDiagnostic from "@/components/mobile/MobileDiagnostic";
 import MobileServiceWorkshop from "@/components/mobile/MobileServiceWorkshop";
+import MobileHeroExtras from "@/components/mobile/MobileHeroExtras";
+import MobileProofStrip from "@/components/mobile/MobileProofStrip";
 
 const painPoints = [
   { pain: "Missed calls", solution: "AI answers every call", caption: "Every call. Every time. Instantly.", Visual: MissedCallVisual },
@@ -807,9 +809,11 @@ const Index = () => {
 
               <AnimatedHeroHeadline />
 
-              <p className="mt-4 max-w-[34rem] text-xs leading-relaxed text-muted-foreground sm:text-sm md:mt-6 md:text-base">
+              <p className="mt-4 hidden max-w-[34rem] text-xs leading-relaxed text-muted-foreground sm:text-sm md:mt-6 md:block md:text-base">
                 AI agents, chatbots, websites and automation that capture leads, book appointments, and run your operations.
               </p>
+
+              <MobileHeroExtras />
 
               <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center md:mt-8 md:gap-4">
                 <Link to="/book-a-call" className="premium-btn inline-flex items-center justify-center gap-3 rounded-full px-6 py-3 text-[11px] md:px-7 md:py-4 md:text-xs">
@@ -874,6 +878,9 @@ const Index = () => {
               <MobileDiagnostic />
             </div>
           </section>
+
+        {/* MOBILE: Proof strip between sections */}
+        <MobileProofStrip />
 
         {/* MOBILE: Service Workshop replaces 3 service sections */}
         <MobileServiceWorkshop />
