@@ -1,49 +1,89 @@
-# Liquid Glass 3D Process Timeline
+# Real 3D Liquid Glass Timeline (Mobile-First)
 
-Reimagine `ProcessGraph.tsx` so the spine, nodes, and cards feel like sculpted liquid glass — with depth, refraction, and motion that responds to scroll.
+The current timeline reads as flat pink. We replace it with a sculpted glass-and-chrome system that has actual depth, real lighting, and chromatic refraction — not a tinted gradient. Mobile is the primary target since most viewers are on phones.
 
-## Visual direction
+## Palette reset (away from "cheap pink")
 
-- **Spine as a glass tube**, not a flat line:
-  - Layered SVG: outer blurred aura, inner translucent tube with highlight + inner shadow, plus a flowing gradient "liquid" that fills as you scroll.
-  - Subtle iridescent shimmer (slow gradient pan) along the filled portion.
-- **Nodes as 3D glass orbs**:
-  - Multi-layer: outer halo, refraction ring, glass sphere with top specular highlight + bottom caustic glow.
-  - Inactive = frosted/clear. Active = liquid pearl with rose/violet inner light. Past = settled, soft glow.
-  - Scroll-driven scale + rotation on the highlight to mimic a moving light source.
-- **Cards as floating glass slabs**:
-  - Thicker frosted backdrop-blur, layered inset highlights (top + bottom), rim light border, soft contact shadow.
-  - Hover: lift + parallax tilt (mouse-tracked, very subtle), highlight follows cursor.
-  - Icon tile becomes a tiny matching glass chip.
+Drop the rose/pink dominance. New palette is premium neutral glass with a faint cool→warm refraction only as edge light:
 
-## Animation upgrades
+- Spine + orbs base: clear glass on a soft platinum background
+  - Glass body: `rgba(255,255,255,0.55)` over `hsl(225 15% 96%)`
+  - Inner shadow ink: `hsl(225 20% 18% / 0.18)`
+  - Specular highlight: pure white
+- Refraction (used sparingly, only at edges/rim):
+  - Cool edge: `hsl(210 90% 70% / 0.35)`
+  - Warm edge: `hsl(28 95% 70% / 0.30)`
+  - Violet caustic: `hsl(265 70% 70% / 0.25)`
+- Active accent (replaces the pink bloom): liquid mercury — white core → cool blue rim → warm amber underlight. No pink.
 
-- **Liquid fill**: spine fill height bound to scroll progress with a spring (already used) but the gradient inside also pans vertically on a slow loop for a liquid feel.
-- **Active node bloom**: as scroll crosses a node, orb scales 1 → 1.4 → 1, halo expands, a single soft caustic ripple emits outward (CSS-only, one-shot via key based on activeIndex).
-- **Card entrance**: from `y: 40, rotateX: 8deg, opacity: 0, scale: 0.96` → settled, staggered per row. Uses `transform-gpu` and `perspective` on parent for real 3D.
-- **Scroll-linked light sweep**: a faint diagonal highlight slides across each card once when it activates.
-- **Reduced motion**: respect `prefers-reduced-motion` — drop tilt, ripple, and shimmer; keep fade-in.
+Result: looks like polished glass on marble, with a subtle prism kiss on the rim — premium, not candy.
+
+## True 3D construction (not flat gradients)
+
+Spine becomes a real cylinder, not a div:
+
+- Inline SVG cylinder with 3 stops across X to fake roundness:
+  `0% dark edge → 18% mid → 50% bright highlight → 82% mid → 100% dark edge`
+- Top + bottom elliptical caps (SVG ellipses) so the tube has actual ends.
+- Behind it: a soft drop shadow offset 6px right + blurred 18px = real contact shadow on the page.
+- Liquid fill is a second cylinder masked to the scroll height, with its own internal highlight stripe and a slow vertical gradient pan for the "liquid moving" feel.
+
+Orbs become real spheres:
+
+- Each orb is an SVG `<circle>` stack:
+  1. Contact shadow ellipse below (blur 8, dy 6) — grounds the orb in 3D
+  2. Sphere base: radial gradient with light source at top-left (28%, 22%)
+  3. Terminator shadow: dark crescent on the bottom-right inside the sphere
+  4. Bounce light: subtle warm rim at bottom-left from the "marble" surface
+  5. Specular hot spot: tiny white highlight near top-left
+  6. Fresnel rim: 1px ring with chromatic split (cool top, warm bottom) at very low opacity
+- This is what makes a sphere read as 3D: top-left key light, bottom-right terminator, bottom bounce, rim light. Pure CSS gradients alone can't do it convincingly — SVG with stacked filters can.
+
+Cards become floating glass slabs with depth cues:
+
+- Multi-layer shadow: tight dark contact shadow (`0 2px 4px / 0.12`) + medium ambient (`0 12px 28px / 0.10`) + wide soft (`0 40px 80px / 0.08`). This stack is what makes objects feel lifted off the page.
+- Edge highlight on top + left (light source consistency with orb).
+- Terminator shadow on bottom + right edge (1px inset dark line).
+- Backdrop blur 24px with 0.55 white tint, NOT 0.78 — let the background show through so it reads as glass, not frosted plastic.
+- Subtle inner reflection of the orb's color near the edge closest to the spine (tiny radial gradient in the corner) — sells the "glass reflecting glass" effect.
+
+## Mobile-first behavior (390px primary)
+
+The current mobile spine is at `left-5` with cards crammed to the right. We rework it specifically for phones:
+
+- Spine slightly thicker on mobile (8px tube vs current 6px) so the cylinder shading actually reads.
+- Orbs scale down to 32px but keep all 6 lighting layers.
+- Cards span `calc(100vw - 64px)` with the spine inset 24px from the left, leaving the orb centered on the spine and the card overlapping the spine slightly with a notched left edge — looks like the card is threaded onto the rod (real 3D relationship).
+- Each card has a small 3D entrance: starts at `rotateY: -12deg` (hinged on the spine) and settles to 0. Reads as a card swinging into place on the rod.
+- Active orb on mobile gets a single subtle scale pulse + rim brighten (no ripple, no shimmer) to keep it cheap on GPU.
+- Drop tilt-on-mouse entirely on coarse pointers.
+- Reduced motion: keep the static 3D look (the lighting), drop animations only.
+
+## Animation upgrades (kept tasteful)
+
+- Liquid fill: vertical gradient pan 6s loop, only on the filled portion.
+- Active orb bloom: scale 1 → 1.18 → 1.04 with a synchronized rim-light intensity bump (no pink halo explosion).
+- Card entrance (mobile): `rotateY` swing 12deg → 0 + opacity, 500ms, easeOut.
+- Card entrance (desktop): keep current `y/rotateX` reveal, add a one-shot specular sweep across the surface when activated.
+- Scroll-linked light source: the page-wide light position shifts very slightly with scroll so highlights on all orbs move together — sells that they share a real environment.
 
 ## Technical details
 
-- File: `src/components/ProcessGraph.tsx` (full refactor) + small additions in `src/index.css` for keyframes (`liquid-shimmer`, `caustic-ripple`, `light-sweep`).
-- Keep current Framer Motion + `useScroll` setup. Add:
-  - `useTransform` for per-step active progress to drive orb scale, halo opacity, ripple trigger.
-  - A lightweight mouse-tilt hook (local, ~20 lines) used on cards; disabled on touch + reduced motion.
-- Spine becomes an absolutely-positioned SVG (`<svg>` with `<defs>` for gradients + filters: gaussian blur for aura, feSpecularLighting optional but likely overkill — use layered divs/SVG instead for perf).
-- All colors via existing semantic tokens + the current `timelineCore/Glass/Edge/Aura/Ink` palette extended with one violet accent for the liquid gradient.
-- Mobile (per project rules): keep single-column layout, drop tilt + ripple, keep orb bloom and liquid fill (cheap).
+- File: `src/components/ProcessGraph.tsx` — full rewrite. Spine + orbs become inline SVG components (`<Spine />`, `<Orb />`).
+- `src/index.css` — replace `pg-liquid-fill`, `pg-glass-tube`, `pg-card-sheen`, `pg-ripple` with the new neutral palette versions; add `pg-liquid-mercury` keyframe (slow gradient pan), `pg-rim-pulse` for active orb rim.
+- Remove the rose/pink hex values (`#eac0d7`, `rgba(247,227,239,...)`, etc.) entirely. New colors are platinum white + cool/warm/violet only as low-opacity rim accents.
+- No new dependencies. Keep Framer Motion + `useScroll` + per-step `useTransform` setup.
+- Mobile branch checks `(pointer: coarse)` once at mount to skip mouse-tilt wiring.
 
 ## Non-goals
 
-- No copy/content changes (steps stay as-is).
-- No layout restructuring of surrounding sections.
-- No new dependencies.
+- No copy changes.
+- No layout changes outside the timeline.
+- No change to surrounding sections' background.
 
 ## Acceptance
 
-- Spine reads as a glass tube with visible depth, not a flat gradient bar.
-- Nodes look like 3D pearls/orbs with specular highlights.
-- Active node visibly "blooms" as you scroll past it.
-- Cards feel like floating glass slabs with hover tilt on desktop.
-- Smooth on mobile (390px), no jank, reduced-motion respected.
+- On a 390px phone: spine reads as a real glass rod with a contact shadow; orbs read as 3D spheres with visible top-left light + bottom-right shadow; cards feel threaded onto the rod and swing into view.
+- No dominant pink. Color reads as platinum glass with subtle prism rim only.
+- Active state pulses cleanly without GPU jank.
+- Desktop keeps tilt + sheen; mobile drops them.
