@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 
@@ -27,10 +27,11 @@ const cases = [
   },
 ];
 
-const STACK = [
-  { y: 0, z: 0, scale: 1, opacity: 1 },
-  { y: 18, z: -90, scale: 0.94, opacity: 0.55 },
-  { y: 32, z: -180, scale: 0.88, opacity: 0.28 },
+// position 0 = center, 1 = right-back, 2 = left-back
+const LAYOUT = [
+  { x: 0, y: 0, z: 0, rotateY: 0, scale: 1, opacity: 1 },
+  { x: 70, y: 18, z: -160, rotateY: -22, scale: 0.9, opacity: 0.7 },
+  { x: -70, y: 18, z: -160, rotateY: 22, scale: 0.9, opacity: 0.7 },
 ];
 
 const MobileCaseRolodex = () => {
@@ -44,46 +45,56 @@ const MobileCaseRolodex = () => {
     return () => clearInterval(id);
   }, [reduce, paused]);
 
-  const next = () => setActive((i) => (i + 1) % cases.length);
-  const prev = () => setActive((i) => (i - 1 + cases.length) % cases.length);
+  const goTo = (i: number) => {
+    setPaused(true);
+    setActive(i);
+  };
 
   return (
     <div
-      className="md:hidden relative w-full select-none"
-      onPointerDown={() => setPaused(true)}
+      className="md:hidden relative w-full select-none px-4"
       style={{ perspective: "1400px" }}
     >
-      <div className="relative h-[440px] w-full" style={{ transformStyle: "preserve-3d" }}>
+      <div
+        className="relative mx-auto h-[460px] w-full max-w-sm"
+        style={{ transformStyle: "preserve-3d" }}
+      >
         {cases.map((c, i) => {
           const offset = (i - active + cases.length) % cases.length;
-          const layer = STACK[offset] ?? STACK[STACK.length - 1];
+          const layer = LAYOUT[offset];
           const isActive = offset === 0;
           return (
             <motion.article
               key={c.title}
-              drag={isActive ? "x" : false}
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.35}
-              onDragEnd={(_, info) => {
-                if (info.offset.x < -80 || info.velocity.x < -400) next();
-                else if (info.offset.x > 80 || info.velocity.x > 400) prev();
+              role={isActive ? undefined : "button"}
+              tabIndex={isActive ? -1 : 0}
+              aria-label={isActive ? undefined : `Show ${c.title}`}
+              onClick={() => !isActive && goTo(i)}
+              onKeyDown={(e) => {
+                if (!isActive && (e.key === "Enter" || e.key === " ")) {
+                  e.preventDefault();
+                  goTo(i);
+                }
               }}
               animate={{
+                x: layer.x,
                 y: layer.y,
                 z: layer.z,
+                rotateY: layer.rotateY,
                 scale: layer.scale,
                 opacity: layer.opacity,
-                rotateY: 0,
               }}
               initial={false}
-              transition={{ type: "spring", stiffness: 220, damping: 28, mass: 0.7 }}
+              transition={{ type: "spring", stiffness: 180, damping: 26, mass: 0.8 }}
               style={{
                 transformStyle: "preserve-3d",
-                zIndex: cases.length - offset,
+                transformOrigin: "center center",
+                zIndex: isActive ? 30 : 10,
+                pointerEvents: isActive ? "auto" : "auto",
+                cursor: isActive ? "default" : "pointer",
               }}
-              className="absolute inset-0 mx-auto flex flex-col rounded-3xl border border-foreground/10 bg-background p-7 text-foreground shadow-[0_30px_60px_-30px_hsl(var(--foreground)/0.35),0_8px_20px_-12px_hsl(var(--foreground)/0.18)]"
+              className="absolute inset-0 flex flex-col rounded-3xl border border-foreground/10 bg-background p-7 text-foreground shadow-[0_30px_60px_-30px_hsl(var(--foreground)/0.35),0_8px_20px_-12px_hsl(var(--foreground)/0.18)]"
             >
-              {/* hairline ribbon */}
               <div className="absolute inset-x-7 top-0 h-px bg-gradient-to-r from-transparent via-foreground/40 to-transparent" />
 
               <span className="w-fit rounded-full border border-foreground/15 bg-foreground/[0.03] px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/70">
@@ -107,29 +118,27 @@ const MobileCaseRolodex = () => {
                 </h3>
                 <p className="mt-3 text-sm leading-relaxed text-foreground/65">{c.detail}</p>
 
-                <Link
-                  to="/case-studies"
-                  className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-foreground"
-                >
-                  View case study
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
+                {isActive && (
+                  <Link
+                    to="/case-studies"
+                    className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-foreground"
+                  >
+                    View case study
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                )}
               </div>
             </motion.article>
           );
         })}
       </div>
 
-      {/* dots */}
       <div className="mt-6 flex items-center justify-center gap-2">
         {cases.map((_, i) => (
           <button
             key={i}
             aria-label={`Show case ${i + 1}`}
-            onClick={() => {
-              setPaused(true);
-              setActive(i);
-            }}
+            onClick={() => goTo(i)}
             className={`h-1.5 rounded-full transition-all duration-500 ${
               i === active ? "w-8 bg-foreground" : "w-1.5 bg-foreground/25"
             }`}
