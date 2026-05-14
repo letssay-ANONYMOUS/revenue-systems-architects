@@ -1,10 +1,10 @@
 import { Phone, Zap } from "lucide-react";
 
 const MissedCallVisual = () => (
-  <div className="relative flex h-full w-full items-center overflow-hidden px-4 md:px-5">
+  <div className="relative flex h-full w-full items-center overflow-hidden px-3 md:px-5">
     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_12%_50%,rgba(101,114,237,0.16),transparent_35%),radial-gradient(ellipse_at_58%_47%,rgba(101,114,237,0.08),transparent_38%),linear-gradient(180deg,rgba(255,255,255,0.74),rgba(246,249,255,0.3))]" />
 
-    <div className="relative mr-4 flex h-[6.55rem] w-[6.55rem] shrink-0 items-center justify-center md:mr-5">
+    <div className="relative mr-2 flex h-[4.6rem] w-[4.6rem] shrink-0 items-center justify-center md:mr-5 md:h-[6.55rem] md:w-[6.55rem]">
       <span className="absolute inset-0 rounded-full border border-[#7480f0]/14 bg-white/38 shadow-[0_18px_42px_rgba(91,106,220,0.1),inset_0_1px_0_rgba(255,255,255,0.98)]" />
       <span className="absolute inset-[0.52rem] rounded-full border border-[#7480f0]/18 bg-white/34" />
       <span className="absolute inset-[1.05rem] rounded-full border border-white/82 bg-[#6572ed]/10 shadow-[0_16px_36px_rgba(101,114,237,0.13),inset_0_1px_0_rgba(255,255,255,0.9)]" />
