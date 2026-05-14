@@ -65,13 +65,13 @@ const MissedCallVisual = () => (
       <span className="pp-voice-sheen absolute left-0 top-1/2 h-12 w-16 -translate-y-1/2 rounded-full bg-[#6572ed]/10 blur-xl" />
     </div>
 
-    <div className="ml-4 min-w-[6.15rem] rounded-[1rem] border border-[#d9e2fa] bg-white/86 px-4 py-3 shadow-[0_18px_42px_rgba(67,85,139,0.15),inset_0_1px_0_rgba(255,255,255,0.96),inset_0_-10px_22px_rgba(101,114,237,0.045)] backdrop-blur-xl md:ml-5">
-      <p className="mb-1 text-[0.62rem] font-bold uppercase tracking-[0.16em] text-[#5665c8]">Answered</p>
-      <div className="flex items-center gap-2">
-        <Zap className="h-4 w-4 text-[#6572ed]" fill="currentColor" />
-        <span className="font-display text-2xl font-bold tracking-[-0.06em] text-[#111936]">0.4s</span>
+    <div className="ml-2 min-w-[4.6rem] rounded-[0.85rem] border border-[#d9e2fa] bg-white/86 px-2.5 py-2 shadow-[0_18px_42px_rgba(67,85,139,0.15),inset_0_1px_0_rgba(255,255,255,0.96),inset_0_-10px_22px_rgba(101,114,237,0.045)] backdrop-blur-xl md:ml-5 md:min-w-[6.15rem] md:rounded-[1rem] md:px-4 md:py-3">
+      <p className="mb-0.5 text-[0.52rem] font-bold uppercase tracking-[0.14em] text-[#5665c8] md:mb-1 md:text-[0.62rem] md:tracking-[0.16em]">Answered</p>
+      <div className="flex items-center gap-1 md:gap-2">
+        <Zap className="h-3 w-3 text-[#6572ed] md:h-4 md:w-4" fill="currentColor" />
+        <span className="font-display text-base font-bold tracking-[-0.06em] text-[#111936] md:text-2xl">0.4s</span>
       </div>
-      <p className="mt-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-[#65709c]">Avg speed</p>
+      <p className="mt-0.5 text-[0.52rem] font-semibold uppercase tracking-[0.12em] text-[#65709c] md:mt-1 md:text-[0.62rem] md:tracking-[0.14em]">Avg speed</p>
     </div>
   </div>
 );
