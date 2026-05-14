@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Phone, Bot, Globe, ArrowRight, CheckCircle2, Send, CalendarCheck, Pause, Play } from "lucide-react";
 
@@ -257,6 +257,42 @@ const scenes: Record<string, React.FC> = {
 const MobileServiceWorkshop = () => {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const phoneWrapRef = useRef<HTMLDivElement>(null);
+
+  // Scroll-driven tilt
+  const { scrollYProgress } = useScroll({
+    target: phoneWrapRef,
+    offset: ["start end", "end start"],
+  });
+  const scrollRotY = useTransform(scrollYProgress, [0, 0.5, 1], [10, 0, -10]);
+  const scrollRotX = useTransform(scrollYProgress, [0, 0.5, 1], [-6, 0, 6]);
+
+  // Gyro tilt
+  const gyroY = useMotionValue(0);
+  const gyroX = useMotionValue(0);
+  const gyroYSpring = useSpring(gyroY, { stiffness: 80, damping: 18 });
+  const gyroXSpring = useSpring(gyroX, { stiffness: 80, damping: 18 });
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    const handler = (e: DeviceOrientationEvent) => {
+      // gamma: left-right (-90..90), beta: front-back (-180..180)
+      const g = Math.max(-30, Math.min(30, e.gamma ?? 0));
+      const b = Math.max(-30, Math.min(30, (e.beta ?? 0) - 30));
+      gyroY.set(g * 0.25);
+      gyroX.set(-b * 0.18);
+    };
+    window.addEventListener("deviceorientation", handler);
+    return () => window.removeEventListener("deviceorientation", handler);
+  }, [gyroX, gyroY, reduceMotion]);
+
+  const rotateY = useTransform([scrollRotY, gyroYSpring], ([s, g]: number[]) => s + g);
+  const rotateX = useTransform([scrollRotX, gyroXSpring], ([s, g]: number[]) => s + g);
+
+  // Specular highlight x driven by tilt
+  const specularX = useTransform(rotateY, [-12, 12], [120, -20]);
+  const specularLeft = useTransform(specularX, (v) => `${v}%`);
 
   useEffect(() => {
     if (paused) return;
@@ -298,52 +334,138 @@ const MobileServiceWorkshop = () => {
 
         {/* Phone frame — realistic */}
         <motion.div
-          className="relative mx-auto mb-5 w-full max-w-[300px]"
+          ref={phoneWrapRef}
+          className="relative mx-auto mb-5 w-full max-w-[290px]"
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.15}
           onDragEnd={(_, info) => handleSwipe(info.offset.x)}
+          style={{ perspective: 1400 }}
         >
-          {/* Outer bezel */}
-          <div className="relative aspect-[9/17] rounded-[2.6rem] bg-gradient-to-br from-[#1a2238] via-[#0a1020] to-[#040810] p-[3px] shadow-[0_50px_120px_rgba(0,0,0,0.6),inset_0_1px_0_rgba(255,255,255,0.12),inset_0_-1px_0_rgba(0,0,0,0.5)]">
-            {/* Inner screen */}
-            <div className="relative h-full w-full overflow-hidden rounded-[2.4rem] border border-white/8 bg-gradient-to-br from-[#0e1830] to-[#060912] shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]">
-              {/* Reflective sweep */}
-              <motion.div
-                className="pointer-events-none absolute -inset-y-8 -left-1/3 z-20 w-1/3 rotate-12 bg-gradient-to-r from-transparent via-white/10 to-transparent blur-md"
-                animate={{ x: ["0%", "420%"] }}
-                transition={{ duration: 6.2, repeat: Infinity, ease: [0.16, 1, 0.3, 1], repeatDelay: 1.4 }}
-              />
-              {/* Dynamic island */}
-              <div className="absolute left-1/2 top-2 z-10 h-6 w-24 -translate-x-1/2 rounded-full bg-black shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)]">
-                <div className="absolute right-2.5 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-emerald-400/70" />
-              </div>
-              {/* Status bar */}
-              <div className="relative z-[1] flex items-center justify-between px-6 pt-2.5 text-[9px] font-semibold text-white/70">
-                <span>9:41</span>
-                <span className="flex items-center gap-1">
-                  <span>●●●</span>
-                  <span className="text-[8px]">100%</span>
-                </span>
-              </div>
+          {/* Floating ground shadow */}
+          <div
+            className="pointer-events-none absolute left-1/2 top-[88%] h-10 w-[78%] -translate-x-1/2 rounded-[50%] bg-black/55 blur-2xl"
+          />
 
-              {/* Scene */}
-              <div className="relative h-[calc(100%-2rem)]">
-                <AnimatePresence mode="wait">
+          {/* 3D phone container */}
+          <motion.div
+            className="relative aspect-[9/18.5]"
+            style={{
+              rotateY: reduceMotion ? 0 : rotateY,
+              rotateX: reduceMotion ? 0 : rotateX,
+              transformStyle: "preserve-3d",
+            }}
+            transition={{ type: "spring", stiffness: 60, damping: 18 }}
+          >
+            {/* Titanium side rail (outer frame) */}
+            <div
+              className="absolute inset-0 rounded-[2.7rem] p-[3px]"
+              style={{
+                background:
+                  "linear-gradient(95deg,#e8eaed 0%,#9aa0aa 12%,#3a3f48 28%,#1a1d24 50%,#3a3f48 72%,#9aa0aa 88%,#e8eaed 100%)",
+                boxShadow:
+                  "0 50px 120px rgba(0,0,0,0.55),0 0 0 0.5px rgba(0,0,0,0.4)",
+              }}
+            >
+              {/* Inner frame highlight */}
+              <div
+                className="relative h-full w-full rounded-[2.55rem] p-[2px]"
+                style={{
+                  background:
+                    "linear-gradient(180deg,#2a2e36 0%,#0a0c10 10%,#0a0c10 90%,#2a2e36 100%)",
+                  boxShadow:
+                    "inset 0 1px 0 rgba(255,255,255,0.18),inset 0 -1px 0 rgba(0,0,0,0.6)",
+                }}
+              >
+                {/* Screen */}
+                <div
+                  className="relative h-full w-full overflow-hidden rounded-[2.4rem] bg-gradient-to-br from-[#0e1830] to-[#060912]"
+                  style={{
+                    boxShadow:
+                      "inset 6px 0 14px rgba(0,0,0,0.55),inset -6px 0 14px rgba(0,0,0,0.55),inset 0 1px 0 rgba(255,255,255,0.06)",
+                  }}
+                >
+                  {/* Emissive inner glow + vignette */}
+                  <div
+                    className="pointer-events-none absolute inset-0 z-[2]"
+                    style={{
+                      background:
+                        "radial-gradient(ellipse at 50% 30%, rgba(67,88,255,0.10), transparent 55%), radial-gradient(ellipse at 50% 100%, rgba(0,0,0,0.5), transparent 60%)",
+                    }}
+                  />
+
+                  {/* Tilt-anchored specular sweep */}
                   <motion.div
-                    key={service.key}
-                    initial={{ opacity: 0, y: 18, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -14, scale: 0.98 }}
-                    transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                    className="absolute inset-0"
-                  >
-                    <Scene />
-                  </motion.div>
-                </AnimatePresence>
+                    className="pointer-events-none absolute -inset-y-10 z-20 w-1/3 rotate-12 bg-gradient-to-r from-transparent via-white/14 to-transparent blur-md"
+                    style={{ left: specularLeft }}
+                  />
+
+                  {/* Dynamic island */}
+                  <div className="absolute left-1/2 top-2 z-10 h-6 w-24 -translate-x-1/2 rounded-full bg-black shadow-[inset_0_0_0_1px_rgba(255,255,255,0.06),0_2px_6px_rgba(0,0,0,0.6)]">
+                    <div className="absolute right-2.5 top-1/2 h-1.5 w-1.5 -translate-y-1/2 rounded-full bg-emerald-400/70" />
+                    <div className="absolute left-3 top-1/2 h-1 w-1 -translate-y-1/2 rounded-full bg-white/15" />
+                  </div>
+
+                  {/* Status bar */}
+                  <div className="relative z-[3] flex items-center justify-between px-6 pt-2.5 text-[9px] font-semibold text-white/70">
+                    <span>9:41</span>
+                    <span className="flex items-center gap-1">
+                      <span>●●●</span>
+                      <span className="text-[8px]">100%</span>
+                    </span>
+                  </div>
+
+                  {/* Scene */}
+                  <div className="relative z-[1] h-[calc(100%-2rem)]">
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={service.key}
+                        initial={{ opacity: 0, y: 18, scale: 0.96 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -14, scale: 0.98 }}
+                        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                        className="absolute inset-0"
+                      >
+                        <Scene />
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+
+            {/* Volume buttons (left rail) */}
+            <div
+              className="absolute left-[-3px] top-[18%] h-7 w-[3px] rounded-l-sm"
+              style={{
+                background: "linear-gradient(90deg,#2a2e36,#5b6068 60%,#2a2e36)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.25),0 1px 2px rgba(0,0,0,0.5)",
+              }}
+            />
+            <div
+              className="absolute left-[-3px] top-[26%] h-12 w-[3px] rounded-l-sm"
+              style={{
+                background: "linear-gradient(90deg,#2a2e36,#5b6068 60%,#2a2e36)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.25),0 1px 2px rgba(0,0,0,0.5)",
+              }}
+            />
+            <div
+              className="absolute left-[-3px] top-[36%] h-12 w-[3px] rounded-l-sm"
+              style={{
+                background: "linear-gradient(90deg,#2a2e36,#5b6068 60%,#2a2e36)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.25),0 1px 2px rgba(0,0,0,0.5)",
+              }}
+            />
+
+            {/* Power button (right rail) */}
+            <div
+              className="absolute right-[-3px] top-[28%] h-16 w-[3px] rounded-r-sm"
+              style={{
+                background: "linear-gradient(270deg,#2a2e36,#5b6068 60%,#2a2e36)",
+                boxShadow: "inset 0 1px 0 rgba(255,255,255,0.25),0 1px 2px rgba(0,0,0,0.5)",
+              }}
+            />
+          </motion.div>
 
           {/* Floating service badge */}
           <AnimatePresence mode="wait">
@@ -353,7 +475,7 @@ const MobileServiceWorkshop = () => {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -6, scale: 0.9 }}
               transition={{ type: "spring", stiffness: 320, damping: 22 }}
-              className="absolute -right-2 top-6 flex items-center gap-1.5 rounded-full border border-white/20 bg-white/12 px-3 py-1.5 backdrop-blur-xl"
+              className="absolute -right-3 top-8 z-30 flex items-center gap-1.5 rounded-full border border-white/20 bg-white/12 px-3 py-1.5 backdrop-blur-xl"
             >
               <service.Icon className="h-3 w-3 text-white" />
               <span className="text-[9px] font-bold uppercase tracking-[0.18em] text-white">
@@ -367,7 +489,7 @@ const MobileServiceWorkshop = () => {
             type="button"
             onClick={() => setPaused((p) => !p)}
             aria-label={paused ? "Play" : "Pause"}
-            className="absolute -left-2 top-6 flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-white/8 text-white/80 backdrop-blur active:scale-90"
+            className="absolute -left-3 top-8 z-30 flex h-7 w-7 items-center justify-center rounded-full border border-white/15 bg-white/8 text-white/80 backdrop-blur active:scale-90"
           >
             {paused ? <Play className="h-3 w-3" /> : <Pause className="h-3 w-3" />}
           </button>

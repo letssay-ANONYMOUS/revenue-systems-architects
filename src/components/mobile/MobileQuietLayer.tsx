@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
 import { X } from "lucide-react";
 
 export interface QuietCard {
@@ -20,6 +20,131 @@ const valuePillClass = (tone: string) =>
   tone === "gold"
     ? "border-[#c8a568]/55 bg-[#c69a4f] text-[#080b12] shadow-[0_10px_30px_rgba(111,75,24,0.28),inset_0_1px_0_rgba(255,238,194,0.7)]"
     : "border-[#6ca8ff]/55 bg-[#2f74ff] text-[#07101f] shadow-[0_10px_30px_rgba(21,75,196,0.3),inset_0_1px_0_rgba(196,221,255,0.7)]";
+
+interface PressableCardProps {
+  card: QuietCard;
+  index: number;
+  onOpen: () => void;
+}
+
+const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
+  const controls = useAnimationControls();
+  const [pressed, setPressed] = useState(false);
+  const openingRef = useRef(false);
+
+  const handleDown = () => {
+    if (openingRef.current) return;
+    setPressed(true);
+    controls.start({
+      scale: 0.94,
+      y: 4,
+      rotateX: 4,
+      transition: { type: "spring", stiffness: 420, damping: 22 },
+    });
+  };
+
+  const handleRelease = (didTap: boolean) => {
+    if (openingRef.current) return;
+    setPressed(false);
+    if (didTap) {
+      // Two-stage open: lift up, then trigger sheet
+      openingRef.current = true;
+      controls
+        .start({
+          scale: 1.06,
+          y: -6,
+          rotateX: 0,
+          transition: { type: "spring", stiffness: 320, damping: 20 },
+        })
+        .then(() => {
+          onOpen();
+          // Settle back so the card is normal when sheet closes
+          controls.start({
+            scale: 1,
+            y: 0,
+            rotateX: 0,
+            transition: { type: "spring", stiffness: 260, damping: 26 },
+          });
+          openingRef.current = false;
+        });
+    } else {
+      controls.start({
+        scale: 1,
+        y: 0,
+        rotateX: 0,
+        transition: { type: "spring", stiffness: 380, damping: 26 },
+      });
+    }
+  };
+
+  return (
+    <motion.article
+      className="group relative w-[86vw] shrink-0 snap-start cursor-pointer overflow-hidden rounded-[1.55rem] border border-white/55 bg-white/40 p-2.5 text-left shadow-[0_30px_70px_rgba(20,29,38,0.18),inset_0_1px_0_rgba(255,255,255,0.78)] backdrop-blur-2xl"
+      initial={{ opacity: 0, y: 60, scale: 0.92 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: "-15% 0px" }}
+      transition={{
+        duration: 0.75,
+        delay: index * 0.12,
+        ease: [0.16, 1, 0.3, 1],
+      }}
+      animate={controls}
+      style={{ transformPerspective: 800, transformStyle: "preserve-3d" }}
+      onPointerDown={handleDown}
+      onPointerUp={() => handleRelease(true)}
+      onPointerCancel={() => handleRelease(false)}
+      onPointerLeave={() => pressed && handleRelease(false)}
+    >
+      {/* Inner gloss */}
+      <div
+        className="pointer-events-none absolute inset-0 rounded-[1.55rem] bg-[linear-gradient(135deg,rgba(255,255,255,0.7),rgba(255,255,255,0.16)_38%,rgba(255,255,255,0.06)_60%,rgba(18,28,39,0.08))]"
+      />
+      <div className="pointer-events-none absolute inset-[1px] rounded-[1.45rem] border border-white/40 shadow-[inset_0_18px_40px_rgba(255,255,255,0.22),inset_0_-22px_38px_rgba(35,45,56,0.06)]" />
+
+      {/* Press glow ring */}
+      <motion.div
+        className="pointer-events-none absolute -inset-1 rounded-[1.7rem]"
+        animate={{ opacity: pressed ? 1 : 0 }}
+        transition={{ duration: 0.18 }}
+        style={{
+          background:
+            "radial-gradient(ellipse at 50% 50%, rgba(20,71,212,0.32), transparent 65%)",
+          filter: "blur(14px)",
+        }}
+      />
+
+      {/* Image */}
+      <div className="relative aspect-[16/10.5] overflow-hidden rounded-[1.2rem] border border-white/50 bg-[#d5dbe0] shadow-[0_14px_36px_rgba(21,31,41,0.14),inset_0_1px_0_rgba(255,255,255,0.7)]">
+        <motion.img
+          src={card.imageSrc}
+          alt=""
+          className="h-full w-full object-cover saturate-[1.04]"
+          loading={index === 0 ? "eager" : "lazy"}
+          decoding="async"
+          animate={{ scale: pressed ? 1.05 : 1 }}
+          transition={{ type: "spring", stiffness: 260, damping: 24 }}
+        />
+        <div
+          className={`absolute right-2.5 top-2.5 rounded-full px-3 py-1 text-xs font-black tracking-[-0.03em] backdrop-blur-xl ${valuePillClass(card.valueTone)}`}
+        >
+          {card.value}
+        </div>
+      </div>
+
+      <div className="relative px-2 pb-1.5 pt-3.5">
+        <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#2e3842]/55">
+          {card.label}
+        </p>
+        <p className="mt-2 text-[13px] leading-relaxed text-[#2e3842]/78">
+          {card.description}
+        </p>
+        <p className="mt-2.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#1447d4]/70">
+          Tap to expand
+        </p>
+      </div>
+    </motion.article>
+  );
+};
 
 const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -97,52 +222,15 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
         style={{ scrollPaddingLeft: "7vw" }}
       >
         {cards.map((card, index) => (
-          <motion.article
+          <PressableCard
             key={card.label}
-            className="group relative w-[86vw] shrink-0 snap-start cursor-pointer overflow-hidden rounded-[1.55rem] border border-white/55 bg-white/40 p-2.5 text-left shadow-[0_30px_70px_rgba(20,29,38,0.18),inset_0_1px_0_rgba(255,255,255,0.78)] backdrop-blur-2xl"
-            initial={{ opacity: 0, y: 60, scale: 0.92 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true, margin: "-15% 0px" }}
-            transition={{
-              duration: 0.75,
-              delay: index * 0.12,
-              ease: [0.16, 1, 0.3, 1],
+            card={card}
+            index={index}
+            onOpen={() => {
+              scrollTo(index);
+              setSelected(card);
             }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => setSelected(card)}
-          >
-            {/* Inner gloss */}
-            <div
-              className="pointer-events-none absolute inset-0 rounded-[1.55rem] bg-[linear-gradient(135deg,rgba(255,255,255,0.7),rgba(255,255,255,0.16)_38%,rgba(255,255,255,0.06)_60%,rgba(18,28,39,0.08))]"
-            />
-            <div className="pointer-events-none absolute inset-[1px] rounded-[1.45rem] border border-white/40 shadow-[inset_0_18px_40px_rgba(255,255,255,0.22),inset_0_-22px_38px_rgba(35,45,56,0.06)]" />
-
-            {/* Image */}
-            <div className="relative aspect-[16/10.5] overflow-hidden rounded-[1.2rem] border border-white/50 bg-[#d5dbe0] shadow-[0_14px_36px_rgba(21,31,41,0.14),inset_0_1px_0_rgba(255,255,255,0.7)]">
-              <img
-                src={card.imageSrc}
-                alt=""
-                className="h-full w-full object-cover saturate-[1.04]"
-                loading={index === 0 ? "eager" : "lazy"}
-                decoding="async"
-              />
-              <div className={`absolute right-2.5 top-2.5 rounded-full px-3 py-1 text-xs font-black tracking-[-0.03em] backdrop-blur-xl ${valuePillClass(card.valueTone)}`}>
-                {card.value}
-              </div>
-            </div>
-
-            <div className="relative px-2 pb-1.5 pt-3.5">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#2e3842]/55">
-                {card.label}
-              </p>
-              <p className="mt-2 text-[13px] leading-relaxed text-[#2e3842]/78">
-                {card.description}
-              </p>
-              <p className="mt-2.5 text-[10px] font-semibold uppercase tracking-[0.22em] text-[#1447d4]/70">
-                Tap to expand
-              </p>
-            </div>
-          </motion.article>
+          />
         ))}
       </motion.div>
 
