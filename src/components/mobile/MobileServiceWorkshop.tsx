@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { Phone, Bot, Globe, ArrowRight, CheckCircle2, Send, CalendarCheck, Pause, Play } from "lucide-react";
 
