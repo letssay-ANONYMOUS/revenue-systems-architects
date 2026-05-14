@@ -407,16 +407,37 @@ const MobileServiceWorkshop = () => {
                   </div>
 
                   {/* Status bar */}
-                  <div className="relative z-[3] flex items-center justify-between px-6 pt-2.5 text-[9px] font-semibold text-white/70">
-                    <span>9:41</span>
-                    <span className="flex items-center gap-1">
-                      <span>●●●</span>
-                      <span className="text-[8px]">100%</span>
-                    </span>
+                  <div className="relative z-[3] flex items-center justify-between px-6 pt-2.5 text-[10px] font-semibold text-white/85">
+                    <span className="tracking-tight">9:41</span>
+                    <div className="flex items-center gap-1.5">
+                      {/* Signal */}
+                      <svg width="15" height="9" viewBox="0 0 15 9" fill="currentColor" aria-hidden>
+                        <rect x="0" y="6" width="2.2" height="3" rx="0.5" />
+                        <rect x="3.4" y="4" width="2.2" height="5" rx="0.5" />
+                        <rect x="6.8" y="2" width="2.2" height="7" rx="0.5" />
+                        <rect x="10.2" y="0" width="2.2" height="9" rx="0.5" />
+                      </svg>
+                      {/* Wifi */}
+                      <svg width="13" height="9" viewBox="0 0 13 9" fill="currentColor" aria-hidden>
+                        <path d="M6.5 1.5C8.7 1.5 10.7 2.3 12.2 3.7L11 5C9.8 3.9 8.2 3.2 6.5 3.2C4.8 3.2 3.2 3.9 2 5L0.8 3.7C2.3 2.3 4.3 1.5 6.5 1.5Z" />
+                        <path d="M6.5 4.5C7.8 4.5 9 5 9.9 5.8L8.7 7C8.1 6.5 7.3 6.1 6.5 6.1C5.7 6.1 4.9 6.5 4.3 7L3.1 5.8C4 5 5.2 4.5 6.5 4.5Z" />
+                        <circle cx="6.5" cy="8" r="1" />
+                      </svg>
+                      {/* Apple-style battery */}
+                      <div className="relative ml-0.5 flex h-[10px] w-[22px] items-center">
+                        <div className="relative h-full w-full rounded-[2.5px] border border-white/55">
+                          <div
+                            className="absolute left-[1px] top-[1px] bottom-[1px] rounded-[1.5px] bg-white"
+                            style={{ width: "calc(100% - 2px)" }}
+                          />
+                        </div>
+                        <div className="absolute -right-[2px] top-1/2 h-[4px] w-[1.5px] -translate-y-1/2 rounded-r-[1px] bg-white/55" />
+                      </div>
+                    </div>
                   </div>
 
                   {/* Scene */}
-                  <div className="relative z-[1] h-[calc(100%-2rem)]">
+                  <div className="relative z-[1] h-[calc(100%-3rem)] pb-4">
                     <AnimatePresence mode="wait">
                       <motion.div
                         key={service.key}
@@ -430,6 +451,9 @@ const MobileServiceWorkshop = () => {
                       </motion.div>
                     </AnimatePresence>
                   </div>
+
+                  {/* Home indicator bar */}
+                  <div className="absolute bottom-1.5 left-1/2 z-[5] h-[5px] w-[110px] -translate-x-1/2 rounded-full bg-white/85 shadow-[0_0_8px_rgba(255,255,255,0.15)]" />
                 </div>
               </div>
             </div>
