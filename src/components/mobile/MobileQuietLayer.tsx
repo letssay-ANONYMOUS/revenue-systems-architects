@@ -29,56 +29,51 @@ interface PressableCardProps {
 
 const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
   const controls = useAnimationControls();
+  const articleRef = useRef<HTMLElement | null>(null);
   const [pressed, setPressed] = useState(false);
   const openingRef = useRef(false);
 
-  const handleDown = () => {
+  const pressIn = (e: React.PointerEvent<HTMLElement>) => {
     if (openingRef.current) return;
+    const el = articleRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    // Normalized offset from center: -1..1
+    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+    const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+    // Tilt away from finger: left tap -> right edge lifts (rotateY positive)
+    const rotY = -nx * 6;
+    const rotX = ny * 5;
     setPressed(true);
     controls.start({
-      scale: 0.94,
-      y: 4,
-      rotateX: 4,
-      transition: { type: "spring", stiffness: 420, damping: 22 },
+      scale: 0.95,
+      y: 3,
+      rotateX: rotX,
+      rotateY: rotY,
+      transition: { type: "spring", stiffness: 460, damping: 24 },
     });
   };
 
-  const handleRelease = (didTap: boolean) => {
+  const pressOut = async (didTap: boolean) => {
     if (openingRef.current) return;
     setPressed(false);
+    if (didTap) openingRef.current = true;
+    await controls.start({
+      scale: 1,
+      y: 0,
+      rotateX: 0,
+      rotateY: 0,
+      transition: { type: "spring", stiffness: 520, damping: 28, mass: 0.6 },
+    });
     if (didTap) {
-      // Two-stage open: lift up, then trigger sheet
-      openingRef.current = true;
-      controls
-        .start({
-          scale: 1.06,
-          y: -6,
-          rotateX: 0,
-          transition: { type: "spring", stiffness: 320, damping: 20 },
-        })
-        .then(() => {
-          onOpen();
-          // Settle back so the card is normal when sheet closes
-          controls.start({
-            scale: 1,
-            y: 0,
-            rotateX: 0,
-            transition: { type: "spring", stiffness: 260, damping: 26 },
-          });
-          openingRef.current = false;
-        });
-    } else {
-      controls.start({
-        scale: 1,
-        y: 0,
-        rotateX: 0,
-        transition: { type: "spring", stiffness: 380, damping: 26 },
-      });
+      onOpen();
+      openingRef.current = false;
     }
   };
 
   return (
     <motion.article
+      ref={articleRef as React.RefObject<HTMLElement>}
       className="group relative w-[86vw] shrink-0 snap-start cursor-pointer overflow-hidden rounded-[1.55rem] border border-white/55 bg-white/40 p-2.5 text-left shadow-[0_30px_70px_rgba(20,29,38,0.18),inset_0_1px_0_rgba(255,255,255,0.78)] backdrop-blur-2xl"
       initial={{ opacity: 0, y: 60, scale: 0.92 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
@@ -89,11 +84,16 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
         ease: [0.16, 1, 0.3, 1],
       }}
       animate={controls}
-      style={{ transformPerspective: 800, transformStyle: "preserve-3d" }}
-      onPointerDown={handleDown}
-      onPointerUp={() => handleRelease(true)}
-      onPointerCancel={() => handleRelease(false)}
-      onPointerLeave={() => pressed && handleRelease(false)}
+      style={{
+        transformPerspective: 900,
+        transformStyle: "preserve-3d",
+        transformOrigin: "center center",
+        willChange: "transform",
+      }}
+      onPointerDown={pressIn}
+      onPointerUp={() => pressOut(true)}
+      onPointerCancel={() => pressOut(false)}
+      onPointerLeave={() => pressed && pressOut(false)}
     >
       {/* Inner gloss */}
       <div
