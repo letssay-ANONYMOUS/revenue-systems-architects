@@ -816,14 +816,13 @@
   72% { opacity: 0.45; }
   100% { transform: translate(330%, -50%) scaleX(1.2); opacity: 0; }
 }
-.pp-voice-flow,
-.pp-voice-glow {
-  animation: pp-voice-flow 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite, pp-voice-breathe 1.9s ease-in-out infinite;
-  transform-box: fill-box;
-  transform-origin: center;
+.pp-voice-flow {
+  animation: pp-voice-worm 2.6s linear infinite, pp-voice-worm-pulse 1.3s ease-in-out infinite;
 }
 .pp-voice-glow {
-  animation-delay: -0.42s, 0s;
+  animation: pp-voice-worm 2.6s linear infinite;
+  animation-delay: -0.18s;
+  opacity: 0.85;
 }
 .pp-voice-sheen {
   animation: pp-voice-sheen 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
