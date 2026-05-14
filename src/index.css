@@ -793,9 +793,18 @@
   100% { transform: scale(1.8); opacity: 0; }
 }
 @keyframes pp-voice-flow {
-  0% { stroke-dashoffset: 320; opacity: 0.45; }
-  45% { opacity: 1; }
-  100% { stroke-dashoffset: 0; opacity: 0.5; }
+  0% { stroke-dashoffset: 640; opacity: 0; }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+@keyframes pp-voice-worm {
+  0% { stroke-dashoffset: 640; }
+  100% { stroke-dashoffset: 0; }
+}
+@keyframes pp-voice-worm-pulse {
+  0%, 100% { stroke-width: 2.4; filter: drop-shadow(0 0 3px rgba(101,114,237,0.55)); }
+  50% { stroke-width: 3.4; filter: drop-shadow(0 0 7px rgba(101,114,237,0.95)); }
 }
 @keyframes pp-voice-breathe {
   0%, 100% { transform: translateY(0) scaleY(0.92); opacity: 0.7; }
@@ -807,14 +816,13 @@
   72% { opacity: 0.45; }
   100% { transform: translate(330%, -50%) scaleX(1.2); opacity: 0; }
 }
-.pp-voice-flow,
-.pp-voice-glow {
-  animation: pp-voice-flow 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite, pp-voice-breathe 1.9s ease-in-out infinite;
-  transform-box: fill-box;
-  transform-origin: center;
+.pp-voice-flow {
+  animation: pp-voice-worm 2.6s linear infinite, pp-voice-worm-pulse 1.3s ease-in-out infinite;
 }
 .pp-voice-glow {
-  animation-delay: -0.42s, 0s;
+  animation: pp-voice-worm 2.6s linear infinite;
+  animation-delay: -0.18s;
+  opacity: 0.85;
 }
 .pp-voice-sheen {
   animation: pp-voice-sheen 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
