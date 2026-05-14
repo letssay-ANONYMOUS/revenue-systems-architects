@@ -879,6 +879,9 @@ const Index = () => {
             </div>
           </section>
 
+        {/* MOBILE: Proof strip between sections */}
+        <MobileProofStrip />
+
         {/* MOBILE: Service Workshop replaces 3 service sections */}
         <MobileServiceWorkshop />
 
