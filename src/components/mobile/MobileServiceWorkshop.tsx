@@ -257,6 +257,41 @@ const scenes: Record<string, React.FC> = {
 const MobileServiceWorkshop = () => {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const phoneWrapRef = useRef<HTMLDivElement>(null);
+
+  // Scroll-driven tilt
+  const { scrollYProgress } = useScroll({
+    target: phoneWrapRef,
+    offset: ["start end", "end start"],
+  });
+  const scrollRotY = useTransform(scrollYProgress, [0, 0.5, 1], [10, 0, -10]);
+  const scrollRotX = useTransform(scrollYProgress, [0, 0.5, 1], [-6, 0, 6]);
+
+  // Gyro tilt
+  const gyroY = useMotionValue(0);
+  const gyroX = useMotionValue(0);
+  const gyroYSpring = useSpring(gyroY, { stiffness: 80, damping: 18 });
+  const gyroXSpring = useSpring(gyroX, { stiffness: 80, damping: 18 });
+
+  useEffect(() => {
+    if (reduceMotion) return;
+    const handler = (e: DeviceOrientationEvent) => {
+      // gamma: left-right (-90..90), beta: front-back (-180..180)
+      const g = Math.max(-30, Math.min(30, e.gamma ?? 0));
+      const b = Math.max(-30, Math.min(30, (e.beta ?? 0) - 30));
+      gyroY.set(g * 0.25);
+      gyroX.set(-b * 0.18);
+    };
+    window.addEventListener("deviceorientation", handler);
+    return () => window.removeEventListener("deviceorientation", handler);
+  }, [gyroX, gyroY, reduceMotion]);
+
+  const rotateY = useTransform([scrollRotY, gyroYSpring], ([s, g]: number[]) => s + g);
+  const rotateX = useTransform([scrollRotX, gyroXSpring], ([s, g]: number[]) => s + g);
+
+  // Specular highlight x driven by tilt
+  const specularX = useTransform(rotateY, [-12, 12], [120, -20]);
 
   useEffect(() => {
     if (paused) return;
