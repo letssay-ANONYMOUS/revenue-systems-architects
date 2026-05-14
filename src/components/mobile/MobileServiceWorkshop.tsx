@@ -292,6 +292,7 @@ const MobileServiceWorkshop = () => {
 
   // Specular highlight x driven by tilt
   const specularX = useTransform(rotateY, [-12, 12], [120, -20]);
+  const specularLeft = useTransform(specularX, (v) => `${v}%`);
 
   useEffect(() => {
     if (paused) return;
