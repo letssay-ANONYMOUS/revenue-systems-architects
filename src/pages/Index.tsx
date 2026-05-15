@@ -290,13 +290,9 @@ const ReliableHeroVideo = () => {
     video.playsInline = true;
     const playback = video.play();
     if (playback && typeof playback.catch === "function") {
-      void playback.catch(() => {
-        if (sourceIndex < HERO_VIDEO_SOURCES.length - 1) {
-          setSourceIndex((index) => Math.min(index + 1, HERO_VIDEO_SOURCES.length - 1));
-        }
-      });
+      void playback.catch(() => undefined);
     }
-  }, [sourceIndex]);
+  }, []);
 
   const recoverVideo = useCallback(() => {
     if (isTestMediaEnvironment()) return;
