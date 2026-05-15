@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion, useScroll, useSpring, useTransform, type MotionValue } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import SectionReveal from "./SectionReveal";
 
@@ -32,17 +32,7 @@ const CTASection = ({
 
   return (
     <section ref={sectionRef} className="relative flex min-h-[132dvh] items-center overflow-hidden bg-[#f6f8fb] py-24 text-[#07101f] md:min-h-[145dvh] md:py-40">
-      <video
-        className="absolute inset-0 h-full w-full object-cover opacity-100"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        aria-hidden="true"
-      >
-        <source src="/cta-croc-generated-video.mp4" type="video/mp4" />
-      </video>
+      <SeamlessCTAVideo />
 
       <div className="relative z-10 mx-auto w-full max-w-[1340px] px-5 md:section-padding">
         <SectionReveal>
@@ -85,6 +75,107 @@ const CTASection = ({
         </SectionReveal>
       </div>
     </section>
+  );
+};
+
+const CTA_VIDEO_SRC = "/cta-croc-generated-video.mp4";
+const CTA_VIDEO_FADE_SECONDS = 1.35;
+const CTA_VIDEO_FALLBACK_SECONDS = 10;
+
+const SeamlessCTAVideo = () => {
+  const primaryRef = useRef<HTMLVideoElement>(null);
+  const secondaryRef = useRef<HTMLVideoElement>(null);
+  const [activeLayer, setActiveLayer] = useState<0 | 1>(0);
+
+  useEffect(() => {
+    if (window.navigator.userAgent.toLowerCase().includes("jsdom")) return;
+
+    const current = activeLayer === 0 ? primaryRef.current : secondaryRef.current;
+    const previous = activeLayer === 0 ? secondaryRef.current : primaryRef.current;
+    if (!current) return;
+
+    let switchTimer = 0;
+    let stopPreviousTimer = 0;
+    let metadataHandler: (() => void) | null = null;
+
+    const fadeMs = CTA_VIDEO_FADE_SECONDS * 1000;
+    const play = (video: HTMLVideoElement) => {
+      video.muted = true;
+      video.playsInline = true;
+      const playback = video.play();
+      if (playback && typeof playback.catch === "function") {
+        void playback.catch(() => undefined);
+      }
+    };
+    const scheduleNextLayer = () => {
+      const duration = Number.isFinite(current.duration) && current.duration > CTA_VIDEO_FADE_SECONDS
+        ? current.duration
+        : CTA_VIDEO_FALLBACK_SECONDS;
+      const switchDelay = Math.max(1200, (duration - CTA_VIDEO_FADE_SECONDS) * 1000);
+
+      switchTimer = window.setTimeout(() => {
+        const next = activeLayer === 0 ? secondaryRef.current : primaryRef.current;
+        if (next) {
+          next.currentTime = 0;
+          play(next);
+        }
+        setActiveLayer(activeLayer === 0 ? 1 : 0);
+      }, switchDelay);
+    };
+
+    play(current);
+
+    if (previous) {
+      stopPreviousTimer = window.setTimeout(() => {
+        previous.pause();
+        previous.currentTime = 0;
+      }, fadeMs);
+    }
+
+    if (current.readyState >= 1) {
+      scheduleNextLayer();
+    } else {
+      metadataHandler = scheduleNextLayer;
+      current.addEventListener("loadedmetadata", metadataHandler, { once: true });
+    }
+
+    return () => {
+      window.clearTimeout(switchTimer);
+      window.clearTimeout(stopPreviousTimer);
+      if (metadataHandler) current.removeEventListener("loadedmetadata", metadataHandler);
+    };
+  }, [activeLayer]);
+
+  const videoClass = "absolute inset-0 h-full w-full object-cover transition-opacity";
+  const videoStyle = {
+    transitionDuration: `${CTA_VIDEO_FADE_SECONDS * 1000}ms`,
+    transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
+  };
+
+  return (
+    <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
+      <video
+        ref={primaryRef}
+        className={`${videoClass} ${activeLayer === 0 ? "opacity-100" : "opacity-0"}`}
+        style={videoStyle}
+        autoPlay
+        muted
+        playsInline
+        preload="auto"
+      >
+        <source src={CTA_VIDEO_SRC} type="video/mp4" />
+      </video>
+      <video
+        ref={secondaryRef}
+        className={`${videoClass} ${activeLayer === 1 ? "opacity-100" : "opacity-0"}`}
+        style={videoStyle}
+        muted
+        playsInline
+        preload="auto"
+      >
+        <source src={CTA_VIDEO_SRC} type="video/mp4" />
+      </video>
+    </div>
   );
 };
 

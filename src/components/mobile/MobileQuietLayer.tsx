@@ -32,11 +32,15 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
   const articleRef = useRef<HTMLElement | null>(null);
   const [pressed, setPressed] = useState(false);
   const openingRef = useRef(false);
+  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+  const hasDraggedRef = useRef(false);
 
   const pressIn = (e: React.PointerEvent<HTMLElement>) => {
     if (openingRef.current) return;
     const el = articleRef.current;
     if (!el) return;
+    pointerStartRef.current = { x: e.clientX, y: e.clientY };
+    hasDraggedRef.current = false;
     const rect = el.getBoundingClientRect();
     // Normalized offset from center: -1..1
     const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -54,29 +58,46 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
     });
   };
 
+  const pressMove = (e: React.PointerEvent<HTMLElement>) => {
+    const start = pointerStartRef.current;
+    if (!start || hasDraggedRef.current) return;
+    const distance = Math.hypot(e.clientX - start.x, e.clientY - start.y);
+    if (distance < 10) return;
+
+    hasDraggedRef.current = true;
+    setPressed(false);
+    controls.start({
+      scale: 1,
+      y: 0,
+      rotateX: 0,
+      rotateY: 0,
+      transition: { duration: 0.14, ease: [0.16, 1, 0.3, 1] },
+    });
+  };
+
   const pressOut = async (didTap: boolean) => {
     if (openingRef.current) return;
+    const shouldOpen = didTap && !hasDraggedRef.current;
+    pointerStartRef.current = null;
     setPressed(false);
-    if (didTap) openingRef.current = true;
+    if (shouldOpen) openingRef.current = true;
     await controls.start({
       scale: 1,
       y: 0,
       rotateX: 0,
       rotateY: 0,
-      transition: { duration: 0.22, ease: [0.16, 1, 0.3, 1] },
+      transition: { duration: 0.16, ease: [0.16, 1, 0.3, 1] },
     });
-    if (didTap) {
-      requestAnimationFrame(() => {
-        onOpen();
-        openingRef.current = false;
-      });
+    if (shouldOpen) {
+      onOpen();
+      openingRef.current = false;
     }
   };
 
   return (
     <motion.article
       ref={articleRef as React.RefObject<HTMLElement>}
-      className="group relative w-[86vw] shrink-0 touch-manipulation snap-start cursor-pointer overflow-hidden rounded-[1.55rem] border border-white/55 bg-white/40 p-2.5 text-left shadow-[0_30px_70px_rgba(20,29,38,0.18),inset_0_1px_0_rgba(255,255,255,0.78)] backdrop-blur-2xl"
+      className="group relative w-[86vw] shrink-0 touch-pan-x snap-start cursor-pointer overflow-hidden rounded-[1.55rem] border border-white/55 bg-white/40 p-2.5 text-left shadow-[0_30px_70px_rgba(20,29,38,0.18),inset_0_1px_0_rgba(255,255,255,0.78)] backdrop-blur-2xl"
       initial={{ opacity: 0, y: 60, scale: 0.92 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-15% 0px" }}
@@ -93,6 +114,7 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
         willChange: "transform",
       }}
       onPointerDown={pressIn}
+      onPointerMove={pressMove}
       onPointerUp={() => pressOut(true)}
       onPointerCancel={() => pressOut(false)}
       onPointerLeave={() => pressed && pressOut(false)}
@@ -122,8 +144,9 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
           src={card.imageSrc}
           alt=""
           className="h-full w-full object-cover saturate-[1.04]"
-          loading={index === 0 ? "eager" : "lazy"}
+          loading="eager"
           decoding="async"
+          fetchpriority="high"
           animate={{ scale: pressed ? 1.05 : 1 }}
           transition={{ type: "spring", stiffness: 260, damping: 24 }}
         />
@@ -153,6 +176,28 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
   const trackRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [selected, setSelected] = useState<QuietCard | null>(null);
+
+  useEffect(() => {
+    const preloadLinks: HTMLLinkElement[] = [];
+    cards.forEach(({ imageSrc }) => {
+      if (!imageSrc) return;
+
+      const image = new Image();
+      image.decoding = "async";
+      image.src = imageSrc;
+
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "image";
+      link.href = imageSrc;
+      document.head.appendChild(link);
+      preloadLinks.push(link);
+    });
+
+    return () => {
+      preloadLinks.forEach((link) => link.remove());
+    };
+  }, [cards]);
 
   // Track active card via scroll position
   useEffect(() => {
@@ -217,12 +262,16 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
       {/* Horizontal scroller */}
       <motion.div
         ref={trackRef}
-        className="relative z-10 flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-visible px-[7vw] pb-8 pt-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        className="relative z-10 flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain px-[7vw] pb-8 pt-2 touch-pan-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-5% 0px" }}
         transition={{ duration: 0.5 }}
-        style={{ scrollPaddingLeft: "7vw" }}
+        style={{
+          scrollPaddingLeft: "7vw",
+          touchAction: "pan-x",
+          WebkitOverflowScrolling: "touch",
+        }}
       >
         {cards.map((card, index) => (
           <PressableCard
@@ -252,7 +301,7 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
         ))}
       </div>
 
-      <AnimatePresence>
+      <AnimatePresence mode="wait">
         {selected && (
           <MobileCardSheet card={selected} onClose={() => setSelected(null)} />
         )}
@@ -305,7 +354,7 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
-        transition={{ type: "spring", stiffness: 320, damping: 34, mass: 0.9 }}
+        transition={{ type: "spring", stiffness: 520, damping: 42, mass: 0.72 }}
         drag="y"
         dragConstraints={{ top: 0, bottom: 0 }}
         dragElastic={{ top: 0, bottom: 0.4 }}
@@ -351,7 +400,10 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
               className="h-full w-full object-cover"
               initial={{ opacity: 0, scale: 1.04 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
+              transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
+              loading="eager"
+              decoding="async"
+              fetchpriority="high"
             />
           </div>
         </div>

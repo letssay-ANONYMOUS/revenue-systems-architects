@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { createPortal } from "react-dom";
-import { AnimatePresence, motion, useScroll, useSpring, useTransform, type MotionValue } from "framer-motion";
+import { AnimatePresence, motion, useScroll, useSpring, useTransform, type MotionValue, type Variants } from "framer-motion";
 import {
   Phone, CalendarCheck, Globe, Smartphone,
   Bot, UserCheck, BarChart3,
@@ -78,16 +78,19 @@ const websiteShowcases = [
     title: "Real Estate",
     eyebrow: "Luxury property website",
     imageSrc: "/real-estate-website-card.jpg",
+    phoneImageSrc: "/phone-real-estate-website.jpg",
   },
   {
     title: "Cafe Orders",
     eyebrow: "Cafe ordering system",
     imageSrc: "/cafe-website-card.jpg",
+    phoneImageSrc: "/phone-cafe-website.jpg",
   },
   {
     title: "Clinics",
     eyebrow: "Clinic booking system",
     imageSrc: "/clinic-website-card.jpg",
+    phoneImageSrc: "/phone-clinic-website.jpg",
   },
 ];
 
@@ -257,6 +260,139 @@ const RisingShowcaseCard = ({ card, index, progress, onSelect }: RisingShowcaseC
   );
 };
 
+const HERO_VIDEO_SOURCES = [
+  "/hero-background-framed-pingpong.mp4",
+  "/hero-background-pingpong.mp4",
+  "/hero-background.mp4",
+];
+
+const isTestMediaEnvironment = () => window.navigator.userAgent.toLowerCase().includes("jsdom");
+
+const ReliableHeroVideo = () => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const stallTimerRef = useRef<number | null>(null);
+  const [sourceIndex, setSourceIndex] = useState(0);
+  const [isReady, setIsReady] = useState(false);
+  const source = HERO_VIDEO_SOURCES[sourceIndex];
+
+  const clearStallTimer = useCallback(() => {
+    if (stallTimerRef.current === null) return;
+    window.clearTimeout(stallTimerRef.current);
+    stallTimerRef.current = null;
+  }, []);
+
+  const playVideo = useCallback(() => {
+    if (isTestMediaEnvironment()) return;
+    const video = videoRef.current;
+    if (!video) return;
+
+    video.muted = true;
+    video.playsInline = true;
+    const playback = video.play();
+    if (playback && typeof playback.catch === "function") {
+      void playback.catch(() => {
+        if (sourceIndex < HERO_VIDEO_SOURCES.length - 1) {
+          setSourceIndex((index) => Math.min(index + 1, HERO_VIDEO_SOURCES.length - 1));
+        }
+      });
+    }
+  }, [sourceIndex]);
+
+  const recoverVideo = useCallback(() => {
+    if (isTestMediaEnvironment()) return;
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (video.error && sourceIndex < HERO_VIDEO_SOURCES.length - 1) {
+      setSourceIndex((index) => Math.min(index + 1, HERO_VIDEO_SOURCES.length - 1));
+      return;
+    }
+
+    if (video.readyState < 2) {
+      video.load();
+    }
+    playVideo();
+  }, [playVideo, sourceIndex]);
+
+  useEffect(() => {
+    if (isTestMediaEnvironment()) {
+      setIsReady(true);
+      return;
+    }
+
+    const video = videoRef.current;
+    if (!video) return;
+
+    setIsReady(false);
+    video.load();
+    playVideo();
+
+    const markReady = () => {
+      clearStallTimer();
+      setIsReady(true);
+      playVideo();
+    };
+    const handleError = () => {
+      clearStallTimer();
+      if (sourceIndex < HERO_VIDEO_SOURCES.length - 1) {
+        setSourceIndex((index) => Math.min(index + 1, HERO_VIDEO_SOURCES.length - 1));
+      }
+    };
+    const handleStall = () => {
+      clearStallTimer();
+      stallTimerRef.current = window.setTimeout(recoverVideo, 900);
+    };
+    const handleVisibility = () => {
+      if (!document.hidden) recoverVideo();
+    };
+    const handlePageShow = () => recoverVideo();
+
+    video.addEventListener("loadeddata", markReady);
+    video.addEventListener("canplay", markReady);
+    video.addEventListener("playing", markReady);
+    video.addEventListener("error", handleError);
+    video.addEventListener("stalled", handleStall);
+    video.addEventListener("waiting", handleStall);
+    video.addEventListener("suspend", handleStall);
+    document.addEventListener("visibilitychange", handleVisibility);
+    window.addEventListener("pageshow", handlePageShow);
+    window.addEventListener("focus", handlePageShow);
+
+    return () => {
+      clearStallTimer();
+      video.removeEventListener("loadeddata", markReady);
+      video.removeEventListener("canplay", markReady);
+      video.removeEventListener("playing", markReady);
+      video.removeEventListener("error", handleError);
+      video.removeEventListener("stalled", handleStall);
+      video.removeEventListener("waiting", handleStall);
+      video.removeEventListener("suspend", handleStall);
+      document.removeEventListener("visibilitychange", handleVisibility);
+      window.removeEventListener("pageshow", handlePageShow);
+      window.removeEventListener("focus", handlePageShow);
+    };
+  }, [clearStallTimer, playVideo, recoverVideo, source, sourceIndex]);
+
+  return (
+    <div aria-hidden="true" className="absolute inset-0 overflow-hidden bg-[#f7f9fc]">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_25%_40%,rgba(20,71,212,0.12),transparent_36%),linear-gradient(90deg,#f7f9fc_0%,#eef4fb_46%,#ffffff_100%)]" />
+      <video
+        key={source}
+        ref={videoRef}
+        src={source}
+        className={`absolute inset-0 h-full w-full object-cover object-[50%_center] transition-opacity duration-500 md:object-[48%_center] ${isReady ? "opacity-100" : "opacity-0"}`}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        disablePictureInPicture
+        controlsList="nodownload noplaybackrate noremoteplayback"
+      />
+    </div>
+  );
+};
+
 interface RisingCardDetailProps {
   card: TransitionCard;
   onClose: () => void;
@@ -388,8 +524,12 @@ const RisingCardDetail = ({ card, onClose }: RisingCardDetailProps) => {
 const WebsiteShowcaseCarousel = () => {
   const [[activeIndex, direction], setActiveSlide] = useState<[number, number]>([0, 0]);
   const [selectedWebsiteIndex, setSelectedWebsiteIndex] = useState<number | null>(null);
+  const [selectedWebsiteDevice, setSelectedWebsiteDevice] = useState<"desktop" | "phone">("desktop");
+  const [deviceView, setDeviceView] = useState<"desktop" | "phone">("desktop");
   const active = websiteShowcases[activeIndex];
   const selectedWebsite = selectedWebsiteIndex === null ? null : websiteShowcases[selectedWebsiteIndex];
+  const selectedWebsiteImageSrc = selectedWebsiteDevice === "phone" ? selectedWebsite?.phoneImageSrc : selectedWebsite?.imageSrc;
+  const activePhoneImageSrc = active.phoneImageSrc ?? active.imageSrc;
   const showPrevious = () => setActiveSlide(([current]) => [(current - 1 + websiteShowcases.length) % websiteShowcases.length, -1]);
   const showNext = () => setActiveSlide(([current]) => [(current + 1) % websiteShowcases.length, 1]);
   const showSlide = (index: number) => {
@@ -399,20 +539,47 @@ const WebsiteShowcaseCarousel = () => {
   const closePreview = useCallback(() => setSelectedWebsiteIndex(null), []);
 
   useEffect(() => {
+    const preloadLinks: HTMLLinkElement[] = [];
+    websiteShowcases.flatMap(({ imageSrc, phoneImageSrc }) => [imageSrc, phoneImageSrc]).forEach((imageSrc) => {
+      if (!imageSrc) return;
+      const img = new Image();
+      img.decoding = "async";
+      img.src = imageSrc;
+
+      const link = document.createElement("link");
+      link.rel = "preload";
+      link.as = "image";
+      link.href = imageSrc;
+      document.head.appendChild(link);
+      preloadLinks.push(link);
+    });
+
+    return () => {
+      preloadLinks.forEach((link) => link.remove());
+    };
+  }, []);
+
+  useEffect(() => {
     if (!selectedWebsite) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") closePreview();
     };
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
 
     window.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
     };
   }, [closePreview, selectedWebsite]);
 
-  const panelVariants: any = {
+  const panelVariants: Variants = {
     enter: (travelDirection: number) => ({
       x: travelDirection >= 0 ? "132%" : "-132%",
       opacity: 0,
@@ -454,150 +621,281 @@ const WebsiteShowcaseCarousel = () => {
   return (
     <>
       <div className="mb-10 flex justify-center overflow-hidden py-2 md:mb-18 md:overflow-visible">
-      <div className="relative w-full max-w-[960px]">
-        <div className="pointer-events-none absolute -inset-10 rounded-[3.5rem] bg-[radial-gradient(ellipse_at_50%_12%,rgba(255,255,255,0.96),transparent_44%),radial-gradient(ellipse_at_78%_46%,rgba(20,71,212,0.08),transparent_42%),radial-gradient(ellipse_at_18%_70%,rgba(213,170,90,0.08),transparent_38%)] blur-2xl" />
-        <motion.div
-          className="relative [perspective:1600px]"
-          initial={{ opacity: 0, y: 26, scale: 0.98 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true, margin: "-8% 0px" }}
-          transition={{ duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <div className="relative aspect-[16/10.35] md:aspect-[16/9.7]">
-            <AnimatePresence initial={false} custom={direction} mode="sync">
-              <motion.div
-                key={active.title}
-                custom={direction}
-                variants={panelVariants}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                style={{
-                  willChange: "transform, opacity, filter",
-                  backfaceVisibility: "hidden",
-                }}
-                className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.65rem] border border-white/76 bg-white/58 p-2.5 text-left shadow-[0_38px_105px_rgba(24,38,60,0.15),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-1px_0_rgba(17,24,39,0.05)] backdrop-blur-2xl [transform-style:preserve-3d] md:rounded-[2rem] md:p-3"
-              >
-                <div className="flex h-8 items-center justify-between border-b border-[#111827]/8 px-3 md:h-10 md:px-4">
-                  <div className="flex items-center gap-1.5">
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#efb0a8] shadow-[0_0_10px_rgba(239,176,168,0.45)]" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#d8bf82] shadow-[0_0_10px_rgba(216,191,130,0.35)]" />
-                    <span className="h-2.5 w-2.5 rounded-full bg-[#9dd0a8] shadow-[0_0_10px_rgba(157,208,168,0.35)]" />
-                  </div>
-                  <div className="rounded-full border border-white/76 bg-white/62 px-3 py-1 text-[8px] font-semibold uppercase tracking-[0.22em] text-[#1d2a3c]/62 shadow-[inset_0_1px_0_rgba(255,255,255,0.86)] md:text-[9px]">
-                    {active.eyebrow}
-                  </div>
-                </div>
+        <div className="relative w-full max-w-[1180px]">
+          <div className="pointer-events-none absolute -inset-10 rounded-[3.5rem] bg-[radial-gradient(ellipse_at_50%_12%,rgba(255,255,255,0.96),transparent_44%),radial-gradient(ellipse_at_78%_46%,rgba(20,71,212,0.08),transparent_42%),radial-gradient(ellipse_at_18%_70%,rgba(213,170,90,0.08),transparent_38%)] blur-2xl" />
 
-                <div className="relative h-[calc(100%-2rem)] overflow-hidden rounded-b-[1.25rem] bg-[#07101f] md:h-[calc(100%-2.5rem)] md:rounded-b-[1.6rem]">
-                  {active.imageSrc ? (
-                    <motion.img
-                      src={active.imageSrc}
-                      alt={`${active.title} website example`}
-                      className="absolute inset-0 h-full w-full object-cover object-top"
-                      style={{ objectPosition: active.title === "Real Estate" ? "center 22%" : "center top" }}
-                      loading="lazy"
-                      decoding="async"
-                      initial={false}
+          <div className="relative z-20 mb-7 flex justify-center">
+            <div className="relative inline-flex rounded-full border border-white/78 bg-white/48 p-1 shadow-[0_18px_48px_rgba(20,32,50,0.13),inset_0_1px_0_rgba(255,255,255,0.96),inset_0_-10px_24px_rgba(17,24,39,0.05)] backdrop-blur-2xl backdrop-saturate-150">
+              <div className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(255,255,255,0.18)_45%,rgba(20,71,212,0.07))]" />
+              {(["desktop", "phone"] as const).map((view) => (
+                <button
+                  key={view}
+                  type="button"
+                  aria-pressed={deviceView === view}
+                  onClick={() => setDeviceView(view)}
+                  className={`relative z-10 rounded-full px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.22em] transition-colors duration-300 ${
+                    deviceView === view ? "text-[#111827]" : "text-[#263445]/56 hover:text-[#111827]/82"
+                  }`}
+                >
+                  {deviceView === view && (
+                    <motion.span
+                      layoutId="website-device-view-pill"
+                      className="absolute inset-0 -z-10 rounded-full border border-white/82 bg-white/72 shadow-[0_12px_30px_rgba(20,32,50,0.13),inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-8px_18px_rgba(17,24,39,0.06)]"
+                      transition={{ type: "spring", stiffness: 520, damping: 38, mass: 0.6 }}
                     />
-                  ) : (
-                    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_72%_12%,rgba(255,255,255,0.18),transparent_34%),linear-gradient(135deg,#0a1322,#111827_46%,#07101f)]">
-                      <div
-                        className="absolute inset-0 opacity-[0.22]"
-                        style={{
-                          backgroundImage: "linear-gradient(rgba(255,255,255,0.16) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.16) 1px, transparent 1px)",
-                          backgroundSize: "44px 44px",
-                        }}
-                      />
-                      <div className="absolute left-6 top-7 max-w-[23rem] md:left-9 md:top-9">
-                        <p className="mb-4 text-[9px] font-semibold uppercase tracking-[0.28em] text-white/48 md:text-[10px]">{active.eyebrow}</p>
-                        <p className="font-display text-4xl font-semibold leading-[0.96] tracking-[-0.05em] text-white md:text-6xl">
-                          {active.title}
-                        </p>
-                      </div>
-                      <div className="absolute bottom-7 left-7 right-7 h-24 rounded-[1.35rem] border border-white/14 bg-white/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl" />
-                    </div>
                   )}
-                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_0%,rgba(255,255,255,0.12),transparent_35%),linear-gradient(180deg,transparent_0%,rgba(7,16,31,0.10)_100%)]" />
+                  <span className="relative">{view === "desktop" ? "Desktop" : "Phone"}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <AnimatePresence mode="wait" initial={false}>
+            {deviceView === "desktop" ? (
+            <motion.div
+              key="desktop-website-preview"
+              className="relative"
+              initial={{ opacity: 0, y: 18, scale: 0.985, filter: "blur(10px)" }}
+              animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -16, scale: 0.985, filter: "blur(10px)" }}
+              transition={{ duration: 0.46, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <motion.div
+                className="relative [perspective:1600px]"
+                initial={{ opacity: 0, y: 26, scale: 0.98 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, margin: "-8% 0px" }}
+                transition={{ duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <div className="relative aspect-[16/10.35] md:aspect-[16/9.7]">
+                  <AnimatePresence initial={false} custom={direction} mode="sync">
+                    <motion.div
+                      key={active.title}
+                      custom={direction}
+                      variants={panelVariants}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
+                      style={{
+                        willChange: "transform, opacity, filter",
+                        backfaceVisibility: "hidden",
+                      }}
+                      className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.65rem] border border-white/76 bg-white/58 p-2.5 text-left shadow-[0_38px_105px_rgba(24,38,60,0.15),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-1px_0_rgba(17,24,39,0.05)] backdrop-blur-2xl [transform-style:preserve-3d] md:rounded-[2rem] md:p-3"
+                    >
+                      <div className="flex h-8 items-center justify-between border-b border-[#111827]/8 px-3 md:h-10 md:px-4">
+                        <div className="flex items-center gap-1.5">
+                          <span className="h-2.5 w-2.5 rounded-full bg-[#efb0a8] shadow-[0_0_10px_rgba(239,176,168,0.45)]" />
+                          <span className="h-2.5 w-2.5 rounded-full bg-[#d8bf82] shadow-[0_0_10px_rgba(216,191,130,0.35)]" />
+                          <span className="h-2.5 w-2.5 rounded-full bg-[#9dd0a8] shadow-[0_0_10px_rgba(157,208,168,0.35)]" />
+                        </div>
+                        <div className="rounded-full border border-white/76 bg-white/62 px-3 py-1 text-[8px] font-semibold uppercase tracking-[0.22em] text-[#1d2a3c]/62 shadow-[inset_0_1px_0_rgba(255,255,255,0.86)] md:text-[9px]">
+                          {active.eyebrow}
+                        </div>
+                      </div>
+
+                      <div className="relative h-[calc(100%-2rem)] overflow-hidden rounded-b-[1.25rem] bg-[#07101f] md:h-[calc(100%-2.5rem)] md:rounded-b-[1.6rem]">
+                        {active.imageSrc ? (
+                          <motion.img
+                            src={active.imageSrc}
+                            alt={`${active.title} website example`}
+                            className="absolute inset-0 h-full w-full object-cover object-top"
+                            style={{ objectPosition: active.title === "Real Estate" ? "center 22%" : "center top" }}
+                            loading="eager"
+                            decoding="async"
+                            fetchpriority="high"
+                            initial={false}
+                          />
+                        ) : (
+                          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_72%_12%,rgba(255,255,255,0.18),transparent_34%),linear-gradient(135deg,#0a1322,#111827_46%,#07101f)]">
+                            <div
+                              className="absolute inset-0 opacity-[0.22]"
+                              style={{
+                                backgroundImage: "linear-gradient(rgba(255,255,255,0.16) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.16) 1px, transparent 1px)",
+                                backgroundSize: "44px 44px",
+                              }}
+                            />
+                            <div className="absolute left-6 top-7 max-w-[23rem] md:left-9 md:top-9">
+                              <p className="mb-4 text-[9px] font-semibold uppercase tracking-[0.28em] text-white/48 md:text-[10px]">{active.eyebrow}</p>
+                              <p className="font-display text-4xl font-semibold leading-[0.96] tracking-[-0.05em] text-white md:text-6xl">
+                                {active.title}
+                              </p>
+                            </div>
+                            <div className="absolute bottom-7 left-7 right-7 h-24 rounded-[1.35rem] border border-white/14 bg-white/8 shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl" />
+                          </div>
+                        )}
+                        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_0%,rgba(255,255,255,0.12),transparent_35%),linear-gradient(180deg,transparent_0%,rgba(7,16,31,0.10)_100%)]" />
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                  <button
+                    type="button"
+                    aria-label={`Open full ${active.title} website preview`}
+                    onClick={() => {
+                      if (active.imageSrc) {
+                        setSelectedWebsiteDevice("desktop");
+                        setSelectedWebsiteIndex(activeIndex);
+                      }
+                    }}
+                    className="absolute inset-0 z-20 cursor-pointer rounded-[1.65rem] bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1447d4]/50 focus-visible:ring-offset-4 focus-visible:ring-offset-white md:rounded-[2rem]"
+                  />
+                  <button
+                    type="button"
+                    aria-label={`Expand ${active.title} website preview`}
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      if (active.imageSrc) {
+                        setSelectedWebsiteDevice("desktop");
+                        setSelectedWebsiteIndex(activeIndex);
+                      }
+                    }}
+                    className="absolute bottom-5 right-5 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-white/76 bg-white/70 text-[#111827] opacity-100 shadow-[0_16px_38px_rgba(20,32,50,0.18),inset_0_1px_0_rgba(255,255,255,0.95),inset_0_-8px_18px_rgba(17,24,39,0.06)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-white/90 active:translate-y-0.5 active:scale-[0.94] active:shadow-[0_7px_18px_rgba(20,32,50,0.15),inset_0_4px_12px_rgba(17,24,39,0.1)] md:bottom-6 md:right-6"
+                  >
+                    <Maximize2 className="h-[1.1rem] w-[1.1rem]" />
+                  </button>
                 </div>
               </motion.div>
-            </AnimatePresence>
-            <button
-              type="button"
-              aria-label={`Open full ${active.title} website preview`}
-              onClick={() => {
-                if (active.imageSrc) setSelectedWebsiteIndex(activeIndex);
-              }}
-              className="absolute inset-0 z-20 cursor-pointer rounded-[1.65rem] bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1447d4]/50 focus-visible:ring-offset-4 focus-visible:ring-offset-white md:rounded-[2rem]"
-            />
-            <button
-              type="button"
-              aria-label={`Expand ${active.title} website preview`}
-              onClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-                if (active.imageSrc) setSelectedWebsiteIndex(activeIndex);
-              }}
-              className="absolute bottom-5 right-5 z-50 flex h-11 w-11 items-center justify-center rounded-full border border-white/76 bg-white/70 text-[#111827] opacity-100 shadow-[0_16px_38px_rgba(20,32,50,0.18),inset_0_1px_0_rgba(255,255,255,0.95),inset_0_-8px_18px_rgba(17,24,39,0.06)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-white/90 active:translate-y-0.5 active:scale-[0.94] active:shadow-[0_7px_18px_rgba(20,32,50,0.15),inset_0_4px_12px_rgba(17,24,39,0.1)] md:bottom-6 md:right-6"
-            >
-              <Maximize2 className="h-[1.1rem] w-[1.1rem]" />
-            </button>
-          </div>
-        </motion.div>
 
-        <div className="absolute left-1 top-1/2 z-30 -translate-y-1/2 p-3 md:-left-[5.45rem]">
-          <motion.button
-            type="button"
-            data-native-press
-            aria-label="Previous website example"
-            onClick={(event) => {
-              event.stopPropagation();
-              showPrevious();
-            }}
-            className="relative flex h-16 w-16 items-center justify-center rounded-full border border-white/78 bg-white/80 text-[#111827] shadow-[0_24px_60px_rgba(20,32,50,0.21),inset_0_1px_0_rgba(255,255,255,0.97),inset_0_-10px_22px_rgba(17,24,39,0.075)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:-translate-x-0.5 hover:bg-white/94 active:translate-y-0.5 active:scale-[0.965] active:shadow-[0_10px_24px_rgba(20,32,50,0.18),inset_0_4px_12px_rgba(17,24,39,0.1),inset_0_1px_0_rgba(255,255,255,0.84)]"
-          >
-            <ChevronLeft className="h-6 w-6" strokeWidth={2.35} />
-          </motion.button>
-        </div>
+              <div className="absolute left-1 top-1/2 z-30 -translate-y-1/2 p-3 md:-left-[4.85rem]">
+                <motion.button
+                  type="button"
+                  data-native-press
+                  aria-label="Previous website example"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    showPrevious();
+                  }}
+                  className="relative flex h-16 w-16 items-center justify-center rounded-full border border-white/78 bg-white/80 text-[#111827] shadow-[0_24px_60px_rgba(20,32,50,0.21),inset_0_1px_0_rgba(255,255,255,0.97),inset_0_-10px_22px_rgba(17,24,39,0.075)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:-translate-x-0.5 hover:bg-white/94 active:translate-y-0.5 active:scale-[0.965] active:shadow-[0_10px_24px_rgba(20,32,50,0.18),inset_0_4px_12px_rgba(17,24,39,0.1),inset_0_1px_0_rgba(255,255,255,0.84)]"
+                >
+                  <ChevronLeft className="h-6 w-6" strokeWidth={2.35} />
+                </motion.button>
+              </div>
 
-        <div className="absolute right-1 top-1/2 z-30 -translate-y-1/2 p-3 md:-right-[5.55rem]">
-          <motion.button
-            type="button"
-            data-native-press
-            aria-label="Next website example"
-            onClick={(event) => {
-              event.stopPropagation();
-              showNext();
-            }}
-            className="relative flex h-16 w-16 items-center justify-center rounded-full border border-white/78 bg-white/80 text-[#1447d4] shadow-[0_24px_60px_rgba(20,32,50,0.21),inset_0_1px_0_rgba(255,255,255,0.97),inset_0_-10px_22px_rgba(17,24,39,0.075)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:translate-x-0.5 hover:bg-white/94 active:translate-y-0.5 active:scale-[0.965] active:shadow-[0_10px_24px_rgba(20,32,50,0.18),inset_0_4px_12px_rgba(17,24,39,0.1),inset_0_1px_0_rgba(255,255,255,0.84)]"
-          >
-            <ChevronRight className="h-6 w-6" strokeWidth={2.35} />
-          </motion.button>
-        </div>
+              <div className="absolute right-1 top-1/2 z-30 -translate-y-1/2 p-3 md:-right-[6.05rem]">
+                <motion.button
+                  type="button"
+                  data-native-press
+                  aria-label="Next website example"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    showNext();
+                  }}
+                  className="relative flex h-16 w-16 items-center justify-center rounded-full border border-white/78 bg-white/80 text-[#111827] shadow-[0_24px_60px_rgba(20,32,50,0.21),inset_0_1px_0_rgba(255,255,255,0.97),inset_0_-10px_22px_rgba(17,24,39,0.075)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:translate-x-0.5 hover:bg-white/94 active:translate-y-0.5 active:scale-[0.965] active:shadow-[0_10px_24px_rgba(20,32,50,0.18),inset_0_4px_12px_rgba(17,24,39,0.1),inset_0_1px_0_rgba(255,255,255,0.84)]"
+                >
+                  <ChevronRight className="h-6 w-6" strokeWidth={2.35} />
+                </motion.button>
+              </div>
 
-        <div className="mt-5 flex justify-center gap-2">
-          {websiteShowcases.map((item, index) => (
-            <button
-              key={item.title}
-              type="button"
-              aria-label={`Show ${item.title} website example`}
-              onClick={() => showSlide(index)}
-              className={`h-1.5 rounded-full transition-all duration-500 ${index === activeIndex ? "w-8 bg-[#111827]" : "w-1.5 bg-[#111827]/18 hover:bg-[#111827]/34"}`}
-            />
-          ))}
-        </div>
-      </div>
-      </div>
-
-      <AnimatePresence>
-        {selectedWebsite?.imageSrc && (
+              <div className="mt-5 flex justify-center gap-2">
+                {websiteShowcases.map((item, index) => (
+                  <button
+                    key={item.title}
+                    type="button"
+                    aria-label={`Show ${item.title} website example`}
+                    onClick={() => showSlide(index)}
+                    className={`h-1.5 rounded-full transition-all duration-500 ${index === activeIndex ? "w-8 bg-[#111827]" : "w-1.5 bg-[#111827]/18 hover:bg-[#111827]/34"}`}
+                  />
+                ))}
+              </div>
+            </motion.div>
+            ) : (
             <motion.div
+              key="phone-website-preview"
+              className="relative mx-auto flex w-full max-w-[430px] items-center justify-center px-16 py-1 sm:max-w-[470px]"
+              initial={{ opacity: 0, y: 22, scale: 0.96, rotateY: -8, filter: "blur(12px)" }}
+              animate={{ opacity: 1, y: 0, scale: 1, rotateY: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: -18, scale: 0.965, rotateY: 7, filter: "blur(12px)" }}
+              transition={{ duration: 0.54, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="absolute left-0 top-1/2 z-30 -translate-y-1/2">
+                <motion.button
+                  type="button"
+                  data-native-press
+                  aria-label="Previous phone website example"
+                  onClick={showPrevious}
+                  className="relative flex h-12 w-12 items-center justify-center rounded-full border border-white/78 bg-white/80 text-[#111827] shadow-[0_24px_60px_rgba(20,32,50,0.21),inset_0_1px_0_rgba(255,255,255,0.97),inset_0_-10px_22px_rgba(17,24,39,0.075)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:-translate-x-0.5 hover:bg-white/94 active:translate-y-0.5 active:scale-[0.965] active:shadow-[0_10px_24px_rgba(20,32,50,0.18),inset_0_4px_12px_rgba(17,24,39,0.1),inset_0_1px_0_rgba(255,255,255,0.84)] md:h-16 md:w-16"
+                >
+                  <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" strokeWidth={2.35} />
+                </motion.button>
+              </div>
+
+              <button
+                type="button"
+                aria-label={`Open ${active.title} phone website preview`}
+                onClick={() => {
+                  if (activePhoneImageSrc) {
+                    setSelectedWebsiteDevice("phone");
+                    setSelectedWebsiteIndex(activeIndex);
+                  }
+                }}
+                className="group relative block w-full max-w-[300px] rounded-[2.6rem] border border-white/80 bg-white/62 p-3 text-left shadow-[0_46px_110px_rgba(24,38,60,0.2),inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-12px_28px_rgba(17,24,39,0.06)] backdrop-blur-2xl transition-transform duration-300 active:translate-y-0.5 active:scale-[0.985] sm:max-w-[335px]"
+              >
+                <div className="pointer-events-none absolute inset-0 rounded-[2.6rem] bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(255,255,255,0.16)_42%,rgba(20,71,212,0.08))]" />
+                <div className="relative rounded-[2.25rem] border border-[#111827]/12 bg-[#0a1020] p-[0.46rem] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),inset_0_-10px_24px_rgba(255,255,255,0.05),0_16px_38px_rgba(20,32,50,0.14)]">
+                  <div className="absolute left-1/2 top-[0.78rem] z-20 h-5 w-24 -translate-x-1/2 rounded-full bg-[#050914] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_2px_10px_rgba(0,0,0,0.28)]" />
+                  <div className="relative aspect-[9/19.5] overflow-hidden rounded-[1.82rem] bg-[#07101f]">
+                    {activePhoneImageSrc && (
+                      <img
+                        src={activePhoneImageSrc}
+                        alt={`${active.title} mobile website preview`}
+                        className="absolute inset-0 h-full w-full object-cover object-top"
+                        loading="eager"
+                        decoding="async"
+                        fetchpriority="high"
+                      />
+                    )}
+                    <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(100deg,rgba(255,255,255,0.22),transparent_22%,transparent_72%,rgba(255,255,255,0.07)),linear-gradient(180deg,rgba(255,255,255,0.12),transparent_20%,transparent_72%,rgba(7,16,31,0.16))]" />
+                  </div>
+                </div>
+                <div className="relative mt-3 flex items-center justify-between px-1">
+                  <div>
+                    <p className="text-[8px] font-semibold uppercase tracking-[0.24em] text-[#263445]/48">Phone view</p>
+                    <p className="mt-1 text-[11px] font-semibold text-[#111827]">{active.title}</p>
+                  </div>
+                  <Maximize2 className="h-4 w-4 text-[#111827]/72 transition-transform duration-300 group-hover:scale-110" />
+                </div>
+              </button>
+
+              <div className="absolute right-0 top-1/2 z-30 -translate-y-1/2">
+                <motion.button
+                  type="button"
+                  data-native-press
+                  aria-label="Next phone website example"
+                  onClick={showNext}
+                  className="relative flex h-12 w-12 items-center justify-center rounded-full border border-white/78 bg-white/80 text-[#111827] shadow-[0_24px_60px_rgba(20,32,50,0.21),inset_0_1px_0_rgba(255,255,255,0.97),inset_0_-10px_22px_rgba(17,24,39,0.075)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:translate-x-0.5 hover:bg-white/94 active:translate-y-0.5 active:scale-[0.965] active:shadow-[0_10px_24px_rgba(20,32,50,0.18),inset_0_4px_12px_rgba(17,24,39,0.1),inset_0_1px_0_rgba(255,255,255,0.84)] md:h-16 md:w-16"
+                >
+                  <ChevronRight className="h-5 w-5 md:h-6 md:w-6" strokeWidth={2.35} />
+                </motion.button>
+              </div>
+
+              <div className="absolute -bottom-7 left-1/2 flex -translate-x-1/2 justify-center gap-2">
+                {websiteShowcases.map((item, index) => (
+                  <button
+                    key={item.title}
+                    type="button"
+                    aria-label={`Show ${item.title} phone website example`}
+                    onClick={() => showSlide(index)}
+                    className={`h-1.5 rounded-full transition-all duration-500 ${index === activeIndex ? "w-8 bg-[#111827]" : "w-1.5 bg-[#111827]/18 hover:bg-[#111827]/34"}`}
+                  />
+                ))}
+              </div>
+            </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {typeof document !== "undefined" && createPortal(
+        <AnimatePresence mode="wait">
+          {selectedWebsite && selectedWebsiteImageSrc && (
+            <motion.div
+              data-lenis-prevent
               key="website-preview"
               className="fixed inset-0 z-[1400] flex items-end justify-center px-4 pb-5 pt-16 md:items-center md:px-8 md:py-8"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.76, ease: [0.16, 1, 0.3, 1] }}
               onClick={closePreview}
             >
               <motion.div
@@ -606,7 +904,7 @@ const WebsiteShowcaseCarousel = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.58, delay: selectedWebsite ? 0 : 0.12, ease: [0.16, 1, 0.3, 1] }}
               />
               <motion.div
                 role="dialog"
@@ -615,8 +913,8 @@ const WebsiteShowcaseCarousel = () => {
                 className="relative z-10 flex max-h-[92dvh] w-full max-w-[min(94vw,1440px)] flex-col overflow-hidden rounded-[1.8rem] border border-white/76 bg-white/64 p-2.5 shadow-[0_44px_130px_rgba(24,38,60,0.24),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-1px_0_rgba(17,24,39,0.06)] backdrop-blur-2xl md:rounded-[2.2rem] md:p-3"
                 initial={{ y: "104%", opacity: 0, scale: 0.94, filter: "blur(16px)" }}
                 animate={{ y: 0, opacity: 1, scale: 1, filter: "blur(0px)" }}
-                exit={{ y: "104%", opacity: 0, scale: 0.96, filter: "blur(14px)" }}
-                transition={{ duration: 0.82, ease: [0.16, 1, 0.3, 1] }}
+                exit={{ y: "112%", opacity: 0.98, scale: 0.98, filter: "blur(8px)" }}
+                transition={{ duration: 0.84, ease: [0.16, 1, 0.3, 1] }}
                 onClick={(event) => event.stopPropagation()}
               >
                 <div className="flex h-9 shrink-0 items-center justify-between border-b border-[#111827]/8 px-3 md:h-11 md:px-4">
@@ -632,24 +930,27 @@ const WebsiteShowcaseCarousel = () => {
                     type="button"
                     aria-label="Close full website preview"
                     onClick={closePreview}
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-white/76 bg-white/66 text-[#111827] shadow-[0_12px_30px_rgba(20,32,50,0.14),inset_0_1px_0_rgba(255,255,255,0.9)] transition duration-300 hover:bg-white/90"
+                    className="flex h-9 w-9 items-center justify-center rounded-full border border-white/76 bg-white/66 text-[#111827] shadow-[0_12px_30px_rgba(20,32,50,0.14),inset_0_1px_0_rgba(255,255,255,0.9)] transition duration-300 hover:bg-white/90 active:translate-y-0.5 active:scale-[0.94] active:shadow-[0_7px_18px_rgba(20,32,50,0.12),inset_0_4px_12px_rgba(17,24,39,0.1)]"
                   >
                     <X className="h-4 w-4" />
                   </button>
                 </div>
-                <div className="max-h-[calc(92dvh-3.25rem)] overflow-auto rounded-b-[1.35rem] bg-[#07101f] md:rounded-b-[1.75rem]">
+                <div className="max-h-[calc(92dvh-3.25rem)] overflow-auto overscroll-contain rounded-b-[1.35rem] bg-[#07101f] md:rounded-b-[1.75rem]">
                   <img
-                    src={selectedWebsite.imageSrc}
+                    src={selectedWebsiteImageSrc}
                     alt={`${selectedWebsite.title} full website design`}
                     className="h-auto w-full max-w-none"
                     loading="eager"
                     decoding="async"
+                    fetchpriority="high"
                   />
                 </div>
               </motion.div>
             </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </>
   );
 };
@@ -777,17 +1078,7 @@ const Index = () => {
 
       {/* HERO — immediate, no lazy loading */}
       <section ref={heroRef} className="mobile-stable-hero relative overflow-hidden bg-black">
-        <video
-          className="absolute inset-0 h-full w-full object-cover object-[62%_center] md:object-[64%_center]"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          aria-hidden="true"
-        >
-          <source src="/hero-background-framed-pingpong.mp4" type="video/mp4" />
-        </video>
+        <ReliableHeroVideo />
 
         <div className="pointer-events-none absolute inset-0 pt-20 md:pt-0">
           <div className="mobile-stable-hero mx-auto flex max-w-[1480px] items-end justify-center px-4 pb-10 sm:px-6 md:items-center md:justify-end md:px-6 md:pb-[20vh] lg:px-8 xl:translate-x-8 2xl:translate-x-12">
@@ -1059,6 +1350,33 @@ const Index = () => {
           </div>
         </section>
       </LazySection>
+
+      {/* WEBSITES & APPS */}
+      <section className="relative overflow-hidden bg-[#f7faff] py-14 text-[#101831] md:py-28">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_82%_10%,rgba(210,226,255,0.66),transparent_44%),radial-gradient(ellipse_at_12%_88%,rgba(255,255,255,0.95),transparent_46%),linear-gradient(135deg,#ffffff_0%,#f8fbff_46%,#eef5ff_100%)]" />
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.5]"
+          style={{
+            backgroundImage: "linear-gradient(rgba(93,119,174,0.045) 1px, transparent 1px), linear-gradient(90deg, rgba(93,119,174,0.045) 1px, transparent 1px)",
+            backgroundSize: "68px 68px",
+            maskImage: "linear-gradient(180deg, transparent 0%, black 10%, black 90%, transparent 100%)",
+            WebkitMaskImage: "linear-gradient(180deg, transparent 0%, black 10%, black 90%, transparent 100%)",
+          }}
+        />
+        <div className="relative z-10 mx-auto max-w-[1320px] px-5 md:px-10 lg:px-16">
+          <SectionReveal>
+            <div className="mb-8 md:mb-12">
+              <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.34em] text-[#4358ff] md:text-xs">
+                Websites & Apps
+              </p>
+              <h2 className="font-display text-[2.55rem] font-extrabold leading-[0.96] tracking-[-0.055em] text-[#101831] md:text-[4.5rem]">
+                Built to <span className="gradient-text">Convert</span>
+              </h2>
+            </div>
+          </SectionReveal>
+          <WebsiteShowcaseCarousel />
+        </div>
+      </section>
 
       {/* PROCESS — lazy loaded */}
       <LazySection rootMargin="300px" minHeight="300px">

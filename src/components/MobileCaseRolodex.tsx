@@ -152,27 +152,39 @@ const MobileCaseRolodex = () => {
                     className="absolute inset-0 rounded-[28px]"
                     style={{
                       boxShadow:
-                        "0 40px 80px -30px hsl(var(--foreground) / 0.45), 0 12px 30px -18px hsl(var(--foreground) / 0.25), 0 6px 24px -12px hsl(214 80% 40% / 0.18)",
+                        "0 38px 92px -34px rgba(20,32,50,0.34), 0 18px 44px -26px rgba(20,32,50,0.18), inset 0 1px 0 rgba(255,255,255,0.92)",
                     }}
                   />
 
-                  {/* Glass surface — truly translucent so the page shows through */}
+                  {/* Glass surface */}
                   <div
                     aria-hidden
-                    className="absolute inset-0 rounded-[28px] bg-white/15 backdrop-blur-2xl backdrop-saturate-150"
+                    className="absolute inset-0 rounded-[28px] border border-white/78 bg-white/38 backdrop-blur-2xl backdrop-saturate-150"
                   />
 
-                  {/* Faint per-card color tint (kept very low so it stays clear) */}
+                  {/* Faint reflective tint */}
                   <div
                     aria-hidden
-                    className="absolute inset-0 rounded-[28px] opacity-25"
-                    style={{ background: c.blob }}
+                    className="absolute inset-0 rounded-[28px] opacity-[0.12]"
+                    style={{
+                      background:
+                        "radial-gradient(circle at 20% 5%, rgba(255,255,255,0.96), transparent 35%), radial-gradient(circle at 88% 22%, rgba(20,71,212,0.24), transparent 34%), radial-gradient(circle at 22% 90%, rgba(255,255,255,0.72), transparent 40%)",
+                    }}
                   />
 
                   {/* Top specular highlight */}
                   <div
                     aria-hidden
-                    className="absolute inset-x-0 top-0 h-1/2 rounded-t-[28px] bg-gradient-to-b from-white/40 via-white/5 to-transparent"
+                    className="absolute inset-x-0 top-0 h-1/2 rounded-t-[28px] bg-gradient-to-b from-white/72 via-white/18 to-transparent"
+                  />
+
+                  <div
+                    aria-hidden
+                    className="absolute -left-8 top-8 h-48 w-28 rotate-[-18deg] rounded-full bg-white/38 blur-2xl"
+                  />
+                  <div
+                    aria-hidden
+                    className="absolute -right-10 bottom-5 h-36 w-28 rotate-12 rounded-full bg-[#dfeaff]/36 blur-2xl"
                   />
 
                   {/* Refractive gradient border */}
@@ -181,7 +193,7 @@ const MobileCaseRolodex = () => {
                     className="pointer-events-none absolute inset-0 rounded-[28px] p-px"
                     style={{
                       background:
-                        "linear-gradient(150deg, hsl(0 0% 100% / 0.9), hsl(var(--foreground) / 0.18) 40%, hsl(var(--foreground) / 0.04) 70%, hsl(0 0% 100% / 0.6))",
+                        "linear-gradient(145deg, rgba(255,255,255,0.98), rgba(255,255,255,0.44) 28%, rgba(17,24,39,0.10) 55%, rgba(255,255,255,0.78))",
                       WebkitMask:
                         "linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0)",
                       WebkitMaskComposite: "xor",
@@ -205,7 +217,7 @@ const MobileCaseRolodex = () => {
                     style={{ opacity: isActive ? 1 : 0 }}
                     aria-hidden={!isActive}
                   >
-                    <span className="w-fit rounded-full border border-white/60 bg-white/40 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/75 backdrop-blur-md">
+                    <span className="w-fit rounded-full border border-white/76 bg-white/52 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-foreground/75 shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_8px_20px_rgba(20,32,50,0.08)] backdrop-blur-xl">
                       {c.tag}
                     </span>
 
@@ -243,39 +255,43 @@ const MobileCaseRolodex = () => {
               );
             })}
 
-            <motion.button
-              type="button"
-              aria-label="Previous case"
-              data-native-press
-              onClick={goPrev}
-              whileTap={{
-                y: 1,
-                scale: 0.94,
-                boxShadow:
-                  "0 8px 22px rgba(20,32,50,0.14), inset 0 5px 14px rgba(17,24,39,0.1), inset 0 1px 0 rgba(255,255,255,0.78)",
-              }}
-              transition={{ type: "spring", stiffness: 560, damping: 26, mass: 0.42 }}
-              className="absolute -left-2 top-1/2 z-40 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/75 bg-white/58 text-[#111827] shadow-[0_18px_46px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-9px_18px_rgba(17,24,39,0.06)] backdrop-blur-2xl backdrop-saturate-150"
-            >
-              <ChevronLeft className="h-5 w-5" strokeWidth={2.35} />
-            </motion.button>
+            <div className="absolute left-0 top-1/2 z-40 -translate-y-1/2">
+              <motion.button
+                type="button"
+                aria-label="Previous case"
+                data-native-press
+                onClick={goPrev}
+                whileTap={{
+                  y: 1,
+                  scale: 0.94,
+                  boxShadow:
+                    "0 8px 22px rgba(20,32,50,0.14), inset 0 5px 14px rgba(17,24,39,0.1), inset 0 1px 0 rgba(255,255,255,0.78)",
+                }}
+                transition={{ type: "spring", stiffness: 560, damping: 26, mass: 0.42 }}
+                className="relative flex h-12 w-12 items-center justify-center rounded-full border border-white/78 bg-white/70 text-[#111827] shadow-[0_18px_46px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.96),inset_0_-9px_18px_rgba(17,24,39,0.06)] backdrop-blur-2xl backdrop-saturate-150"
+              >
+                <ChevronLeft className="h-5 w-5" strokeWidth={2.35} />
+              </motion.button>
+            </div>
 
-            <motion.button
-              type="button"
-              aria-label="Next case"
-              data-native-press
-              onClick={goNext}
-              whileTap={{
-                y: 1,
-                scale: 0.94,
-                boxShadow:
-                  "0 8px 22px rgba(20,32,50,0.14), inset 0 5px 14px rgba(17,24,39,0.1), inset 0 1px 0 rgba(255,255,255,0.78)",
-              }}
-              transition={{ type: "spring", stiffness: 560, damping: 26, mass: 0.42 }}
-              className="absolute -right-2 top-1/2 z-40 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/75 bg-white/58 text-[#111827] shadow-[0_18px_46px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-9px_18px_rgba(17,24,39,0.06)] backdrop-blur-2xl backdrop-saturate-150"
-            >
-              <ChevronRight className="h-5 w-5" strokeWidth={2.35} />
-            </motion.button>
+            <div className="absolute -right-1 top-1/2 z-40 -translate-y-1/2">
+              <motion.button
+                type="button"
+                aria-label="Next case"
+                data-native-press
+                onClick={goNext}
+                whileTap={{
+                  y: 1,
+                  scale: 0.94,
+                  boxShadow:
+                    "0 8px 22px rgba(20,32,50,0.14), inset 0 5px 14px rgba(17,24,39,0.1), inset 0 1px 0 rgba(255,255,255,0.78)",
+                }}
+                transition={{ type: "spring", stiffness: 560, damping: 26, mass: 0.42 }}
+                className="relative flex h-12 w-12 items-center justify-center rounded-full border border-white/78 bg-white/70 text-[#111827] shadow-[0_18px_46px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.96),inset_0_-9px_18px_rgba(17,24,39,0.06)] backdrop-blur-2xl backdrop-saturate-150"
+              >
+                <ChevronRight className="h-5 w-5" strokeWidth={2.35} />
+              </motion.button>
+            </div>
           </div>
         </div>
 
