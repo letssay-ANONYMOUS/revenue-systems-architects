@@ -36,12 +36,15 @@ const Navbar = () => {
   return (
     <>
       <motion.nav
-        className="fixed top-0 left-0 right-0 z-[1200] transform-gpu"
-        style={{ padding: "0 34px", willChange: "transform" }}
+        className="fixed left-0 right-0 top-0 z-[1200] transform-gpu"
+        style={{
+          padding: "max(0.65rem, env(safe-area-inset-top)) 1rem 0",
+          willChange: "transform",
+        }}
       >
         <div
-          className="mx-auto flex items-center justify-between"
-          style={{ height: "82px", maxWidth: "1400px" }}
+          className="mx-auto flex h-16 items-center justify-between md:h-[82px]"
+          style={{ maxWidth: "1400px" }}
         >
           {/* Logo — far left, never morphs */}
           <Link to="/" className="shrink-0 flex items-center">
@@ -87,7 +90,7 @@ const Navbar = () => {
 
           <button
             type="button"
-            className="relative z-[1300] -mr-3 flex h-12 w-12 items-center justify-center rounded-full text-foreground transition-transform duration-200 active:scale-95 lg:hidden"
+            className="relative z-[1300] -mr-1 flex h-12 w-12 items-center justify-center rounded-full border border-white/70 bg-white/68 text-foreground shadow-[0_16px_42px_rgba(20,32,50,0.13),inset_0_1px_0_rgba(255,255,255,0.96)] backdrop-blur-2xl transition-transform duration-200 active:scale-95 lg:hidden"
             onPointerDown={(event) => {
               event.preventDefault();
               setMobileOpen((open) => !open);
@@ -106,54 +109,65 @@ const Navbar = () => {
         {mobileOpen && (
           <motion.div
             id="mobile-navigation"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[1400] flex flex-col bg-background/95 backdrop-blur-2xl lg:hidden"
+            initial={{ opacity: 0, filter: "blur(10px)" }}
+            animate={{ opacity: 1, filter: "blur(0px)" }}
+            exit={{ opacity: 0, filter: "blur(10px)" }}
+            transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-[1400] flex flex-col overflow-hidden bg-[#f8fafc]/96 backdrop-blur-2xl lg:hidden"
         >
-            <div className="flex h-24 items-center justify-between px-8">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_22%_0%,rgba(255,255,255,0.96),transparent_38%),radial-gradient(ellipse_at_80%_18%,rgba(199,216,255,0.42),transparent_38%),linear-gradient(180deg,#ffffff_0%,#f7faff_48%,#edf3f9_100%)]" />
+            <div
+              className="relative z-10 flex items-center justify-between px-6 pb-3"
+              style={{ paddingTop: "max(1rem, env(safe-area-inset-top))" }}
+            >
               <img src={agentforgeLogo} alt="AgentForge" className="h-7 w-auto" />
               <button
                 type="button"
                 aria-label="Close menu"
-                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/70 bg-white/62 text-foreground shadow-[0_18px_46px_rgba(20,32,50,0.14),inset_0_1px_0_rgba(255,255,255,0.94)] backdrop-blur-2xl active:scale-95"
+                className="flex h-14 w-14 items-center justify-center rounded-full border border-white/75 bg-white/72 text-foreground shadow-[0_20px_52px_rgba(20,32,50,0.14),inset_0_1px_0_rgba(255,255,255,0.96),inset_0_-10px_22px_rgba(17,24,39,0.055)] backdrop-blur-2xl transition-transform active:translate-y-0.5 active:scale-95"
                 onPointerDown={(event) => {
                   event.preventDefault();
                   setMobileOpen(false);
                 }}
               >
-                <X size={20} />
+                <X size={24} strokeWidth={2.35} />
               </button>
             </div>
-            <div className="flex-1 flex flex-col justify-center px-8 gap-2">
+            <motion.div
+              className="relative z-10 mx-5 mt-8 rounded-[2rem] border border-white/70 bg-white/64 p-3 shadow-[0_28px_80px_rgba(32,48,74,0.12),inset_0_1px_0_rgba(255,255,255,0.96),inset_0_-18px_34px_rgba(17,24,39,0.045)] backdrop-blur-2xl"
+              initial={{ y: 26, opacity: 0, scale: 0.98 }}
+              animate={{ y: 0, opacity: 1, scale: 1 }}
+              exit={{ y: 18, opacity: 0, scale: 0.985 }}
+              transition={{ duration: 0.48, ease: [0.16, 1, 0.3, 1] }}
+            >
               {navLinks.map((link, i) => (
                 <motion.div
                   key={link.path}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.08 + i * 0.045, duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
                 >
                   <Link
                     to={link.path}
                     onClick={() => setMobileOpen(false)}
-                    className={`flex items-center justify-between py-4 border-b border-border/50 ${
-                      location.pathname === link.path ? "text-primary" : "text-foreground"
+                    className={`flex items-center justify-between rounded-[1.35rem] px-4 py-4 transition-colors ${
+                      location.pathname === link.path ? "bg-[#101831] text-white shadow-[0_12px_28px_rgba(16,24,49,0.18)]" : "text-[#101831]"
                     }`}
                   >
-                    <span className="font-display font-semibold text-xl">{link.label}</span>
-                    <ArrowRight className="w-4 h-4 text-muted-foreground transition-transform duration-200 hover:scale-110" />
+                    <span className="font-display text-[1.32rem] font-semibold tracking-[-0.02em]">{link.label}</span>
+                    <ArrowRight className={`h-4 w-4 transition-transform duration-200 ${location.pathname === link.path ? "text-white/78" : "text-[#101831]/42"}`} />
                   </Link>
                 </motion.div>
               ))}
-            </div>
-            <div className="px-8 pb-10">
+            </motion.div>
+            <div className="relative z-10 mt-auto px-5 pb-[calc(1.35rem+env(safe-area-inset-bottom))]">
               <Link
                 to="/book-a-call"
                 onClick={() => setMobileOpen(false)}
-                className="premium-btn text-sm text-center w-full block py-4 rounded-full"
+                className="nav-cta-arrow-button flex w-full py-5"
               >
-                Book a Strategy Call
+                <span>Book a Strategy Call</span>
+                <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
           </motion.div>

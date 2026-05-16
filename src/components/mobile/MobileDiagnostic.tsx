@@ -73,19 +73,19 @@ const TapToFlipButton = ({ onFlip }: { onFlip: () => void }) => (
       onFlip();
     }}
     whileTap={{ scale: 0.94, y: 1 }}
-    className="absolute -bottom-3 -right-2 z-20 flex h-16 w-16 items-center justify-center text-[#111827]"
+    className="absolute -bottom-2 -right-1 z-20 flex h-16 w-16 items-center justify-center text-[#111827]"
   >
     {[0, 1, 2].map((line) => (
       <motion.span
         key={line}
-        className="pointer-events-none absolute h-[1.5px] w-3 rounded-full bg-[#1447d4]/75"
+        className="pointer-events-none absolute h-[1.6px] w-3.5 rounded-full bg-[#1447d4]/78"
         style={{
-          right: line === 0 ? 23 : line === 1 ? 19 : 23,
-          top: line === 0 ? 10 : line === 1 ? 17 : 24,
-          rotate: line === 0 ? -36 : line === 1 ? 0 : 36,
-          transformOrigin: "left center",
+          right: line === 0 ? 24 : line === 1 ? 20 : 24,
+          top: line === 0 ? 8 : line === 1 ? 14 : 20,
+          rotate: line === 0 ? -22 : line === 1 ? 0 : 22,
+          transformOrigin: "right center",
         }}
-        animate={{ opacity: [0, 1, 0], scaleX: [0.35, 1, 0.45], x: [0, 3, 5] }}
+        animate={{ opacity: [0, 1, 0], scaleX: [0.35, 1, 0.45], x: [0, -2, -4] }}
         transition={{
           duration: 1.45,
           repeat: Infinity,
@@ -100,8 +100,9 @@ const TapToFlipButton = ({ onFlip }: { onFlip: () => void }) => (
       className="pointer-events-none absolute bottom-0 right-0 h-11 w-11 drop-shadow-[0_10px_18px_rgba(17,24,39,0.18)]"
       fill="none"
       aria-hidden="true"
-      animate={{ y: [1, -1, 3, 0], scale: [1, 1, 0.94, 1] }}
+      animate={{ y: [1, -1, 3, 0], x: [0, 0, 0, 0], scale: [1, 1, 0.94, 1] }}
       transition={{ duration: 1.45, repeat: Infinity, ease: [0.16, 1, 0.3, 1], repeatDelay: 0.46 }}
+      style={{ transformOrigin: "center bottom" }}
     >
       <motion.path
         d="M13.6 8.4v9.2m0 0-1.9-2.1a2 2 0 0 0-2.9 2.7l4.7 5.8c.8 1 2 1.6 3.3 1.6h4.5c2.5 0 4.5-2 4.5-4.5v-5.4a1.8 1.8 0 0 0-3.6 0v-.9a1.8 1.8 0 0 0-3.6 0v-.8a1.8 1.8 0 0 0-3.6 0V8.4a1.7 1.7 0 0 0-3.4 0Z"
