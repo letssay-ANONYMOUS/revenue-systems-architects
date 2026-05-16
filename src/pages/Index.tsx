@@ -763,7 +763,7 @@ const WebsiteShowcaseCarousel = () => {
                             style={{ objectPosition: active.title === "Real Estate" ? "center 22%" : "center top" }}
                             loading="eager"
                             decoding="async"
-                            fetchpriority="high"
+                            fetchPriority="high"
                             initial={false}
                           />
                         ) : (
@@ -910,7 +910,7 @@ const WebsiteShowcaseCarousel = () => {
                           style={{ backfaceVisibility: "hidden", willChange: "transform, opacity, filter" }}
                           loading="eager"
                           decoding="async"
-                          fetchpriority="high"
+                          fetchPriority="high"
                         />
                       )}
                     </AnimatePresence>
@@ -1021,7 +1021,7 @@ const WebsiteShowcaseCarousel = () => {
                     className="h-auto w-full max-w-none"
                     loading="eager"
                     decoding="async"
-                    fetchpriority="high"
+                    fetchPriority="high"
                   />
                 </div>
               </motion.div>
