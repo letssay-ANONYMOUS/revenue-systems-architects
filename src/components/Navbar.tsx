@@ -36,7 +36,7 @@ const Navbar = () => {
   return (
     <>
       <motion.nav
-        className="fixed top-0 left-0 right-0 z-[1000] transform-gpu"
+        className="fixed top-0 left-0 right-0 z-[1200] transform-gpu"
         style={{ padding: "0 34px", willChange: "transform" }}
       >
         <div
@@ -86,9 +86,16 @@ const Navbar = () => {
           </div>
 
           <button
-            className={`lg:hidden p-1.5 -mr-1 transition-transform duration-200 hover:scale-110 text-foreground`}
-            onClick={() => setMobileOpen(!mobileOpen)}
+            type="button"
+            className="relative z-[1300] -mr-3 flex h-12 w-12 items-center justify-center rounded-full text-foreground transition-transform duration-200 active:scale-95 lg:hidden"
+            onPointerDown={(event) => {
+              event.preventDefault();
+              setMobileOpen((open) => !open);
+            }}
+            onClick={(event) => event.preventDefault()}
             aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-navigation"
           >
             {mobileOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -98,13 +105,27 @@ const Navbar = () => {
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
+            id="mobile-navigation"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="lg:hidden fixed inset-0 z-[990] flex flex-col bg-background/95 backdrop-blur-2xl"
+          className="fixed inset-0 z-[1400] flex flex-col bg-background/95 backdrop-blur-2xl lg:hidden"
         >
-            <div className="h-16" />
+            <div className="flex h-24 items-center justify-between px-8">
+              <img src={agentforgeLogo} alt="AgentForge" className="h-7 w-auto" />
+              <button
+                type="button"
+                aria-label="Close menu"
+                className="flex h-12 w-12 items-center justify-center rounded-full border border-white/70 bg-white/62 text-foreground shadow-[0_18px_46px_rgba(20,32,50,0.14),inset_0_1px_0_rgba(255,255,255,0.94)] backdrop-blur-2xl active:scale-95"
+                onPointerDown={(event) => {
+                  event.preventDefault();
+                  setMobileOpen(false);
+                }}
+              >
+                <X size={20} />
+              </button>
+            </div>
             <div className="flex-1 flex flex-col justify-center px-8 gap-2">
               {navLinks.map((link, i) => (
                 <motion.div

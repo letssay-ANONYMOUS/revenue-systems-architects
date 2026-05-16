@@ -103,7 +103,7 @@ const AnimatedHeroHeadline = () => {
   return (
     <h1
       aria-label="Your Business, Answered. Automated. Accelerated."
-      className="font-['Cormorant_Garamond'] text-[2.7rem] font-semibold leading-[0.86] tracking-normal text-[#07101f] sm:text-[3.15rem] md:text-[4.35rem] lg:text-[4.85rem]"
+      className="hero-floating-copy-edge font-['Cormorant_Garamond'] text-[2.7rem] font-semibold leading-[0.86] tracking-normal text-[#07101f] sm:text-[3.15rem] md:text-[4.35rem] lg:text-[4.85rem]"
       style={{ perspective: "600px" }}
     >
       {heroHeadlineLines.map((line) => (
@@ -301,7 +301,7 @@ const ReliableHeroVideo = () => {
     }
   }, []);
 
-  const recoverVideo = useCallback(() => {
+  const resetAndRecoverVideo = useCallback(() => {
     if (isTestMediaEnvironment()) return;
     const video = videoRef.current;
     if (!video) return;
@@ -309,6 +309,10 @@ const ReliableHeroVideo = () => {
     if (video.error && sourceIndex < HERO_VIDEO_SOURCES.length - 1) {
       setSourceIndex((index) => Math.min(index + 1, HERO_VIDEO_SOURCES.length - 1));
       return;
+    }
+
+    if (video.readyState < 2 && video.networkState !== HTMLMediaElement.NETWORK_LOADING) {
+      video.load();
     }
 
     playVideo();
@@ -347,12 +351,17 @@ const ReliableHeroVideo = () => {
     };
     const handleStall = () => {
       clearStallTimer();
-      stallTimerRef.current = window.setTimeout(recoverVideo, 900);
+      stallTimerRef.current = window.setTimeout(resetAndRecoverVideo, 900);
     };
     const handleVisibility = () => {
-      if (!document.hidden) recoverVideo();
+      if (!document.hidden) resetAndRecoverVideo();
     };
-    const handlePageShow = () => recoverVideo();
+    const handlePageShow = () => resetAndRecoverVideo();
+    const handleUserWake = () => playVideo();
+    const heartbeat = window.setInterval(() => {
+      if (document.hidden) return;
+      if (video.paused || video.ended || video.readyState < 2) resetAndRecoverVideo();
+    }, 2400);
 
     video.addEventListener("loadeddata", markReady);
     video.addEventListener("canplay", markReady);
@@ -361,12 +370,15 @@ const ReliableHeroVideo = () => {
     video.addEventListener("stalled", handleStall);
     video.addEventListener("waiting", handleStall);
     document.addEventListener("visibilitychange", handleVisibility);
+    document.addEventListener("pointerdown", handleUserWake, { passive: true });
+    document.addEventListener("touchstart", handleUserWake, { passive: true });
     window.addEventListener("pageshow", handlePageShow);
     window.addEventListener("focus", handlePageShow);
 
     return () => {
       clearStallTimer();
       clearReadyFallbackTimer();
+      window.clearInterval(heartbeat);
       video.removeEventListener("loadeddata", markReady);
       video.removeEventListener("canplay", markReady);
       video.removeEventListener("playing", markReady);
@@ -374,10 +386,12 @@ const ReliableHeroVideo = () => {
       video.removeEventListener("stalled", handleStall);
       video.removeEventListener("waiting", handleStall);
       document.removeEventListener("visibilitychange", handleVisibility);
+      document.removeEventListener("pointerdown", handleUserWake);
+      document.removeEventListener("touchstart", handleUserWake);
       window.removeEventListener("pageshow", handlePageShow);
       window.removeEventListener("focus", handlePageShow);
     };
-  }, [clearReadyFallbackTimer, clearStallTimer, playVideo, recoverVideo, source, sourceIndex]);
+  }, [clearReadyFallbackTimer, clearStallTimer, playVideo, resetAndRecoverVideo, source, sourceIndex]);
 
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden bg-[#f7f9fc]">
@@ -1252,7 +1266,7 @@ const Index = () => {
 
               <AnimatedHeroHeadline />
 
-              <p className="mt-4 hidden max-w-[34rem] text-xs leading-relaxed text-muted-foreground sm:text-sm md:mt-6 md:block md:text-base">
+              <p className="hero-floating-body-edge mt-4 hidden max-w-[34rem] text-xs leading-relaxed text-muted-foreground sm:text-sm md:mt-6 md:block md:text-base">
                 AI agents, chatbots, websites and automation that capture leads, book appointments, and run your operations.
               </p>
 
@@ -1265,7 +1279,7 @@ const Index = () => {
                 </Link>
               </div>
 
-              <div className="mt-8 flex items-center gap-4 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground/48 md:text-xs md:tracking-[0.28em]">
+              <div className="hero-floating-body-edge mt-8 flex items-center gap-4 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground/48 md:text-xs md:tracking-[0.28em]">
                 <span className="h-px w-9 bg-foreground/16" />
                 <span>Built for businesses that want speed, clarity, and execution.</span>
               </div>

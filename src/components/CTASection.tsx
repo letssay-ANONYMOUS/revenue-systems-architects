@@ -107,6 +107,15 @@ const SeamlessCTAVideo = () => {
         void playback.catch(() => undefined);
       }
     };
+    const recover = () => {
+      if (document.hidden) return;
+      if (current.paused || current.ended || current.readyState < 2) {
+        if (current.readyState < 2 && current.networkState !== HTMLMediaElement.NETWORK_LOADING) {
+          current.load();
+        }
+        play(current);
+      }
+    };
     const scheduleNextLayer = () => {
       const duration = Number.isFinite(current.duration) && current.duration > CTA_VIDEO_FADE_SECONDS
         ? current.duration
@@ -121,6 +130,15 @@ const SeamlessCTAVideo = () => {
         }
         setActiveLayer(activeLayer === 0 ? 1 : 0);
       }, switchDelay);
+    };
+    const switchImmediately = () => {
+      window.clearTimeout(switchTimer);
+      const next = activeLayer === 0 ? secondaryRef.current : primaryRef.current;
+      if (next) {
+        next.currentTime = 0;
+        play(next);
+      }
+      setActiveLayer(activeLayer === 0 ? 1 : 0);
     };
 
     play(current);
@@ -139,10 +157,33 @@ const SeamlessCTAVideo = () => {
       current.addEventListener("loadedmetadata", metadataHandler, { once: true });
     }
 
+    const heartbeat = window.setInterval(recover, 2400);
+    const handleVisibility = () => recover();
+    const handleWake = () => recover();
+    current.addEventListener("ended", switchImmediately);
+    current.addEventListener("stalled", recover);
+    current.addEventListener("waiting", recover);
+    current.addEventListener("error", recover);
+    document.addEventListener("visibilitychange", handleVisibility);
+    document.addEventListener("pointerdown", handleWake, { passive: true });
+    document.addEventListener("touchstart", handleWake, { passive: true });
+    window.addEventListener("pageshow", handleWake);
+    window.addEventListener("focus", handleWake);
+
     return () => {
       window.clearTimeout(switchTimer);
       window.clearTimeout(stopPreviousTimer);
+      window.clearInterval(heartbeat);
       if (metadataHandler) current.removeEventListener("loadedmetadata", metadataHandler);
+      current.removeEventListener("ended", switchImmediately);
+      current.removeEventListener("stalled", recover);
+      current.removeEventListener("waiting", recover);
+      current.removeEventListener("error", recover);
+      document.removeEventListener("visibilitychange", handleVisibility);
+      document.removeEventListener("pointerdown", handleWake);
+      document.removeEventListener("touchstart", handleWake);
+      window.removeEventListener("pageshow", handleWake);
+      window.removeEventListener("focus", handleWake);
     };
   }, [activeLayer]);
 
@@ -162,6 +203,8 @@ const SeamlessCTAVideo = () => {
         muted
         playsInline
         preload="auto"
+        disablePictureInPicture
+        controlsList="nodownload noplaybackrate noremoteplayback"
       >
         <source src={CTA_VIDEO_SRC} type="video/mp4" />
       </video>
@@ -172,6 +215,8 @@ const SeamlessCTAVideo = () => {
         muted
         playsInline
         preload="auto"
+        disablePictureInPicture
+        controlsList="nodownload noplaybackrate noremoteplayback"
       >
         <source src={CTA_VIDEO_SRC} type="video/mp4" />
       </video>

@@ -248,17 +248,12 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
     const cardWidth = el.clientWidth * 0.86 + 16;
     const startIndex = Math.round(start.scrollLeft / cardWidth);
     const delta = start.x - touch.clientX;
-    const elapsed = Math.max(1, performance.now() - start.time);
-    const velocity = Math.abs(delta) / elapsed;
-
     if (Math.abs(delta) < 24) {
       window.setTimeout(() => scrollTo(Math.round(el.scrollLeft / cardWidth)), 40);
       return;
     }
 
-    const hardSwipe = Math.abs(delta) > 170 || velocity > 1.25;
-    const step = hardSwipe ? 2 : 1;
-    const target = Math.max(0, Math.min(cards.length - 1, startIndex + (delta > 0 ? step : -step)));
+    const target = Math.max(0, Math.min(cards.length - 1, startIndex + (delta > 0 ? 1 : -1)));
     window.setTimeout(() => scrollTo(target), 40);
   };
 
