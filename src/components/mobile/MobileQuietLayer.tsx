@@ -146,7 +146,7 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
           className="h-full w-full object-cover saturate-[1.04]"
           loading="eager"
           decoding="async"
-          fetchpriority="high"
+          fetchPriority="high"
           animate={{ scale: pressed ? 1.05 : 1 }}
           transition={{ type: "spring", stiffness: 260, damping: 24 }}
         />
@@ -403,7 +403,7 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
               transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
               loading="eager"
               decoding="async"
-              fetchpriority="high"
+              fetchPriority="high"
             />
           </div>
         </div>
