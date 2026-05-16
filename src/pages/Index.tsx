@@ -733,10 +733,10 @@ const WebsiteShowcaseCarousel = () => {
   return (
     <>
       <div className="mb-10 flex justify-center overflow-visible py-2 md:mb-18">
-        <div className="relative w-full max-w-[1180px]">
+        <div className="relative w-full max-w-[1240px]">
           <div className="pointer-events-none absolute -inset-10 rounded-[3.5rem] bg-[radial-gradient(ellipse_at_50%_12%,rgba(255,255,255,0.96),transparent_44%),radial-gradient(ellipse_at_78%_46%,rgba(20,71,212,0.08),transparent_42%),radial-gradient(ellipse_at_18%_70%,rgba(213,170,90,0.08),transparent_38%)] blur-2xl" />
 
-          <div className="relative z-20 mb-7 flex justify-center">
+          <div className="relative z-20 mb-6 flex justify-center">
             <div className="relative inline-flex rounded-full border border-white/78 bg-white/48 p-1 shadow-[0_18px_48px_rgba(20,32,50,0.13),inset_0_1px_0_rgba(255,255,255,0.96),inset_0_-10px_24px_rgba(17,24,39,0.05)] backdrop-blur-2xl backdrop-saturate-150">
               <div className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(255,255,255,0.18)_45%,rgba(20,71,212,0.07))]" />
               {(["desktop", "phone"] as const).map((view) => (
@@ -779,7 +779,7 @@ const WebsiteShowcaseCarousel = () => {
                 viewport={{ once: true, margin: "-8% 0px" }}
                 transition={{ duration: 0.72, ease: [0.16, 1, 0.3, 1] }}
               >
-                <div className="relative mx-auto aspect-[10/9.25] max-w-[22.5rem] md:aspect-[16/9.7] md:max-w-none">
+                <div className="relative mx-auto aspect-[10/10.15] max-w-[23rem] md:aspect-[16/10.85] md:max-w-none">
                   <AnimatePresence initial={false} custom={direction} mode="sync">
                     <motion.div
                       key={active.title}
@@ -853,7 +853,7 @@ const WebsiteShowcaseCarousel = () => {
                       event.stopPropagation();
                       openActivePreview("desktop");
                     }}
-                    className="absolute bottom-5 right-5 z-50 hidden h-11 w-11 items-center justify-center rounded-full border border-white/76 bg-white/70 text-[#111827] opacity-100 shadow-[0_16px_38px_rgba(20,32,50,0.18),inset_0_1px_0_rgba(255,255,255,0.95),inset_0_-8px_18px_rgba(17,24,39,0.06)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-white/90 active:translate-y-0.5 active:scale-[0.94] active:shadow-[0_7px_18px_rgba(20,32,50,0.15),inset_0_4px_12px_rgba(17,24,39,0.1)] md:bottom-6 md:right-6 md:flex"
+                    className="absolute bottom-5 right-5 z-50 hidden h-12 w-12 items-center justify-center rounded-full border border-white/76 bg-white/70 text-[#111827] opacity-100 shadow-[0_16px_38px_rgba(20,32,50,0.18),inset_0_1px_0_rgba(255,255,255,0.95),inset_0_-8px_18px_rgba(17,24,39,0.06)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:-translate-y-0.5 hover:bg-white/90 active:translate-y-0.5 active:scale-[0.94] active:shadow-[0_7px_18px_rgba(20,32,50,0.15),inset_0_4px_12px_rgba(17,24,39,0.1)] md:bottom-6 md:right-6 md:flex"
                   >
                     <Maximize2 className="h-[1.1rem] w-[1.1rem]" />
                   </button>
@@ -905,24 +905,12 @@ const WebsiteShowcaseCarousel = () => {
             ) : (
             <motion.div
               key="phone-website-preview"
-              className="relative mx-auto flex w-full max-w-[390px] items-center justify-center px-3 pb-12 pt-1 sm:max-w-[430px] md:max-w-[470px] md:px-16 md:pb-1"
+              className="relative mx-auto flex w-full max-w-[390px] flex-col items-center justify-center px-3 pb-2 pt-1 sm:max-w-[430px] md:max-w-[470px] md:px-8"
               initial={{ opacity: 0, y: 22, scale: 0.96, rotateY: -8, filter: "blur(12px)" }}
               animate={{ opacity: 1, y: 0, scale: 1, rotateY: 0, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: -18, scale: 0.965, rotateY: 7, filter: "blur(12px)" }}
               transition={{ duration: 0.54, ease: [0.16, 1, 0.3, 1] }}
             >
-              <div className="absolute left-0 top-1/2 z-30 hidden -translate-y-1/2 md:block">
-                <motion.button
-                  type="button"
-                  data-native-press
-                  aria-label="Previous phone website example"
-                  onClick={showPrevious}
-                  className="relative flex h-12 w-12 items-center justify-center rounded-full border border-white/78 bg-white/80 text-[#111827] shadow-[0_24px_60px_rgba(20,32,50,0.21),inset_0_1px_0_rgba(255,255,255,0.97),inset_0_-10px_22px_rgba(17,24,39,0.075)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:-translate-x-0.5 hover:bg-white/94 active:translate-y-0.5 active:scale-[0.965] active:shadow-[0_10px_24px_rgba(20,32,50,0.18),inset_0_4px_12px_rgba(17,24,39,0.1),inset_0_1px_0_rgba(255,255,255,0.84)] md:h-16 md:w-16"
-                >
-                  <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" strokeWidth={2.35} />
-                </motion.button>
-              </div>
-
               <button
                 type="button"
                 aria-label={`Open ${active.title} phone website preview`}
@@ -973,19 +961,40 @@ const WebsiteShowcaseCarousel = () => {
                 </div>
               </button>
 
-              <div className="absolute right-0 top-1/2 z-30 hidden -translate-y-1/2 md:block">
+              <div className="relative z-30 mt-4 flex items-center justify-center gap-4 md:mt-5">
+                <motion.button
+                  type="button"
+                  data-native-press
+                  aria-label="Previous phone website example"
+                  onClick={showPrevious}
+                  whileTap={{ y: 1, scale: 0.94 }}
+                  className="relative flex h-12 w-12 items-center justify-center rounded-full border border-white/78 bg-white/78 text-[#111827] shadow-[0_18px_46px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.97),inset_0_-9px_18px_rgba(17,24,39,0.065)] backdrop-blur-2xl md:h-14 md:w-14"
+                >
+                  <ChevronLeft className="h-5 w-5 md:h-[1.35rem] md:w-[1.35rem]" strokeWidth={2.35} />
+                </motion.button>
+                <motion.button
+                  type="button"
+                  data-native-press
+                  aria-label={`Expand ${active.title} phone preview`}
+                  onClick={() => openActivePreview("phone")}
+                  whileTap={{ y: 1, scale: 0.94 }}
+                  className="relative flex h-12 w-12 items-center justify-center rounded-full border border-white/80 bg-white/78 text-[#111827] shadow-[0_18px_46px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-9px_18px_rgba(17,24,39,0.065)] backdrop-blur-2xl md:h-14 md:w-14"
+                >
+                  <Maximize2 className="h-5 w-5 md:h-[1.35rem] md:w-[1.35rem]" strokeWidth={2.2} />
+                </motion.button>
                 <motion.button
                   type="button"
                   data-native-press
                   aria-label="Next phone website example"
                   onClick={showNext}
-                  className="relative flex h-12 w-12 items-center justify-center rounded-full border border-white/78 bg-white/80 text-[#111827] shadow-[0_24px_60px_rgba(20,32,50,0.21),inset_0_1px_0_rgba(255,255,255,0.97),inset_0_-10px_22px_rgba(17,24,39,0.075)] backdrop-blur-xl transition-[background-color,box-shadow,transform] duration-300 hover:translate-x-0.5 hover:bg-white/94 active:translate-y-0.5 active:scale-[0.965] active:shadow-[0_10px_24px_rgba(20,32,50,0.18),inset_0_4px_12px_rgba(17,24,39,0.1),inset_0_1px_0_rgba(255,255,255,0.84)] md:h-16 md:w-16"
+                  whileTap={{ y: 1, scale: 0.94 }}
+                  className="relative flex h-12 w-12 items-center justify-center rounded-full border border-white/78 bg-white/78 text-[#111827] shadow-[0_18px_46px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.97),inset_0_-9px_18px_rgba(17,24,39,0.065)] backdrop-blur-2xl md:h-14 md:w-14"
                 >
-                  <ChevronRight className="h-5 w-5 md:h-6 md:w-6" strokeWidth={2.35} />
+                  <ChevronRight className="h-5 w-5 md:h-[1.35rem] md:w-[1.35rem]" strokeWidth={2.35} />
                 </motion.button>
               </div>
 
-              <div className="absolute -bottom-7 left-1/2 hidden -translate-x-1/2 justify-center gap-2 md:flex">
+              <div className="mt-3 flex justify-center gap-2">
                 {websiteShowcases.map((item, index) => (
                   <button
                     key={item.title}
@@ -1000,7 +1009,7 @@ const WebsiteShowcaseCarousel = () => {
             )}
           </AnimatePresence>
 
-          <div className="relative z-30 mt-4 flex flex-col items-center gap-3 md:hidden">
+          <div className={`relative z-30 flex flex-col items-center gap-3 md:hidden ${deviceView === "phone" ? "hidden" : "mt-3"}`}>
             <div className="flex items-center justify-center gap-4">
               <motion.button
                 type="button"
@@ -1054,7 +1063,7 @@ const WebsiteShowcaseCarousel = () => {
             <motion.div
               data-lenis-prevent
               key="website-preview"
-              className="fixed inset-0 z-[1400] flex items-end justify-center px-4 pb-5 pt-16 md:items-center md:px-8 md:py-8"
+              className="fixed inset-0 z-[1400] flex items-end justify-center px-2 pb-3 pt-8 md:items-center md:px-5 md:py-5"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -1073,8 +1082,8 @@ const WebsiteShowcaseCarousel = () => {
                 role="dialog"
                 aria-modal="true"
                 aria-label={`${selectedWebsite.title} full website preview`}
-                className={`relative z-10 flex max-h-[94dvh] w-full flex-col overflow-hidden rounded-[1.8rem] border border-white/76 bg-white/64 p-2.5 shadow-[0_44px_130px_rgba(24,38,60,0.24),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-1px_0_rgba(17,24,39,0.06)] backdrop-blur-2xl md:rounded-[2.2rem] md:p-3 ${
-                  selectedWebsiteDevice === "phone" ? "max-w-[min(96vw,520px)]" : "max-w-[min(94vw,1440px)]"
+                className={`relative z-10 flex max-h-[88dvh] w-full flex-col overflow-hidden rounded-[1.95rem] border border-white/76 bg-white/64 p-2.5 shadow-[0_44px_130px_rgba(24,38,60,0.24),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-1px_0_rgba(17,24,39,0.06)] backdrop-blur-2xl md:max-h-[96dvh] md:rounded-[2.35rem] md:p-3 ${
+                  selectedWebsiteDevice === "phone" ? "max-w-[min(97vw,560px)]" : "max-w-[min(98vw,1720px)]"
                 }`}
                 initial={{ y: "104%", opacity: 0, scale: 0.94, filter: "blur(16px)" }}
                 animate={{ y: 0, opacity: 1, scale: 1, filter: "blur(0px)" }}
@@ -1100,7 +1109,7 @@ const WebsiteShowcaseCarousel = () => {
                     <X className="h-4 w-4" />
                   </button>
                 </div>
-                <div className="max-h-[calc(92dvh-3.25rem)] overflow-auto overscroll-contain rounded-b-[1.35rem] bg-[#07101f] md:rounded-b-[1.75rem]">
+                <div className="max-h-[calc(86dvh-3.25rem)] overflow-auto overscroll-contain rounded-b-[1.45rem] bg-[#07101f] md:max-h-[calc(94dvh-3.5rem)] md:rounded-b-[1.85rem]">
                   <img
                     src={selectedWebsiteImageSrc}
                     alt={`${selectedWebsite.title} full website design`}
