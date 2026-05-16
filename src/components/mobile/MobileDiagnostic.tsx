@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useInView, useMotionValue, useTransform, animate } from "framer-motion";
-import { Check, X, ArrowRight, ChevronRight } from "lucide-react";
+import { Check, X, ArrowRight } from "lucide-react";
 import MissedCallVisual from "@/components/painpoints/visuals/MissedCallVisual";
 import InstantReplyVisual from "@/components/painpoints/visuals/InstantReplyVisual";
 import RemindersVisual from "@/components/painpoints/visuals/RemindersVisual";
@@ -61,6 +61,63 @@ const CountUp = ({ value, prefix, suffix }: { value: number; prefix: string; suf
   }, [value, mv]);
   return <motion.span>{display}</motion.span>;
 };
+
+const TapToFlipButton = ({ onFlip }: { onFlip: () => void }) => (
+  <motion.button
+    type="button"
+    aria-label="Tap to flip card"
+    data-native-press
+    onPointerDownCapture={(event) => event.stopPropagation()}
+    onClick={(event) => {
+      event.stopPropagation();
+      onFlip();
+    }}
+    whileTap={{ scale: 0.94, y: 1 }}
+    className="absolute bottom-2.5 right-3 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/80 bg-white/76 text-[#111827] shadow-[0_18px_46px_rgba(20,32,50,0.18),inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-9px_18px_rgba(17,24,39,0.065)] backdrop-blur-2xl"
+  >
+    <span className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(255,255,255,0.18)_46%,rgba(20,71,212,0.08))]" />
+    <span className="pointer-events-none absolute inset-[3px] rounded-full border border-white/72 shadow-[inset_0_1px_1px_rgba(255,255,255,0.92),inset_0_-5px_12px_rgba(17,24,39,0.055)]" />
+    {[0, 1, 2].map((line) => (
+      <motion.span
+        key={line}
+        className="pointer-events-none absolute h-px w-2 rounded-full bg-[#1447d4]/70"
+        style={{
+          right: line === 0 ? 10 : line === 1 ? 7 : 10,
+          top: line === 0 ? 10 : line === 1 ? 16 : 22,
+          rotate: line === 0 ? -34 : line === 1 ? 0 : 34,
+          transformOrigin: "left center",
+        }}
+        animate={{ opacity: [0, 1, 0], scaleX: [0.35, 1, 0.45], x: [0, 2, 4] }}
+        transition={{
+          duration: 1.45,
+          repeat: Infinity,
+          ease: [0.16, 1, 0.3, 1],
+          delay: 0.18 + line * 0.08,
+          repeatDelay: 0.46,
+        }}
+      />
+    ))}
+    <motion.svg
+      viewBox="0 0 34 34"
+      className="pointer-events-none relative h-7 w-7"
+      fill="none"
+      aria-hidden="true"
+      animate={{ y: [1, -1, 3, 0], scale: [1, 1, 0.94, 1] }}
+      transition={{ duration: 1.45, repeat: Infinity, ease: [0.16, 1, 0.3, 1], repeatDelay: 0.46 }}
+    >
+      <motion.path
+        d="M13.6 8.4v9.2m0 0-1.9-2.1a2 2 0 0 0-2.9 2.7l4.7 5.8c.8 1 2 1.6 3.3 1.6h4.5c2.5 0 4.5-2 4.5-4.5v-5.4a1.8 1.8 0 0 0-3.6 0v-.9a1.8 1.8 0 0 0-3.6 0v-.8a1.8 1.8 0 0 0-3.6 0V8.4a1.7 1.7 0 0 0-3.4 0Z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        initial={{ pathLength: 0.62, opacity: 0.72 }}
+        animate={{ pathLength: [0.72, 1, 1], opacity: [0.72, 1, 0.86] }}
+        transition={{ duration: 1.45, repeat: Infinity, ease: [0.16, 1, 0.3, 1], repeatDelay: 0.46 }}
+      />
+    </motion.svg>
+  </motion.button>
+);
 
 const MobileDiagnostic = () => {
   const [activeGroup, setActiveGroup] = useState(0);
@@ -203,11 +260,7 @@ const MobileDiagnostic = () => {
             </span>
           </div>
 
-          {/* Swipe hint */}
-          <div className="absolute bottom-2 right-3 z-10 flex items-center gap-1 text-[8.5px] font-semibold uppercase tracking-[0.18em] text-[#101831]/45">
-            Tap to flip
-            <ChevronRight className="h-3 w-3" />
-          </div>
+          <TapToFlipButton onFlip={() => setShowSolution((v) => !v)} />
         </motion.div>
 
         {/* Problem -> Solution */}

@@ -271,6 +271,7 @@ const isTestMediaEnvironment = () => window.navigator.userAgent.toLowerCase().in
 const ReliableHeroVideo = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const stallTimerRef = useRef<number | null>(null);
+  const readyFallbackTimerRef = useRef<number | null>(null);
   const [sourceIndex, setSourceIndex] = useState(0);
   const [isReady, setIsReady] = useState(false);
   const source = HERO_VIDEO_SOURCES[sourceIndex];
@@ -279,6 +280,12 @@ const ReliableHeroVideo = () => {
     if (stallTimerRef.current === null) return;
     window.clearTimeout(stallTimerRef.current);
     stallTimerRef.current = null;
+  }, []);
+
+  const clearReadyFallbackTimer = useCallback(() => {
+    if (readyFallbackTimerRef.current === null) return;
+    window.clearTimeout(readyFallbackTimerRef.current);
+    readyFallbackTimerRef.current = null;
   }, []);
 
   const playVideo = useCallback(() => {
@@ -304,9 +311,6 @@ const ReliableHeroVideo = () => {
       return;
     }
 
-    if (video.readyState < 2) {
-      video.load();
-    }
     playVideo();
   }, [playVideo, sourceIndex]);
 
@@ -320,11 +324,18 @@ const ReliableHeroVideo = () => {
     if (!video) return;
 
     setIsReady(false);
+    clearReadyFallbackTimer();
     video.load();
     playVideo();
 
+    readyFallbackTimerRef.current = window.setTimeout(() => {
+      setIsReady(true);
+      playVideo();
+    }, 1400);
+
     const markReady = () => {
       clearStallTimer();
+      clearReadyFallbackTimer();
       setIsReady(true);
       playVideo();
     };
@@ -349,25 +360,24 @@ const ReliableHeroVideo = () => {
     video.addEventListener("error", handleError);
     video.addEventListener("stalled", handleStall);
     video.addEventListener("waiting", handleStall);
-    video.addEventListener("suspend", handleStall);
     document.addEventListener("visibilitychange", handleVisibility);
     window.addEventListener("pageshow", handlePageShow);
     window.addEventListener("focus", handlePageShow);
 
     return () => {
       clearStallTimer();
+      clearReadyFallbackTimer();
       video.removeEventListener("loadeddata", markReady);
       video.removeEventListener("canplay", markReady);
       video.removeEventListener("playing", markReady);
       video.removeEventListener("error", handleError);
       video.removeEventListener("stalled", handleStall);
       video.removeEventListener("waiting", handleStall);
-      video.removeEventListener("suspend", handleStall);
       document.removeEventListener("visibilitychange", handleVisibility);
       window.removeEventListener("pageshow", handlePageShow);
       window.removeEventListener("focus", handlePageShow);
     };
-  }, [clearStallTimer, playVideo, recoverVideo, source, sourceIndex]);
+  }, [clearReadyFallbackTimer, clearStallTimer, playVideo, recoverVideo, source, sourceIndex]);
 
   return (
     <div aria-hidden="true" className="absolute inset-0 overflow-hidden bg-[#f7f9fc]">
@@ -614,6 +624,61 @@ const WebsiteShowcaseCarousel = () => {
     }),
   };
 
+  const phoneScreenVariants: Variants = {
+    enter: (travelDirection: number) => ({
+      x: travelDirection >= 0 ? "46%" : "-46%",
+      opacity: 0,
+      scale: 0.975,
+      filter: "blur(12px)",
+    }),
+    center: {
+      x: "0%",
+      opacity: 1,
+      scale: 1,
+      filter: "blur(0px)",
+      transition: {
+        duration: 0.72,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    },
+    exit: (travelDirection: number) => ({
+      x: travelDirection >= 0 ? "-38%" : "38%",
+      opacity: 0,
+      scale: 0.985,
+      filter: "blur(9px)",
+      transition: {
+        duration: 0.48,
+        ease: [0.55, 0, 0.1, 1],
+      },
+    }),
+  };
+
+  const phoneLabelVariants: Variants = {
+    enter: (travelDirection: number) => ({
+      y: travelDirection >= 0 ? 8 : -8,
+      opacity: 0,
+      filter: "blur(6px)",
+    }),
+    center: {
+      y: 0,
+      opacity: 1,
+      filter: "blur(0px)",
+      transition: {
+        duration: 0.34,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    },
+    exit: (travelDirection: number) => ({
+      y: travelDirection >= 0 ? -8 : 8,
+      opacity: 0,
+      filter: "blur(6px)",
+      transition: {
+        duration: 0.22,
+        ease: [0.55, 0, 0.1, 1],
+      },
+    }),
+  };
+
   return (
     <>
       <div className="mb-10 flex justify-center overflow-hidden py-2 md:mb-18 md:overflow-visible">
@@ -830,24 +895,42 @@ const WebsiteShowcaseCarousel = () => {
                 <div className="relative rounded-[2.25rem] border border-[#111827]/12 bg-[#0a1020] p-[0.46rem] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),inset_0_-10px_24px_rgba(255,255,255,0.05),0_16px_38px_rgba(20,32,50,0.14)]">
                   <div className="absolute left-1/2 top-[0.78rem] z-20 h-5 w-24 -translate-x-1/2 rounded-full bg-[#050914] shadow-[inset_0_1px_0_rgba(255,255,255,0.18),0_2px_10px_rgba(0,0,0,0.28)]" />
                   <div className="relative aspect-[9/19.5] overflow-hidden rounded-[1.82rem] bg-[#07101f]">
-                    {activePhoneImageSrc && (
-                      <img
-                        src={activePhoneImageSrc}
-                        alt={`${active.title} mobile website preview`}
-                        className="absolute inset-0 h-full w-full object-cover object-top"
-                        loading="eager"
-                        decoding="async"
-                        fetchpriority="high"
-                      />
-                    )}
+                    <AnimatePresence initial={false} custom={direction} mode="popLayout">
+                      {activePhoneImageSrc && (
+                        <motion.img
+                          key={activePhoneImageSrc}
+                          custom={direction}
+                          variants={phoneScreenVariants}
+                          initial="enter"
+                          animate="center"
+                          exit="exit"
+                          src={activePhoneImageSrc}
+                          alt={`${active.title} mobile website preview`}
+                          className="absolute inset-0 h-full w-full object-cover object-top"
+                          style={{ backfaceVisibility: "hidden", willChange: "transform, opacity, filter" }}
+                          loading="eager"
+                          decoding="async"
+                          fetchpriority="high"
+                        />
+                      )}
+                    </AnimatePresence>
                     <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(100deg,rgba(255,255,255,0.22),transparent_22%,transparent_72%,rgba(255,255,255,0.07)),linear-gradient(180deg,rgba(255,255,255,0.12),transparent_20%,transparent_72%,rgba(7,16,31,0.16))]" />
                   </div>
                 </div>
                 <div className="relative mt-3 flex items-center justify-between px-1">
-                  <div>
-                    <p className="text-[8px] font-semibold uppercase tracking-[0.24em] text-[#263445]/48">Phone view</p>
-                    <p className="mt-1 text-[11px] font-semibold text-[#111827]">{active.title}</p>
-                  </div>
+                  <AnimatePresence initial={false} custom={direction} mode="wait">
+                    <motion.div
+                      key={active.title}
+                      custom={direction}
+                      variants={phoneLabelVariants}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
+                    >
+                      <p className="text-[8px] font-semibold uppercase tracking-[0.24em] text-[#263445]/48">Phone view</p>
+                      <p className="mt-1 text-[11px] font-semibold text-[#111827]">{active.title}</p>
+                    </motion.div>
+                  </AnimatePresence>
                   <Maximize2 className="h-4 w-4 text-[#111827]/72 transition-transform duration-300 group-hover:scale-110" />
                 </div>
               </button>
