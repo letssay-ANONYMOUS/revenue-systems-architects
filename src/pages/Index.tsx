@@ -380,13 +380,13 @@ const ReliableHeroVideo = () => {
   }, [clearReadyFallbackTimer, clearStallTimer, playVideo, recoverVideo, source, sourceIndex]);
 
   return (
-    <div aria-hidden="true" className="absolute inset-0 overflow-hidden bg-[#f7f9fc]">
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden bg-[#f7f9fc]">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_25%_40%,rgba(20,71,212,0.12),transparent_36%),linear-gradient(90deg,#f7f9fc_0%,#eef4fb_46%,#ffffff_100%)]" />
       <video
         key={source}
         ref={videoRef}
         src={source}
-        className={`absolute inset-0 h-full w-full object-cover object-[50%_center] transition-opacity duration-500 md:object-[48%_center] ${isReady ? "opacity-100" : "opacity-0"}`}
+        className={`pointer-events-none absolute inset-0 h-full w-full object-cover object-[50%_center] transition-opacity duration-500 md:object-[48%_center] ${isReady ? "opacity-100" : "opacity-0"}`}
         autoPlay
         muted
         loop
@@ -1156,7 +1156,7 @@ const Index = () => {
       <Navbar />
 
       {/* HERO — immediate, no lazy loading */}
-      <section ref={heroRef} className="mobile-stable-hero relative overflow-hidden bg-black">
+      <section ref={heroRef} className="mobile-stable-hero relative touch-pan-y overflow-hidden bg-black">
         <ReliableHeroVideo />
 
         <div className="pointer-events-none absolute inset-0 pt-20 md:pt-0">
