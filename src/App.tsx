@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect, lazy, Suspense } from "react";
-import { AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import PageTransition from "@/components/PageTransition";
 import SmoothScroll from "@/components/SmoothScroll";
 import FilmGrain from "@/components/FilmGrain";
@@ -49,7 +49,23 @@ function AnimatedRoutes() {
 }
 
 const PageRouteFallback = () => (
-  <div className="min-h-[100dvh] bg-background" aria-label="Loading page" />
+  <div className="grid min-h-[100dvh] place-items-center bg-[#f7f9fc]" aria-label="Loading page">
+    <div className="relative flex flex-col items-center gap-5">
+      <motion.div
+        className="absolute -inset-10 rounded-full bg-[radial-gradient(circle,rgba(20,71,212,0.14),transparent_62%)] blur-2xl"
+        animate={{ opacity: [0.35, 0.78, 0.35], scale: [0.92, 1.08, 0.92] }}
+        transition={{ duration: 1.8, repeat: Infinity, ease: [0.16, 1, 0.3, 1] }}
+      />
+      <motion.div
+        className="relative h-14 w-14 rounded-full border border-white/80 bg-white/62 shadow-[0_24px_70px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-10px_22px_rgba(17,24,39,0.06)] backdrop-blur-2xl"
+        animate={{ y: [0, -3, 0], scale: [1, 1.025, 1] }}
+        transition={{ duration: 1.25, repeat: Infinity, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#1447d4] shadow-[0_0_18px_rgba(20,71,212,0.7)]" />
+      </motion.div>
+      <p className="relative text-[10px] font-semibold uppercase tracking-[0.34em] text-[#111827]/58">AgentForge</p>
+    </div>
+  </div>
 );
 
 const App = () => (

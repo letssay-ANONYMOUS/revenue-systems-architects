@@ -73,21 +73,19 @@ const TapToFlipButton = ({ onFlip }: { onFlip: () => void }) => (
       onFlip();
     }}
     whileTap={{ scale: 0.94, y: 1 }}
-    className="absolute bottom-2.5 right-3 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/80 bg-white/76 text-[#111827] shadow-[0_18px_46px_rgba(20,32,50,0.18),inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-9px_18px_rgba(17,24,39,0.065)] backdrop-blur-2xl"
+    className="absolute -bottom-3 -right-2 z-20 flex h-16 w-16 items-center justify-center text-[#111827]"
   >
-    <span className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(255,255,255,0.18)_46%,rgba(20,71,212,0.08))]" />
-    <span className="pointer-events-none absolute inset-[3px] rounded-full border border-white/72 shadow-[inset_0_1px_1px_rgba(255,255,255,0.92),inset_0_-5px_12px_rgba(17,24,39,0.055)]" />
     {[0, 1, 2].map((line) => (
       <motion.span
         key={line}
-        className="pointer-events-none absolute h-px w-2 rounded-full bg-[#1447d4]/70"
+        className="pointer-events-none absolute h-[1.5px] w-3 rounded-full bg-[#1447d4]/75"
         style={{
-          right: line === 0 ? 10 : line === 1 ? 7 : 10,
-          top: line === 0 ? 10 : line === 1 ? 16 : 22,
-          rotate: line === 0 ? -34 : line === 1 ? 0 : 34,
+          right: line === 0 ? 23 : line === 1 ? 19 : 23,
+          top: line === 0 ? 10 : line === 1 ? 17 : 24,
+          rotate: line === 0 ? -36 : line === 1 ? 0 : 36,
           transformOrigin: "left center",
         }}
-        animate={{ opacity: [0, 1, 0], scaleX: [0.35, 1, 0.45], x: [0, 2, 4] }}
+        animate={{ opacity: [0, 1, 0], scaleX: [0.35, 1, 0.45], x: [0, 3, 5] }}
         transition={{
           duration: 1.45,
           repeat: Infinity,
@@ -99,7 +97,7 @@ const TapToFlipButton = ({ onFlip }: { onFlip: () => void }) => (
     ))}
     <motion.svg
       viewBox="0 0 34 34"
-      className="pointer-events-none relative h-7 w-7"
+      className="pointer-events-none absolute bottom-0 right-0 h-11 w-11 drop-shadow-[0_10px_18px_rgba(17,24,39,0.18)]"
       fill="none"
       aria-hidden="true"
       animate={{ y: [1, -1, 3, 0], scale: [1, 1, 0.94, 1] }}
@@ -108,7 +106,7 @@ const TapToFlipButton = ({ onFlip }: { onFlip: () => void }) => (
       <motion.path
         d="M13.6 8.4v9.2m0 0-1.9-2.1a2 2 0 0 0-2.9 2.7l4.7 5.8c.8 1 2 1.6 3.3 1.6h4.5c2.5 0 4.5-2 4.5-4.5v-5.4a1.8 1.8 0 0 0-3.6 0v-.9a1.8 1.8 0 0 0-3.6 0v-.8a1.8 1.8 0 0 0-3.6 0V8.4a1.7 1.7 0 0 0-3.4 0Z"
         stroke="currentColor"
-        strokeWidth="1.7"
+        strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
         initial={{ pathLength: 0.62, opacity: 0.72 }}
@@ -174,8 +172,7 @@ const MobileDiagnostic = () => {
 
       {/* Card */}
       <motion.div
-        layout
-        className="relative overflow-hidden rounded-[1.55rem] border border-[#bdd0ee]/80 bg-white/68 shadow-[0_26px_70px_rgba(48,75,130,0.14),inset_0_1px_0_rgba(255,255,255,0.94)] backdrop-blur-2xl"
+        className="relative min-h-[31rem] overflow-hidden rounded-[1.55rem] border border-[#bdd0ee]/80 bg-white/68 shadow-[0_26px_70px_rgba(48,75,130,0.14),inset_0_1px_0_rgba(255,255,255,0.94)] backdrop-blur-2xl"
         transition={{ type: "spring", stiffness: 240, damping: 28 }}
       >
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_75%_0%,rgba(255,255,255,0.94),transparent_36%),radial-gradient(ellipse_at_8%_92%,rgba(211,225,255,0.32),transparent_50%)]" />
@@ -212,7 +209,7 @@ const MobileDiagnostic = () => {
 
         {/* Visual area with swipe-to-flip */}
         <motion.div
-          className="relative h-[10rem] cursor-grab touch-pan-y overflow-hidden border-b border-[#e3e8f1]/80 bg-white/45 active:cursor-grabbing"
+          className="relative h-[10rem] cursor-grab touch-pan-y overflow-visible border-b border-[#e3e8f1]/80 bg-white/45 active:cursor-grabbing"
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.18}
@@ -221,32 +218,34 @@ const MobileDiagnostic = () => {
           }}
           onTap={() => setShowSolution((v) => !v)}
         >
-          <AnimatePresence mode="popLayout" initial={false}>
-            <motion.div
-              key={`${group.key}-${activeItem}-${showSolution ? "sol" : "pain"}`}
-              initial={{ opacity: 0, x: 60, scale: 0.96, filter: "blur(6px)" }}
-              animate={{ opacity: 1, x: 0, scale: 1, filter: "blur(0px)" }}
-              exit={{ opacity: 0, x: -60, scale: 0.96, filter: "blur(6px)" }}
-              transition={{
-                opacity: { duration: 0.32, ease: [0.32, 0.72, 0, 1] },
-                x: { type: "spring", stiffness: 320, damping: 34, mass: 0.85 },
-                scale: { duration: 0.5, ease: [0.32, 0.72, 0, 1] },
-                filter: { duration: 0.28, ease: [0.32, 0.72, 0, 1] },
-              }}
-              className="absolute inset-0"
-            >
-              <Visual />
-              <div
-                className={`pointer-events-none absolute inset-0 transition-opacity duration-500 ${
-                  showSolution ? "opacity-0" : "opacity-100"
-                }`}
-                style={{
-                  background:
-                    "linear-gradient(135deg, rgba(255,71,77,0.12), rgba(255,71,77,0.02) 60%, transparent)",
+          <div className="absolute inset-0 overflow-hidden">
+            <AnimatePresence mode="popLayout" initial={false}>
+              <motion.div
+                key={`${group.key}-${activeItem}-${showSolution ? "sol" : "pain"}`}
+                initial={{ opacity: 0, x: 60, scale: 0.96, filter: "blur(6px)" }}
+                animate={{ opacity: 1, x: 0, scale: 1, filter: "blur(0px)" }}
+                exit={{ opacity: 0, x: -60, scale: 0.96, filter: "blur(6px)" }}
+                transition={{
+                  opacity: { duration: 0.32, ease: [0.32, 0.72, 0, 1] },
+                  x: { type: "spring", stiffness: 320, damping: 34, mass: 0.85 },
+                  scale: { duration: 0.5, ease: [0.32, 0.72, 0, 1] },
+                  filter: { duration: 0.28, ease: [0.32, 0.72, 0, 1] },
                 }}
-              />
-            </motion.div>
-          </AnimatePresence>
+                className="absolute inset-0"
+              >
+                <Visual />
+                <div
+                  className={`pointer-events-none absolute inset-0 transition-opacity duration-500 ${
+                    showSolution ? "opacity-0" : "opacity-100"
+                  }`}
+                  style={{
+                    background:
+                      "linear-gradient(135deg, rgba(255,71,77,0.12), rgba(255,71,77,0.02) 60%, transparent)",
+                  }}
+                />
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
           {/* State badge */}
           <div className="absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full border border-white/70 bg-white/80 px-2.5 py-1 backdrop-blur">
@@ -264,7 +263,7 @@ const MobileDiagnostic = () => {
         </motion.div>
 
         {/* Problem -> Solution */}
-        <div className="relative px-5 py-5">
+        <div className="relative min-h-[12.2rem] px-5 py-5">
           <AnimatePresence mode="popLayout" initial={false}>
             <motion.div
               key={`${group.key}-${activeItem}-text-${showSolution}`}
@@ -287,7 +286,7 @@ const MobileDiagnostic = () => {
                     <p className="text-base font-semibold leading-tight tracking-[-0.015em] text-[#101831]">
                       {item.pain}
                     </p>
-                    <p className="mt-1 text-xs text-[#41517d]/80">Tap the visual to see the fix →</p>
+                    <p className="mt-1 text-xs text-[#41517d]/80">Before the system catches it.</p>
                   </div>
                 </div>
               ) : (
@@ -335,7 +334,8 @@ const MobileDiagnostic = () => {
             <button
               type="button"
               onClick={nextItem}
-              className="flex items-center gap-1 rounded-full border border-[#101831]/15 bg-white/60 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] text-[#101831] backdrop-blur transition-transform active:scale-95"
+              data-native-press
+              className="flex items-center gap-1 rounded-full border border-white/78 bg-white/72 px-3.5 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-[#101831] shadow-[0_14px_34px_rgba(20,32,50,0.13),inset_0_1px_0_rgba(255,255,255,0.96),inset_0_-8px_18px_rgba(17,24,39,0.055)] backdrop-blur-2xl transition-transform active:translate-y-0.5 active:scale-[0.95]"
             >
               Next
               <ArrowRight className="h-3 w-3" />

@@ -97,7 +97,7 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
   return (
     <motion.article
       ref={articleRef as React.RefObject<HTMLElement>}
-      className="group relative w-[86vw] shrink-0 touch-auto snap-start cursor-pointer overflow-hidden rounded-[1.55rem] border border-white/55 bg-white/40 p-2.5 text-left shadow-[0_30px_70px_rgba(20,29,38,0.18),inset_0_1px_0_rgba(255,255,255,0.78)] backdrop-blur-2xl"
+      className="group relative w-[86vw] shrink-0 touch-pan-x snap-start cursor-pointer overflow-hidden rounded-[1.55rem] border border-white/55 bg-white/40 p-2.5 text-left shadow-[0_30px_70px_rgba(20,29,38,0.18),inset_0_1px_0_rgba(255,255,255,0.78)] backdrop-blur-2xl [scroll-snap-stop:normal]"
       initial={{ opacity: 0, y: 60, scale: 0.92 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-15% 0px" }}
@@ -146,7 +146,7 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
           className="h-full w-full object-cover saturate-[1.04]"
           loading="eager"
           decoding="async"
-          fetchPriority="high"
+          fetchpriority="high"
           animate={{ scale: pressed ? 1.05 : 1 }}
           transition={{ type: "spring", stiffness: 260, damping: 24 }}
         />
@@ -174,6 +174,7 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
 
 const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
   const trackRef = useRef<HTMLDivElement>(null);
+  const touchStartRef = useRef<{ x: number; time: number; scrollLeft: number } | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [selected, setSelected] = useState<QuietCard | null>(null);
 
@@ -226,6 +227,41 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
     el.scrollTo({ left: index * cardWidth, behavior: "smooth" });
   };
 
+  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
+    const el = trackRef.current;
+    const touch = event.touches[0];
+    if (!el || !touch) return;
+    touchStartRef.current = {
+      x: touch.clientX,
+      time: performance.now(),
+      scrollLeft: el.scrollLeft,
+    };
+  };
+
+  const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    const el = trackRef.current;
+    const start = touchStartRef.current;
+    const touch = event.changedTouches[0];
+    touchStartRef.current = null;
+    if (!el || !start || !touch) return;
+
+    const cardWidth = el.clientWidth * 0.86 + 16;
+    const startIndex = Math.round(start.scrollLeft / cardWidth);
+    const delta = start.x - touch.clientX;
+    const elapsed = Math.max(1, performance.now() - start.time);
+    const velocity = Math.abs(delta) / elapsed;
+
+    if (Math.abs(delta) < 24) {
+      window.setTimeout(() => scrollTo(Math.round(el.scrollLeft / cardWidth)), 40);
+      return;
+    }
+
+    const hardSwipe = Math.abs(delta) > 170 || velocity > 1.25;
+    const step = hardSwipe ? 2 : 1;
+    const target = Math.max(0, Math.min(cards.length - 1, startIndex + (delta > 0 ? step : -step)));
+    window.setTimeout(() => scrollTo(target), 40);
+  };
+
   return (
     <section
       className="relative block overflow-hidden bg-gradient-to-b from-white via-[#f5f8fc] to-[#eaf0f7] py-16 md:hidden"
@@ -262,7 +298,7 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
       {/* Horizontal scroller */}
       <motion.div
         ref={trackRef}
-        className="relative z-10 flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain px-[7vw] pb-8 pt-2 touch-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        className="relative z-10 flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain px-[7vw] pb-8 pt-2 touch-pan-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-5% 0px" }}
@@ -272,6 +308,8 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
           touchAction: "pan-x",
           WebkitOverflowScrolling: "touch",
         }}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
         {cards.map((card, index) => (
           <PressableCard
@@ -403,7 +441,7 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
               transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
               loading="eager"
               decoding="async"
-              fetchPriority="high"
+              fetchpriority="high"
             />
           </div>
         </div>
