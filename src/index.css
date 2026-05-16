@@ -63,6 +63,8 @@
   html {
     scroll-behavior: smooth;
     overflow-x: hidden;
+    overflow-y: auto;
+    height: auto;
   }
 
   * {
@@ -80,11 +82,14 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
-    overscroll-behavior-y: none;
+    overflow-y: auto;
+    overscroll-behavior-y: auto;
+    min-height: 100%;
   }
 
   #root {
-    overflow-x: clip;
+    overflow-x: hidden;
+    min-height: 100%;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -94,9 +99,7 @@
 
 @layer utilities {
   .mobile-stable-hero {
-    height: 100vh;
     min-height: 100vh;
-    height: 100svh;
     min-height: 100svh;
   }
 
