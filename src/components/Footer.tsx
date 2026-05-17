@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import agentforgeLogo from "@/assets/agentforge-logo.png";
 
 const Footer = () => {
   return (
@@ -18,8 +17,19 @@ const Footer = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-5 md:section-padding py-10 md:py-16">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
           <div className="col-span-2 lg:col-span-1">
-            <Link to="/" className="inline-block">
-              <img src={agentforgeLogo} alt="AgentForge" className="h-8 w-auto" />
+            <Link to="/" className="inline-flex items-center gap-2.5">
+              <img
+                src="/sterk-logo.jpg"
+                alt="STERK.systems"
+                width={512}
+                height={512}
+                loading="eager"
+                decoding="sync"
+                className="h-9 w-9 rounded-[0.7rem] object-cover shadow-[0_12px_34px_rgba(20,32,50,0.14)]"
+              />
+              <span className="font-display text-lg font-semibold tracking-[-0.035em] text-[#07101f]">
+                STERK.systems
+              </span>
             </Link>
             <p className="mt-3 text-xs md:text-sm text-[#314052]/78 leading-relaxed max-w-xs">
               AI systems, websites, and apps that capture leads, respond faster, and run your operations.
@@ -53,7 +63,7 @@ const Footer = () => {
         </div>
 
         <div className="mt-10 md:mt-16 pt-6 md:pt-8 border-t border-[#07101f]/10 flex flex-col md:flex-row justify-between items-center gap-3">
-          <p className="text-[10px] md:text-xs text-[#314052]/72">© 2026 AgentForge. All rights reserved.</p>
+          <p className="text-[10px] md:text-xs text-[#314052]/72">© 2026 STERK.systems. All rights reserved.</p>
           <div className="flex gap-6">
             <span className="text-[10px] md:text-xs text-[#314052]/72 hover:text-[#07101f] cursor-pointer transition-colors">Privacy</span>
             <span className="text-[10px] md:text-xs text-[#314052]/72 hover:text-[#07101f] cursor-pointer transition-colors">Terms</span>

@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
 import { Menu, X, ArrowRight } from "lucide-react";
-import agentforgeLogo from "@/assets/agentforge-logo.png";
 
 const navLinks = [
   { label: "Home", path: "/" },
@@ -35,6 +34,26 @@ const Navbar = () => {
 
   return (
     <>
+      <Link
+        to="/"
+        className="absolute left-4 top-[max(0.85rem,env(safe-area-inset-top))] z-[1190] flex items-center gap-2.5 md:left-6"
+        aria-label="STERK.systems home"
+      >
+        <img
+          src="/sterk-logo.jpg"
+          alt="STERK.systems"
+          width={512}
+          height={512}
+          loading="eager"
+          decoding="sync"
+          fetchPriority="high"
+          className="h-9 w-9 rounded-[0.7rem] object-cover shadow-[0_12px_34px_rgba(20,32,50,0.14)] md:h-10 md:w-10"
+        />
+        <span className="font-display text-[1.08rem] font-semibold tracking-[-0.035em] text-[#101831]">
+          STERK.systems
+        </span>
+      </Link>
+
       <motion.nav
         className="fixed left-0 right-0 top-0 z-[1200] transform-gpu"
         style={{
@@ -43,13 +62,10 @@ const Navbar = () => {
         }}
       >
         <div
-          className="mx-auto flex h-16 items-center justify-between md:h-[82px]"
+          className="mx-auto flex h-16 items-center justify-end md:h-[82px] lg:justify-between"
           style={{ maxWidth: "1400px" }}
         >
-          {/* Logo — far left, never morphs */}
-          <Link to="/" className="shrink-0 flex items-center">
-            <img src={agentforgeLogo} alt="AgentForge" className="h-7 md:h-8 w-auto" />
-          </Link>
+          <div className="hidden w-[12rem] shrink-0 lg:block" aria-hidden="true" />
 
           {/* Center links — only this morphs into frosted pill */}
           <div
@@ -120,7 +136,21 @@ const Navbar = () => {
               className="relative z-10 flex items-center justify-between px-6 pb-3"
               style={{ paddingTop: "max(1rem, env(safe-area-inset-top))" }}
             >
-              <img src={agentforgeLogo} alt="AgentForge" className="h-7 w-auto" />
+              <Link to="/" className="flex items-center gap-2.5" onClick={() => setMobileOpen(false)}>
+                <img
+                  src="/sterk-logo.jpg"
+                  alt="STERK.systems"
+                  width={512}
+                  height={512}
+                  loading="eager"
+                  decoding="sync"
+                  fetchPriority="high"
+                  className="h-9 w-9 rounded-[0.7rem] object-cover shadow-[0_12px_34px_rgba(20,32,50,0.14)]"
+                />
+                <span className="font-display text-[1.08rem] font-semibold tracking-[-0.035em] text-[#101831]">
+                  STERK.systems
+                </span>
+              </Link>
               <button
                 type="button"
                 aria-label="Close menu"

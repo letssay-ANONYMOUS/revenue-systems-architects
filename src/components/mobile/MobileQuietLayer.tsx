@@ -282,7 +282,7 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
         transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
       >
         <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.3em] text-[#141a24]/55">
-          Revenue Systems
+          STERK.systems
         </p>
         <div className="mx-auto mb-5 h-px w-24 bg-gradient-to-r from-transparent via-[#141a24]/22 to-transparent" />
         <h2 className="font-display text-[1.85rem] font-semibold leading-[0.98] tracking-[-0.02em] text-[#141a24]">

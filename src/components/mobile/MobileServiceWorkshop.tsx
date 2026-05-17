@@ -115,7 +115,7 @@ const ChatScene = () => {
           <Bot className="h-4 w-4 text-white/85" />
         </div>
         <div>
-          <p className="text-[11px] font-semibold text-white">AgentForge Assistant</p>
+          <p className="text-[11px] font-semibold text-white">Sterk Assistant</p>
           <p className="text-[9px] text-emerald-300">● Online · typing…</p>
         </div>
       </div>

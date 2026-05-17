@@ -27,7 +27,7 @@ const BrandLoadingScreen = () => (
     animate={{ opacity: 1 }}
     exit={{ opacity: 0, filter: "blur(14px)" }}
     transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-    aria-label="Loading AgentForge"
+    aria-label="Loading STERK.systems"
   >
     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_12%,rgba(255,255,255,1),transparent_36%),radial-gradient(ellipse_at_28%_54%,rgba(198,216,255,0.36),transparent_34%),radial-gradient(ellipse_at_72%_68%,rgba(255,255,255,0.9),transparent_36%),linear-gradient(180deg,#ffffff_0%,#f8fbff_48%,#edf3f9_100%)]" />
     <motion.div
@@ -41,22 +41,27 @@ const BrandLoadingScreen = () => (
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
     >
-      <div className="relative h-20 w-20 rounded-[1.7rem] border border-white/80 bg-white/66 shadow-[0_30px_90px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-16px_30px_rgba(17,24,39,0.06)] backdrop-blur-2xl">
-        <motion.span
-          className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#1447d4] shadow-[0_0_28px_rgba(20,71,212,0.8)]"
-          animate={{ scale: [1, 1.55, 1], opacity: [0.75, 1, 0.75] }}
-          transition={{ duration: 1.35, repeat: Infinity, ease: [0.16, 1, 0.3, 1] }}
+      <div className="relative h-20 w-20 rounded-[1.7rem] border border-white/80 bg-white/66 p-1.5 shadow-[0_30px_90px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-16px_30px_rgba(17,24,39,0.06)] backdrop-blur-2xl">
+        <img
+          src="/sterk-logo.jpg"
+          alt="STERK.systems"
+          width={512}
+          height={512}
+          loading="eager"
+          decoding="sync"
+          fetchPriority="high"
+          className="h-full w-full rounded-[1.25rem] object-cover"
         />
         <motion.span
-          className="absolute inset-3 rounded-[1.25rem] border border-[#1447d4]/18"
+          className="absolute inset-2 rounded-[1.32rem] border border-white/42"
           animate={{ opacity: [0.25, 0.62, 0.25], scale: [0.96, 1.04, 0.96] }}
           transition={{ duration: 1.35, repeat: Infinity, ease: [0.16, 1, 0.3, 1] }}
         />
       </div>
       <div className="text-center">
-        <p className="font-display text-2xl font-semibold tracking-[-0.03em] text-[#101831]">AgentForge</p>
+        <p className="font-display text-2xl font-semibold tracking-[-0.03em] text-[#101831]">STERK.systems</p>
         <p className="mt-2 text-[10px] font-semibold uppercase tracking-[0.34em] text-[#101831]/46">
-          AI Automation Studio
+          Business Automation Studio
         </p>
       </div>
       <div className="h-1 w-36 overflow-hidden rounded-full bg-[#101831]/10">
@@ -159,7 +164,7 @@ const PageRouteFallback = () => (
       >
         <span className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#1447d4] shadow-[0_0_18px_rgba(20,71,212,0.7)]" />
       </motion.div>
-      <p className="relative text-[10px] font-semibold uppercase tracking-[0.34em] text-[#111827]/58">AgentForge</p>
+      <p className="relative text-[10px] font-semibold uppercase tracking-[0.34em] text-[#111827]/58">STERK.systems</p>
     </div>
   </div>
 );
