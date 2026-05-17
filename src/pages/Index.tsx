@@ -267,6 +267,8 @@ const HERO_VIDEO_SOURCES = [
 ];
 
 const isTestMediaEnvironment = () => window.navigator.userAgent.toLowerCase().includes("jsdom");
+const isTouchRuntime = () =>
+  window.matchMedia("(hover: none) and (pointer: coarse)").matches || "ontouchstart" in window;
 
 const ReliableHeroVideo = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -326,16 +328,17 @@ const ReliableHeroVideo = () => {
 
     const video = videoRef.current;
     if (!video) return;
+    const isTouch = isTouchRuntime();
 
     setIsReady(false);
     clearReadyFallbackTimer();
     video.load();
-    playVideo();
+    if (!isTouch) playVideo();
 
     readyFallbackTimerRef.current = window.setTimeout(() => {
       setIsReady(true);
       playVideo();
-    }, 1400);
+    }, isTouch ? 620 : 1400);
 
     const markReady = () => {
       clearStallTimer();
@@ -361,7 +364,7 @@ const ReliableHeroVideo = () => {
     const heartbeat = window.setInterval(() => {
       if (document.hidden) return;
       if (video.paused || video.ended || video.readyState < 2) resetAndRecoverVideo();
-    }, 2400);
+    }, isTouch ? 7200 : 2400);
 
     video.addEventListener("loadeddata", markReady);
     video.addEventListener("canplay", markReady);
@@ -405,7 +408,7 @@ const ReliableHeroVideo = () => {
         muted
         loop
         playsInline
-        preload="auto"
+        preload={isTouchRuntime() ? "metadata" : "auto"}
         disablePictureInPicture
         controlsList="nodownload noplaybackrate noremoteplayback"
       />
@@ -1142,18 +1145,18 @@ const HeroScrollTransition = () => {
     mass: 0.72,
     restDelta: 0.001,
   });
-  const surfaceOpacity = useTransform(smoothProgress, [0, 0.18, 1], [0, 1, 1]);
-  const surfaceY = useTransform(smoothProgress, [0, 0.22, 1], [28, 0, 0]);
-  const headerOpacity = useTransform(smoothProgress, [0.05, 0.16, 0.72], [0, 1, 1]);
-  const headerY = useTransform(smoothProgress, [0.05, 0.22, 0.82], [18, 0, -18]);
-  const cardsY = useTransform(smoothProgress, [0.1, 0.36, 0.9], ["38vh", "0vh", "-28vh"]);
+  const surfaceOpacity = useTransform(smoothProgress, [0, 0.08, 1], [1, 1, 1]);
+  const surfaceY = useTransform(smoothProgress, [0, 0.18, 1], [0, 0, 0]);
+  const headerOpacity = useTransform(smoothProgress, [0, 0.08, 0.72], [1, 1, 1]);
+  const headerY = useTransform(smoothProgress, [0, 0.2, 0.82], [0, 0, -18]);
+  const cardsY = useTransform(smoothProgress, [0, 0.28, 0.9], ["10vh", "0vh", "-24vh"]);
   const sparkOpacity = useTransform(smoothProgress, [0.12, 0.3, 0.52], [0, 0.82, 0]);
   const sparkScale = useTransform(smoothProgress, [0.12, 0.3, 0.52], [0.82, 1, 1.12]);
 
   return (
     <section
       ref={transitionRef}
-      className="relative hidden h-[185vh] overflow-hidden bg-white md:block"
+      className="relative hidden h-[120vh] overflow-hidden bg-white md:block"
       aria-label="Scroll transition"
     >
       <motion.div
@@ -1255,7 +1258,7 @@ const Index = () => {
         <ReliableHeroVideo />
 
         <div className="pointer-events-none absolute inset-0 pt-20 md:pt-0">
-          <div className="mobile-stable-hero mx-auto flex max-w-[1480px] items-end justify-center px-4 pb-10 sm:px-6 md:items-center md:justify-end md:px-6 md:pb-[20vh] lg:px-8 xl:translate-x-8 2xl:translate-x-12">
+          <div className="mobile-stable-hero mx-auto flex max-w-[1480px] items-end justify-center px-4 pb-10 sm:px-6 md:items-center md:justify-end md:px-6 md:pb-[8vh] lg:px-8 xl:translate-x-8 2xl:translate-x-12">
             <motion.div
               initial={{ opacity: 0, y: 18, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -1298,7 +1301,6 @@ const Index = () => {
       </section>
 
       <div className="relative overflow-hidden bg-[#687079] text-white">
-        <HeroScrollTransition />
         <MobileQuietLayer cards={transitionCards} />
 
         {/* BUSINESS PAIN */}
