@@ -1301,6 +1301,7 @@ const Index = () => {
       </section>
 
       <div className="relative overflow-hidden bg-[#687079] text-white">
+        <HeroScrollTransition />
         <MobileQuietLayer cards={transitionCards} />
 
         {/* BUSINESS PAIN */}
