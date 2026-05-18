@@ -32,8 +32,8 @@ const cases = [
 // position 0 = center, 1 = right-back, 2 = left-back
 const LAYOUT = [
   { x: 0, y: 0, z: 0, rotateY: 0, scale: 1, shellOpacity: 1 },
-  { x: 88, y: 16, z: -120, rotateY: -5.5, scale: 0.925, shellOpacity: 0.72 },
-  { x: -88, y: 16, z: -120, rotateY: 5.5, scale: 0.925, shellOpacity: 0.72 },
+  { x: 96, y: 12, z: -120, rotateY: -4.5, scale: 0.93, shellOpacity: 0.7 },
+  { x: -96, y: 12, z: -120, rotateY: 4.5, scale: 0.93, shellOpacity: 0.7 },
 ];
 
 const SPRING = { type: "spring" as const, stiffness: 210, damping: 30, mass: 0.72 };
@@ -80,15 +80,15 @@ const MobileCaseRolodex = () => {
       {/* Soft radial backdrop so frosted glass has something to refract */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 h-[520px] -z-0"
+        className="pointer-events-none absolute inset-x-0 top-0 h-[440px] -z-0"
         style={{
           background:
             "radial-gradient(ellipse at 50% 35%, hsl(214 70% 94%) 0%, hsl(214 50% 97%) 35%, transparent 70%)",
         }}
       />
 
-      <div className="relative z-10 px-4">
-        <div className="relative mx-auto h-[510px] w-full max-w-sm" style={{ perspective: "1600px" }}>
+      <div className="relative z-10 px-2">
+        <div className="relative mx-auto h-[430px] w-full max-w-[430px]" style={{ perspective: "1600px" }}>
           <div
             className="relative h-full w-full"
             style={{ transformStyle: "preserve-3d" }}
@@ -134,25 +134,25 @@ const MobileCaseRolodex = () => {
                     touchAction: "pan-y",
                   }}
                   whileTap={isActive && !reduce ? { cursor: "grabbing" } : undefined}
-                  className="absolute inset-y-0 left-[8%] right-[8%] overflow-visible rounded-[38px] [contain:layout_style_paint]"
+                  className="absolute inset-y-0 left-[1.5%] right-[1.5%] overflow-visible rounded-[34px] [contain:layout_style_paint]"
                 >
                   <div
                     aria-hidden
-                    className="absolute inset-0 translate-y-8 rounded-[38px] bg-black/24 blur-2xl"
+                    className="absolute inset-0 translate-y-7 rounded-[34px] bg-black/24 blur-2xl"
                     style={{ opacity: isActive ? 0.72 : 0.22 }}
                   />
 
                   <div
                     aria-hidden
-                    className="absolute inset-0 rounded-[38px] bg-[#101114] p-[4px] shadow-[0_34px_90px_rgba(8,9,11,0.24),0_14px_38px_rgba(8,9,11,0.18),inset_0_1px_0_rgba(255,255,255,0.34),inset_0_-1px_0_rgba(0,0,0,0.42)]"
+                    className="absolute inset-0 rounded-[34px] bg-[#101114] p-[4px] shadow-[0_30px_78px_rgba(8,9,11,0.24),0_12px_32px_rgba(8,9,11,0.18),inset_0_1px_0_rgba(255,255,255,0.34),inset_0_-1px_0_rgba(0,0,0,0.42)]"
                   >
-                    <div className="absolute inset-[2px] rounded-[36px] bg-[linear-gradient(135deg,rgba(255,255,255,0.38),transparent_12%,transparent_82%,rgba(255,255,255,0.18))]" />
-                    <div className="absolute inset-[4px] rounded-[34px] bg-[linear-gradient(180deg,#fbfbfb_0%,#f7f7f5_50%,#ededeb_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-18px_42px_rgba(0,0,0,0.045),inset_0_0_0_1px_rgba(255,255,255,0.76)]" />
+                    <div className="absolute inset-[2px] rounded-[32px] bg-[linear-gradient(135deg,rgba(255,255,255,0.38),transparent_12%,transparent_82%,rgba(255,255,255,0.18))]" />
+                    <div className="absolute inset-[4px] rounded-[30px] bg-[linear-gradient(180deg,#fbfbfb_0%,#f7f7f5_50%,#ededeb_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-18px_42px_rgba(0,0,0,0.045),inset_0_0_0_1px_rgba(255,255,255,0.76)]" />
                   </div>
 
                   <div
                     aria-hidden
-                    className="absolute inset-[10px] rounded-[30px]"
+                    className="absolute inset-[10px] rounded-[26px]"
                     style={{
                       opacity: isActive ? 0.78 : 0.48,
                       background:
@@ -162,17 +162,17 @@ const MobileCaseRolodex = () => {
 
                   <div
                     aria-hidden
-                    className="absolute inset-[12px] rounded-[28px] border border-[#1b1d22]/7"
+                    className="absolute inset-[12px] rounded-[24px] border border-[#1b1d22]/7"
                   />
 
                   <div
                     aria-hidden
-                    className="absolute inset-x-[17px] top-[17px] h-1/2 rounded-t-[25px] bg-gradient-to-b from-white/72 via-white/20 to-transparent"
+                    className="absolute inset-x-[17px] top-[17px] h-1/2 rounded-t-[22px] bg-gradient-to-b from-white/72 via-white/20 to-transparent"
                   />
 
                   <div
                     aria-hidden
-                    className="pointer-events-none absolute inset-[5px] rounded-[33px] p-px"
+                    className="pointer-events-none absolute inset-[5px] rounded-[29px] p-px"
                     style={{
                       background:
                         "linear-gradient(150deg, rgba(255,255,255,0.92), rgba(255,255,255,0.24) 22%, rgba(0,0,0,0.24) 48%, rgba(255,255,255,0.5) 100%)",
@@ -186,7 +186,7 @@ const MobileCaseRolodex = () => {
                   {/* Faint grain */}
                   <div
                     aria-hidden
-                    className="absolute inset-[5px] rounded-[33px] opacity-[0.035] mix-blend-overlay"
+                    className="absolute inset-[5px] rounded-[29px] opacity-[0.035] mix-blend-overlay"
                     style={{
                       backgroundImage:
                         "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>\")",
@@ -196,37 +196,37 @@ const MobileCaseRolodex = () => {
                   {isActive && (
                     <motion.div
                       key={c.title}
-                      className="relative z-10 flex h-full flex-col px-8 pb-8 pt-8 text-foreground"
+                      className="relative z-10 flex h-full flex-col px-7 pb-7 pt-7 text-foreground"
                       initial={reduce ? false : { opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
                     >
-                      <span className="ml-1 w-fit rounded-full border border-black/5 bg-white/72 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.28em] text-foreground/60 shadow-[0_12px_24px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.98)] backdrop-blur-xl">
+                      <span className="ml-1 w-fit rounded-full border border-black/5 bg-white/72 px-4 py-1.5 text-[9px] font-semibold uppercase tracking-[0.28em] text-foreground/60 shadow-[0_12px_24px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.98)] backdrop-blur-xl">
                         {c.tag}
                       </span>
 
-                      <div className="mt-14 flex items-end gap-5">
-                        <span className="font-display text-[5.5rem] font-black leading-[0.72] tracking-[-0.085em] text-foreground sm:text-[5.75rem]">
+                      <div className="mt-12 flex items-end gap-4">
+                        <span className="font-display text-[4.65rem] font-black leading-[0.72] tracking-[-0.085em] text-foreground sm:text-[5rem]">
                           {c.metric}
                         </span>
-                        <span className="mb-2 max-w-[7rem] text-[1.5rem] font-medium leading-[1.06] text-foreground/70">
+                        <span className="mb-1.5 max-w-[7rem] text-[1.18rem] font-medium leading-[1.08] text-foreground/70">
                           {c.label}
                         </span>
                       </div>
 
-                      <div className="my-10 h-px w-full bg-foreground/16" />
+                      <div className="my-8 h-px w-full bg-foreground/16" />
 
                       <div className="mt-auto">
-                        <h3 className="font-display text-[1.95rem] font-bold leading-tight tracking-[-0.045em]">
+                        <h3 className="font-display text-[1.42rem] font-bold leading-tight tracking-[-0.035em]">
                           {c.title}
                         </h3>
-                        <p className="mt-5 text-[1.14rem] leading-[1.55] text-foreground/64">
+                        <p className="mt-4 max-w-[17rem] text-[0.95rem] leading-[1.55] text-foreground/64">
                           {c.detail}
                         </p>
 
                         <Link
                           to="/book-a-call"
-                          className="mt-10 inline-flex items-center gap-2 text-[1.05rem] font-medium text-foreground/70 transition-colors hover:text-foreground"
+                          className="mt-8 inline-flex items-center gap-2 text-[0.95rem] font-medium text-foreground/70 transition-colors hover:text-foreground"
                         >
                           Build this system
                         </Link>
