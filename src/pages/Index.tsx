@@ -48,7 +48,7 @@ const transitionCards = [
   {
     label: "Calls captured",
     value: "97%",
-    valueTone: "gold",
+    valueTone: "chrome",
     description: "AI stays on the line when your team is busy.",
     imageSrc: "/calls-captured-card.jpg",
     detail: "Live conversations stay handled when your team is busy, so the first response never depends on someone being free.",
@@ -96,6 +96,7 @@ const websiteShowcases = [
 
 const heroHeadlineLines = ["Your Business,", "Answered.", "Automated.", "Accelerated."];
 const heroHeadlineEase = [0.25, 0.46, 0.45, 0.94] as const;
+const operationalChips = ["Answered", "Booked", "Synced", "Active"];
 
 const AnimatedHeroHeadline = () => {
   let characterIndex = 0;
@@ -159,8 +160,8 @@ const RisingShowcaseCard = ({ card, index, progress, onSelect }: RisingShowcaseC
   const openCard = () => {
     window.requestAnimationFrame(() => onSelect(card));
   };
-  const valuePillClass = card.valueTone === "gold"
-    ? "border-[#c8a568]/50 bg-[#c69a4f] text-[#080b12] shadow-[0_10px_30px_rgba(111,75,24,0.24),inset_0_1px_0_rgba(255,238,194,0.64)]"
+  const valuePillClass = card.valueTone === "chrome"
+    ? "border-[#b6c4d8]/70 bg-[linear-gradient(135deg,#f8fbff,#cbd7e8_46%,#1447d4)] text-[#07101f] shadow-[0_10px_30px_rgba(20,71,212,0.18),inset_0_1px_0_rgba(255,255,255,0.72)]"
     : "border-[#6ca8ff]/48 bg-[#2f74ff] text-[#07101f] shadow-[0_10px_30px_rgba(21,75,196,0.26),inset_0_1px_0_rgba(196,221,255,0.66)]";
 
   return (
@@ -1206,6 +1207,20 @@ const HeroScrollTransition = () => {
         </motion.div>
 
         <div className="pointer-events-none absolute inset-x-0 top-[50%] z-20 flex justify-center px-6">
+          <div className="absolute -top-14 left-[8vw] hidden items-center gap-2 md:flex">
+            {["Call captured", "Route synced"].map((label) => (
+              <span key={label} className="sterk-status-chip">
+                {label}
+              </span>
+            ))}
+          </div>
+          <div className="absolute -bottom-14 right-[8vw] hidden items-center gap-2 md:flex">
+            {["Follow-up sent", "Booking ready"].map((label) => (
+              <span key={label} className="sterk-status-chip">
+                {label}
+              </span>
+            ))}
+          </div>
           <motion.div
             className="pointer-events-auto grid w-[min(96rem,96vw)] grid-cols-3 gap-5 lg:gap-7"
             style={{ y: cardsY }}
@@ -1241,6 +1256,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background relative">
       <div className="aurora-bg" />
+      <div className="sterk-system-thread hidden md:block" aria-hidden="true" />
       <Navbar />
 
       {/* HERO — immediate, no lazy loading */}
@@ -1271,6 +1287,14 @@ const Index = () => {
               <p className="hero-floating-body-edge mt-4 hidden max-w-[34rem] text-xs leading-relaxed text-muted-foreground sm:text-sm md:mt-6 md:block md:text-base">
                 AI agents, chatbots, websites and automation that capture leads, book appointments, and run your operations.
               </p>
+
+              <div className="mt-5 hidden flex-wrap gap-2 md:flex">
+                {operationalChips.map((chip) => (
+                  <span key={chip} className="sterk-status-chip">
+                    {chip}
+                  </span>
+                ))}
+              </div>
 
               <MobileHeroExtras />
 
@@ -1443,7 +1467,7 @@ const Index = () => {
               <div className="relative z-10">
                 <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Chatbots & Automation</p>
                 <h2 className="font-display font-bold text-xl md:text-4xl leading-tight mb-3 md:mb-6">
-                  Instant Replies. <span className="gradient-text">Zero Wait Times.</span>
+                  Instant Replies. <span className="sterk-chrome-text">Zero Wait Times.</span>
                 </h2>
                 <p className="text-xs md:text-base text-muted-foreground mb-4 md:mb-8 leading-relaxed">
                   Your chatbot handles FAQs, captures leads, qualifies prospects, and books appointments — while your team closes deals.
@@ -1537,7 +1561,7 @@ const Index = () => {
                 Websites & Apps
               </p>
               <h2 className="font-display text-[2.55rem] font-extrabold leading-[0.96] tracking-[-0.055em] text-[#101831] md:text-[4.5rem]">
-                Built to <span className="gradient-text">Convert</span>
+                Built to <span className="sterk-chrome-text">Convert</span>
               </h2>
             </div>
           </SectionReveal>
@@ -1557,7 +1581,7 @@ const Index = () => {
             <SectionReveal>
               <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Results</p>
               <h2 className="font-display font-bold text-xl md:text-5xl leading-tight max-w-3xl mb-8 md:mb-16">
-                Real Systems. <span className="gradient-text">Measurable Impact.</span>
+                Real Systems. <span className="sterk-chrome-text">Measurable Impact.</span>
               </h2>
             </SectionReveal>
             <MobileCaseRolodex />
@@ -1577,7 +1601,7 @@ const Index = () => {
               <SectionReveal>
                 <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-2 md:mb-4">Why Us</p>
                 <h2 className="font-display font-bold text-xl md:text-4xl leading-tight mb-3 md:mb-6">
-                  Business Thinking. <span className="gradient-text">Engineering Execution.</span>
+                  Business Thinking. <span className="sterk-chrome-text">Engineering Execution.</span>
                 </h2>
                 <p className="text-xs md:text-base text-muted-foreground leading-relaxed mb-3 md:mb-6 hidden md:block">
                   We design revenue systems — where every piece connects, every workflow triggers the next, and your business runs tighter with every passing week.

@@ -17,8 +17,8 @@ interface MobileQuietLayerProps {
 }
 
 const valuePillClass = (tone: string) =>
-  tone === "gold"
-    ? "border-[#c8a568]/55 bg-[#c69a4f] text-[#080b12] shadow-[0_10px_30px_rgba(111,75,24,0.28),inset_0_1px_0_rgba(255,238,194,0.7)]"
+  tone === "chrome"
+    ? "border-[#b6c4d8]/70 bg-[linear-gradient(135deg,#f8fbff,#cbd7e8_46%,#1447d4)] text-[#07101f] shadow-[0_10px_30px_rgba(20,71,212,0.18),inset_0_1px_0_rgba(255,255,255,0.72)]"
     : "border-[#6ca8ff]/55 bg-[#2f74ff] text-[#07101f] shadow-[0_10px_30px_rgba(21,75,196,0.3),inset_0_1px_0_rgba(196,221,255,0.7)]";
 
 interface PressableCardProps {

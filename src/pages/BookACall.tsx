@@ -42,7 +42,7 @@ const BookACall = () => {
               <p className="text-[10px] md:text-xs uppercase tracking-[0.2em] text-primary mb-3">Book a Call</p>
               <h1 className="font-display font-bold text-2xl md:text-5xl lg:text-6xl leading-[1.1] mb-4 md:mb-6">
                 Let's Build Your{" "}
-                <span className="gradient-text">Revenue System</span>
+                <span className="sterk-chrome-text">Revenue System</span>
               </h1>
               <p className="text-sm md:text-lg text-muted-foreground mb-6 md:mb-10 leading-relaxed">
                 Tell us about your business. We'll come prepared with ideas, not a pitch.

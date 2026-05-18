@@ -137,9 +137,9 @@ const LiquidCaseStudyCard = ({ caseStudy, index, progress }: LiquidCaseStudyCard
         <defs>
           <linearGradient id={ribbonId} x1="120" y1="32" x2="430" y2="498" gradientUnits="userSpaceOnUse">
             <stop offset="0" stopColor="#ffffff" stopOpacity="0.86" />
-            <stop offset="0.22" stopColor="#ffdbe9" stopOpacity="0.74" />
+            <stop offset="0.22" stopColor="#dbe8ff" stopOpacity="0.74" />
             <stop offset="0.48" stopColor="#ffffff" stopOpacity="0.32" />
-            <stop offset="0.74" stopColor="#f5a9c4" stopOpacity="0.52" />
+            <stop offset="0.74" stopColor="#8fb4ff" stopOpacity="0.52" />
             <stop offset="1" stopColor="#ffffff" stopOpacity="0.78" />
           </linearGradient>
           <filter id={`${ribbonId}-blur`} x="-20%" y="-20%" width="140%" height="140%">
@@ -222,7 +222,7 @@ const LiquidCaseStudyCards = () => {
       className="relative left-1/2 w-screen -translate-x-1/2 px-5 sm:px-7 lg:px-9"
       style={{ perspective: "1600px" }}
     >
-      <div className="pointer-events-none absolute inset-x-0 -top-32 h-[30rem] bg-[radial-gradient(ellipse_at_50%_50%,rgba(255,237,246,0.34),transparent_70%)]" />
+      <div className="pointer-events-none absolute inset-x-0 -top-32 h-[30rem] bg-[radial-gradient(ellipse_at_50%_50%,rgba(210,226,255,0.34),transparent_70%)]" />
       <div className="mx-auto grid max-w-[1530px] grid-cols-1 gap-7 md:gap-8 lg:grid-cols-3 xl:gap-10">
         {caseStudies.map((caseStudy, index) => (
           <LiquidCaseStudyCard

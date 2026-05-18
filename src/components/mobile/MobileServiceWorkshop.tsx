@@ -180,7 +180,7 @@ const WebScene = () => {
     <div className="flex h-full flex-col p-4">
       <div className="mb-3 flex items-center gap-1.5">
         <span className="h-2 w-2 rounded-full bg-red-400/70" />
-        <span className="h-2 w-2 rounded-full bg-yellow-400/70" />
+        <span className="h-2 w-2 rounded-full bg-[#8fb4ff]/70" />
         <span className="h-2 w-2 rounded-full bg-emerald-400/70" />
         <div className="ml-2 flex-1 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[8px] text-white/45">
           yourbrand.com
