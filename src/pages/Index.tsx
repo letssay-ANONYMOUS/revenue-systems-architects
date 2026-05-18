@@ -1426,8 +1426,8 @@ const Index = () => {
             </SectionReveal>
 
             <div className="mt-4 md:mt-8 text-center">
-              <Link to="/ai-calling-agents" className="inline-flex items-center gap-2 text-xs md:text-sm font-medium text-white/80 hover:underline group">
-                Explore AI Calling Agents <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+              <Link to="/book-a-call" className="inline-flex items-center gap-2 text-xs md:text-sm font-medium text-white/80 hover:underline group">
+                Build an AI calling system <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
               </Link>
             </div>
           </div>
@@ -1456,8 +1456,8 @@ const Index = () => {
                     </div>
                   ))}
                 </div>
-                <Link to="/chatbots-automation" className="inline-flex items-center gap-2 mt-3 md:mt-8 text-xs md:text-sm font-medium text-primary hover:underline group">
-                  Learn more <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
+                <Link to="/book-a-call" className="inline-flex items-center gap-2 mt-3 md:mt-8 text-xs md:text-sm font-medium text-primary hover:underline group">
+                  Build this system <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
                 </Link>
               </div>
 

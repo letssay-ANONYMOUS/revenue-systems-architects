@@ -12,9 +12,9 @@ type Service = {
 };
 
 const services: Service[] = [
-  { key: "call", label: "AI Calls", title: "Answers every call.", href: "/ai-calling-agents", Icon: Phone },
-  { key: "chat", label: "Chatbots", title: "Replies instantly.", href: "/chatbots-automation", Icon: Bot },
-  { key: "web", label: "Websites", title: "Built to convert.", href: "/websites-apps", Icon: Globe },
+  { key: "call", label: "AI Calls", title: "Answers every call.", href: "/book-a-call", Icon: Phone },
+  { key: "chat", label: "Chatbots", title: "Replies instantly.", href: "/book-a-call", Icon: Bot },
+  { key: "web", label: "Websites", title: "Built to convert.", href: "/book-a-call", Icon: Globe },
 ];
 
 const Waveform = () => (

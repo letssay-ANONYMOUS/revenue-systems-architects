@@ -5,9 +5,6 @@ import { Menu, X, ArrowRight } from "lucide-react";
 
 const navLinks = [
   { label: "Home", path: "/" },
-  { label: "AI Calling", path: "/ai-calling-agents" },
-  { label: "Automation", path: "/chatbots-automation" },
-  { label: "Results", path: "/case-studies" },
   { label: "About", path: "/about" },
 ];
 

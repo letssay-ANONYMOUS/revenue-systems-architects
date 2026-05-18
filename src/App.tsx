@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useEffect, lazy, Suspense, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import PageTransition from "@/components/PageTransition";
@@ -10,10 +10,6 @@ import SmoothScroll from "@/components/SmoothScroll";
 import FilmGrain from "@/components/FilmGrain";
 import Index from "./pages/Index";
 
-const AICallingAgents = lazy(() => import("./pages/AICallingAgents"));
-const ChatbotsAutomation = lazy(() => import("./pages/ChatbotsAutomation"));
-const WebsitesApps = lazy(() => import("./pages/WebsitesApps"));
-const CaseStudies = lazy(() => import("./pages/CaseStudies"));
 const About = lazy(() => import("./pages/About"));
 const BookACall = lazy(() => import("./pages/BookACall"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -136,10 +132,10 @@ function AnimatedRoutes() {
       <Suspense fallback={<PageRouteFallback />}>
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<PageTransition><Index /></PageTransition>} />
-          <Route path="/ai-calling-agents" element={<PageTransition><AICallingAgents /></PageTransition>} />
-          <Route path="/chatbots-automation" element={<PageTransition><ChatbotsAutomation /></PageTransition>} />
-          <Route path="/websites-apps" element={<PageTransition><WebsitesApps /></PageTransition>} />
-          <Route path="/case-studies" element={<PageTransition><CaseStudies /></PageTransition>} />
+          <Route path="/ai-calling-agents" element={<Navigate to="/" replace />} />
+          <Route path="/chatbots-automation" element={<Navigate to="/" replace />} />
+          <Route path="/websites-apps" element={<Navigate to="/" replace />} />
+          <Route path="/case-studies" element={<Navigate to="/" replace />} />
           <Route path="/about" element={<PageTransition><About /></PageTransition>} />
           <Route path="/book-a-call" element={<PageTransition><BookACall /></PageTransition>} />
           <Route path="*" element={<PageTransition><NotFound /></PageTransition>} />

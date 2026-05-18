@@ -66,8 +66,8 @@ const CTASection = ({
                 Book a Strategy Call
                 <ArrowRight className="h-4 w-4" />
               </Link>
-              <Link to="/case-studies" className="inline-flex items-center justify-center rounded-xl border border-white/56 bg-white/24 px-8 py-4 text-center text-sm font-semibold text-[#07101f] shadow-[0_12px_38px_rgba(14,23,36,0.08),inset_0_1px_0_rgba(255,255,255,0.72),inset_0_-1px_0_rgba(7,16,31,0.05)] backdrop-blur-xl transition-all duration-300 hover:bg-white/42 sm:flex-1 md:py-5">
-                See Our Work
+              <Link to="/about" className="inline-flex items-center justify-center rounded-xl border border-white/56 bg-white/24 px-8 py-4 text-center text-sm font-semibold text-[#07101f] shadow-[0_12px_38px_rgba(14,23,36,0.08),inset_0_1px_0_rgba(255,255,255,0.72),inset_0_-1px_0_rgba(7,16,31,0.05)] backdrop-blur-xl transition-all duration-300 hover:bg-white/42 sm:flex-1 md:py-5">
+                About STERK
               </Link>
             </motion.div>
           </div>

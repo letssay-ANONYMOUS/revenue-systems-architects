@@ -223,10 +223,10 @@ const MobileCaseRolodex = () => {
 
                       {isActive && (
                         <Link
-                          to="/case-studies"
+                          to="/book-a-call"
                           className="mt-10 inline-flex items-center gap-2 text-[1.18rem] font-medium text-foreground/70"
                         >
-                          View case study
+                          Build this system
                         </Link>
                       )}
                     </div>

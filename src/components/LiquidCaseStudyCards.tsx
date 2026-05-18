@@ -191,11 +191,11 @@ const LiquidCaseStudyCard = ({ caseStudy, index, progress }: LiquidCaseStudyCard
           <div className="liquid-case-divider my-8 h-px" />
 
           <Link
-            to="/case-studies"
-            className="inline-flex items-center gap-4 text-base font-semibold text-[#4d5562] transition-colors duration-300 group-hover:text-[#8f6678] md:text-lg xl:text-xl"
+            to="/book-a-call"
+            className="inline-flex items-center gap-4 text-base font-semibold text-[#4d5562] transition-colors duration-300 group-hover:text-[#1447d4] md:text-lg xl:text-xl"
           >
-            View case study
-            <ArrowRight className="h-5 w-5 text-[#d06b90] transition-transform duration-300 group-hover:translate-x-1.5" />
+            Build this system
+            <ArrowRight className="h-5 w-5 text-[#1447d4] transition-transform duration-300 group-hover:translate-x-1.5" />
           </Link>
         </div>
       </div>
