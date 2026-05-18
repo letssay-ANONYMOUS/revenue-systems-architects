@@ -174,8 +174,35 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
 
 const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
   const trackRef = useRef<HTMLDivElement>(null);
+  const settleTimerRef = useRef(0);
+  const touchingRef = useRef(false);
+  const touchStartRef = useRef<{ x: number; y: number; left: number; t: number } | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [selected, setSelected] = useState<QuietCard | null>(null);
+
+  const getCardStride = useCallback((el: HTMLDivElement) => el.clientWidth * 0.86 + 16, []);
+
+  const scrollTo = useCallback(
+    (index: number, behavior: ScrollBehavior = "smooth") => {
+      const el = trackRef.current;
+      if (!el) return;
+      const cardStride = getCardStride(el);
+      const target = Math.max(0, Math.min(cards.length - 1, index));
+      el.scrollTo({ left: target * cardStride, behavior });
+    },
+    [cards.length, getCardStride],
+  );
+
+  const steerToNearest = useCallback(() => {
+    const el = trackRef.current;
+    if (!el || touchingRef.current) return;
+    const cardStride = getCardStride(el);
+    const nearest = Math.max(0, Math.min(cards.length - 1, Math.round(el.scrollLeft / cardStride)));
+    const targetLeft = nearest * cardStride;
+    if (Math.abs(el.scrollLeft - targetLeft) > 3) {
+      el.scrollTo({ left: targetLeft, behavior: "smooth" });
+    }
+  }, [cards.length, getCardStride]);
 
   useEffect(() => {
     const preloadLinks: HTMLLinkElement[] = [];
@@ -199,31 +226,71 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
     };
   }, [cards]);
 
-  // Track active card via scroll position
+  // Track active card via scroll position, then softly steer to the closest card after scrolling settles.
   useEffect(() => {
     const el = trackRef.current;
     if (!el) return;
     let raf = 0;
     const onScroll = () => {
       cancelAnimationFrame(raf);
+      window.clearTimeout(settleTimerRef.current);
       raf = requestAnimationFrame(() => {
-        const cardWidth = el.clientWidth * 0.86 + 16;
+        const cardWidth = getCardStride(el);
         const idx = Math.round(el.scrollLeft / cardWidth);
         setActiveIndex(Math.max(0, Math.min(cards.length - 1, idx)));
       });
+      if (!touchingRef.current) {
+        settleTimerRef.current = window.setTimeout(steerToNearest, 150);
+      }
     };
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       el.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(raf);
+      window.clearTimeout(settleTimerRef.current);
     };
-  }, [cards.length]);
+  }, [cards.length, getCardStride, steerToNearest]);
 
-  const scrollTo = (index: number) => {
+  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
     const el = trackRef.current;
-    if (!el) return;
-    const cardWidth = el.clientWidth * 0.86 + 16;
-    el.scrollTo({ left: index * cardWidth, behavior: "smooth" });
+    const touch = event.touches[0];
+    if (!el || !touch) return;
+    window.clearTimeout(settleTimerRef.current);
+    touchingRef.current = true;
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY, left: el.scrollLeft, t: performance.now() };
+  };
+
+  const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    const el = trackRef.current;
+    const start = touchStartRef.current;
+    touchingRef.current = false;
+    touchStartRef.current = null;
+    if (!el || !start) {
+      settleTimerRef.current = window.setTimeout(steerToNearest, 140);
+      return;
+    }
+
+    const touch = event.changedTouches[0];
+    if (!touch) return;
+    const dx = touch.clientX - start.x;
+    const dy = touch.clientY - start.y;
+    const elapsed = Math.max(1, performance.now() - start.t);
+    const speed = Math.abs(dx) / elapsed;
+    const cardStride = getCardStride(el);
+    const startIndex = Math.round(start.left / cardStride);
+    const isHorizontal = Math.abs(dx) > 22 && Math.abs(dx) > Math.abs(dy) * 1.05;
+
+    if (!isHorizontal) {
+      settleTimerRef.current = window.setTimeout(steerToNearest, 140);
+      return;
+    }
+
+    const direction = dx < 0 ? 1 : -1;
+    const hardSwipe = speed > 0.95 || Math.abs(dx) > el.clientWidth * 0.46;
+    const step = hardSwipe ? 2 : 1;
+    const targetIndex = Math.max(0, Math.min(cards.length - 1, startIndex + direction * step));
+    setActiveIndex(targetIndex);
+    settleTimerRef.current = window.setTimeout(() => scrollTo(targetIndex), hardSwipe ? 90 : 120);
   };
 
   return (
@@ -263,6 +330,13 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
       <motion.div
         ref={trackRef}
         className="relative z-10 flex gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain px-[7vw] pb-8 pt-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={() => {
+          touchingRef.current = false;
+          touchStartRef.current = null;
+          settleTimerRef.current = window.setTimeout(steerToNearest, 140);
+        }}
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-5% 0px" }}
