@@ -15,7 +15,7 @@ const Footer = () => {
         <source src="/cta-croc-generated-video.mp4" type="video/mp4" />
       </video>
       <div className="relative z-10 max-w-7xl mx-auto px-5 md:section-padding py-10 md:py-16">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12">
           <div className="col-span-2 lg:col-span-1">
             <Link to="/" className="inline-flex items-center gap-2.5">
               <img
@@ -52,13 +52,6 @@ const Footer = () => {
               <li><Link to="/case-studies" className="text-xs md:text-sm text-[#314052]/78 hover:text-primary transition-colors">Case Studies</Link></li>
               <li><Link to="/book-a-call" className="text-xs md:text-sm text-[#314052]/78 hover:text-primary transition-colors">Contact</Link></li>
             </ul>
-          </div>
-
-          <div className="col-span-2 lg:col-span-1">
-            <h4 className="font-display font-semibold text-xs uppercase tracking-wider mb-3 md:mb-4 text-[#07101f]">Ready to Start?</h4>
-            <Link to="/book-a-call" className="premium-btn text-xs inline-block">
-              Book a Call
-            </Link>
           </div>
         </div>
 

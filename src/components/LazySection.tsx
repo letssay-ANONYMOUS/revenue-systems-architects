@@ -1,53 +1,24 @@
-import { useRef, useState, useEffect, ReactNode, Suspense } from "react";
+import { ReactNode, Suspense } from "react";
 
 interface LazySectionProps {
   children: ReactNode;
-  /** Distance before viewport to start rendering (default 300px) */
   rootMargin?: string;
-  /** Minimum height placeholder to prevent layout shift */
   minHeight?: string;
-  /** Optional skeleton/placeholder while loading */
   fallback?: ReactNode;
 }
 
 const LazySection = ({
   children,
-  rootMargin = "300px",
-  minHeight = "200px",
+  rootMargin,
+  minHeight,
   fallback,
 }: LazySectionProps) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const [isVisible, setIsVisible] = useState(() => (
-    typeof window !== "undefined" &&
-    window.innerWidth >= 1024 &&
-    window.matchMedia("(pointer: fine)").matches
-  ));
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: `${rootMargin} 0px ${rootMargin} 0px` }
-    );
-
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [rootMargin]);
+  void rootMargin;
+  void minHeight;
 
   return (
-    <div ref={ref} style={{ minHeight: isVisible ? undefined : minHeight }}>
-      {isVisible ? (
-        <Suspense fallback={fallback || null}>{children}</Suspense>
-      ) : (
-        fallback || null
-      )}
+    <div>
+      <Suspense fallback={fallback || null}>{children}</Suspense>
     </div>
   );
 };

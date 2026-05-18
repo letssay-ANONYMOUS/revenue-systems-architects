@@ -15,8 +15,7 @@ const StickyMobileCTA = () => {
   useEffect(() => {
     if (location.pathname === "/book-a-call") return;
     const onScroll = () => {
-      // Show after 70% of viewport scrolled
-      setVisible(window.scrollY > window.innerHeight * 0.7);
+      setVisible(window.scrollY > window.innerHeight * 0.35);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -29,14 +28,14 @@ const StickyMobileCTA = () => {
     <AnimatePresence>
       {visible && !dismissed && (
         <motion.div
-          className="fixed inset-x-0 bottom-0 z-[100] flex justify-center px-4 pb-[calc(0.9rem+env(safe-area-inset-bottom))] md:hidden"
+          className="pointer-events-none fixed inset-x-0 bottom-0 z-[1350] flex justify-center px-4 pb-[calc(0.9rem+env(safe-area-inset-bottom))] md:hidden"
           initial={{ y: 120, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 120, opacity: 0 }}
           transition={{ type: "spring", stiffness: 320, damping: 30, mass: 0.7 }}
         >
           <div
-            className="relative flex w-full max-w-[28rem] items-center gap-2 overflow-hidden rounded-full border border-white/65 bg-white/55 p-1.5 pl-3 shadow-[0_24px_60px_rgba(11,31,79,0.28),inset_0_1px_0_rgba(255,255,255,0.95),inset_0_-2px_8px_rgba(17,24,39,0.06)] backdrop-blur-2xl"
+            className="pointer-events-auto relative flex w-full max-w-[28rem] items-center gap-2 overflow-hidden rounded-full border border-white/65 bg-white/55 p-1.5 pl-3 shadow-[0_24px_60px_rgba(11,31,79,0.28),inset_0_1px_0_rgba(255,255,255,0.95),inset_0_-2px_8px_rgba(17,24,39,0.06)] backdrop-blur-2xl"
             style={{ backdropFilter: "blur(28px) saturate(170%)", WebkitBackdropFilter: "blur(28px) saturate(170%)" }}
           >
             {/* Animated breathing hairline on top edge */}

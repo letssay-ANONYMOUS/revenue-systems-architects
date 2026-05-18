@@ -34,11 +34,11 @@ const ConnectedToolsVisual = () => (
       </div>
     </div>
 
-    {nodes.map(({ x, y, Icon }) => (
+    {nodes.map(({ x, y, Icon }, index) => (
       <div
         key={`${x}-${y}`}
-        className="absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-[#dfe7f8] bg-white/78 text-[#6372e7] shadow-[0_12px_28px_rgba(67,85,139,0.11),inset_0_1px_0_rgba(255,255,255,0.94)]"
-        style={{ left: `${x}%`, top: `${y}%` }}
+        className="absolute flex h-11 w-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-[#dfe7f8] bg-white/78 text-[#6372e7] opacity-0 shadow-[0_12px_28px_rgba(67,85,139,0.11),inset_0_1px_0_rgba(255,255,255,0.94)]"
+        style={{ left: `${x}%`, top: `${y}%`, animation: `pp-tool-pop 0.62s cubic-bezier(0.16,1,0.3,1) ${0.22 + index * 0.1}s forwards, pp-node-pulse 3.4s ease-in-out ${1 + index * 0.18}s infinite` }}
       >
         <Icon className="h-5 w-5" strokeWidth={1.9} />
       </div>

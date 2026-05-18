@@ -57,15 +57,15 @@ const Navbar = () => {
       <motion.nav
         className="fixed left-0 right-0 top-0 z-[1200] transform-gpu"
         style={{
-          padding: "max(0.65rem, env(safe-area-inset-top)) 1rem 0",
+          padding: "max(1rem, env(safe-area-inset-top)) 1rem 0",
           willChange: "transform",
         }}
       >
         <div
-          className="mx-auto flex h-16 items-center justify-end md:h-[82px] lg:justify-between"
+          className="mx-auto flex h-16 items-center justify-end md:h-[82px] lg:justify-center xl:justify-between"
           style={{ maxWidth: "1400px" }}
         >
-          <div className="hidden w-[12rem] shrink-0 lg:block" aria-hidden="true" />
+          <div className="hidden w-[12rem] shrink-0 xl:block" aria-hidden="true" />
 
           {/* Center links — only this morphs into frosted pill */}
           <div
@@ -82,7 +82,7 @@ const Navbar = () => {
               <Link
                 key={link.path}
                 to={link.path}
-                className={`nav-link-underline rounded-full px-5 py-2.5 text-[14px] font-medium whitespace-nowrap ${
+                className={`nav-link-underline rounded-full px-3.5 py-2.5 text-[13px] font-medium whitespace-nowrap xl:px-5 xl:text-[14px] ${
                   scrolled
                     ? location.pathname === link.path ? "nav-text-ink" : "nav-text-muted-ink hover:nav-text-ink"
                     : location.pathname === link.path ? "text-foreground" : "text-muted-foreground hover:text-foreground"
@@ -95,7 +95,7 @@ const Navbar = () => {
           </div>
 
           {/* Book a Call — far right, never morphs */}
-          <div className="hidden lg:block shrink-0">
+          <div className="hidden xl:block shrink-0">
             <motion.div data-native-press>
               <Link to="/book-a-call" data-native-press className="nav-cta-arrow-button">
                 <span>Book a Call</span>

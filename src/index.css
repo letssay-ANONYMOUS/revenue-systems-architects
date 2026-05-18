@@ -122,7 +122,8 @@
   @media (min-width: 768px) {
     .mobile-stable-hero {
       height: auto;
-      min-height: 132dvh;
+      min-height: 132vh;
+      min-height: 132svh;
     }
   }
 }
@@ -928,6 +929,10 @@
 @keyframes pp-node-pulse {
   0%, 100% { background-color: rgba(255, 255, 255, 0.78); border-color: rgba(101, 114, 237, 0.22); }
   50% { background-color: rgba(238, 240, 255, 0.94); border-color: rgba(101, 114, 237, 0.52); box-shadow: 0 0 0 5px rgba(101, 114, 237, 0.1); }
+}
+@keyframes pp-tool-pop {
+  0% { opacity: 0; transform: translate(-50%, -50%) translateY(10px) scale(0.72); filter: blur(5px); }
+  100% { opacity: 1; transform: translate(-50%, -50%) translateY(0) scale(1); filter: blur(0); }
 }
 @keyframes pp-draw {
   to { stroke-dashoffset: 0; }

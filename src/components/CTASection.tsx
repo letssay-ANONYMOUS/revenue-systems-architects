@@ -31,7 +31,7 @@ const CTASection = ({
     : [headline];
 
   return (
-    <section ref={sectionRef} className="relative flex min-h-[132dvh] items-center overflow-hidden bg-[#f6f8fb] py-24 text-[#07101f] md:min-h-[145dvh] md:py-40">
+    <section ref={sectionRef} className="relative flex min-h-[132svh] items-center overflow-hidden bg-[#f6f8fb] py-24 text-[#07101f] md:min-h-[145svh] md:py-40">
       <SeamlessCTAVideo />
 
       <div className="relative z-10 mx-auto w-full max-w-[1340px] px-5 md:section-padding">
@@ -194,7 +194,8 @@ const SeamlessCTAVideo = () => {
   };
 
   return (
-    <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
+    <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="sticky top-0 h-[100svh] min-h-screen w-full overflow-hidden">
       <video
         ref={primaryRef}
         className={`${videoClass} ${activeLayer === 0 ? "opacity-100" : "opacity-0"}`}
@@ -220,6 +221,7 @@ const SeamlessCTAVideo = () => {
       >
         <source src={CTA_VIDEO_SRC} type="video/mp4" />
       </video>
+      </div>
     </div>
   );
 };
