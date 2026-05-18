@@ -45,15 +45,15 @@ const Footer = () => {
 
           <div>
             <h4 className="text-[10px] font-bold uppercase tracking-[0.28em] text-[#101831]/52">Contact</h4>
-            <div className="mt-5 space-y-3">
+            <div className="mt-5 space-y-2.5">
               {contactLinks.map(({ label, href, Icon }) => (
                 <a
                   key={href}
                   href={href}
-                  className="group flex items-center gap-3 rounded-2xl border border-[#d9e2ef]/78 bg-white/58 px-4 py-3 text-sm font-medium text-[#243044] transition-all duration-300 hover:border-[#1447d4]/28 hover:bg-white/82 hover:text-[#1447d4]"
+                  className="group flex items-center gap-2.5 text-xs font-medium leading-snug text-[#314052]/78 transition-colors duration-300 hover:text-[#1447d4] md:text-sm"
                 >
-                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-[#eef4ff] text-[#1447d4]">
-                    <Icon className="h-4 w-4" />
+                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-[#eef4ff] text-[#1447d4]">
+                    <Icon className="h-3.5 w-3.5" />
                   </span>
                   <span className="min-w-0 break-words">{label}</span>
                 </a>

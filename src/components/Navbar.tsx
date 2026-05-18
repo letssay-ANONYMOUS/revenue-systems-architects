@@ -8,8 +8,8 @@ const navLinks = [
   { label: "About", path: "/about" },
 ];
 
-const SCROLL_ENTER = 56;
-const SCROLL_EXIT = 28;
+const SCROLL_ENTER = 6;
+const SCROLL_EXIT = 1;
 const SHELL_TRANSITION = "max-width 760ms cubic-bezier(0.16, 1, 0.3, 1), border-radius 760ms cubic-bezier(0.16, 1, 0.3, 1), background-color 760ms cubic-bezier(0.16, 1, 0.3, 1), border-color 760ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 760ms cubic-bezier(0.16, 1, 0.3, 1), transform 760ms cubic-bezier(0.16, 1, 0.3, 1), padding 760ms cubic-bezier(0.16, 1, 0.3, 1)";
 
 const Navbar = () => {
