@@ -31,12 +31,12 @@ const cases = [
 
 // position 0 = center, 1 = right-back, 2 = left-back
 const LAYOUT = [
-  { x: 0, y: 0, z: 0, rotateY: 0, scale: 1, opacity: 1 },
-  { x: 76, y: 10, z: -90, rotateY: -7, scale: 0.965, opacity: 0.52 },
-  { x: -76, y: 10, z: -90, rotateY: 7, scale: 0.965, opacity: 0.52 },
+  { x: 0, y: 0, z: 0, rotateY: 0, scale: 1, shellOpacity: 1 },
+  { x: 88, y: 16, z: -120, rotateY: -5.5, scale: 0.925, shellOpacity: 0.72 },
+  { x: -88, y: 16, z: -120, rotateY: 5.5, scale: 0.925, shellOpacity: 0.72 },
 ];
 
-const SPRING = { type: "spring" as const, stiffness: 180, damping: 26, mass: 0.8 };
+const SPRING = { type: "spring" as const, stiffness: 210, damping: 30, mass: 0.72 };
 
 const MobileCaseRolodex = () => {
   const reduce = useReducedMotion();
@@ -88,10 +88,7 @@ const MobileCaseRolodex = () => {
       />
 
       <div className="relative z-10 px-4">
-        <div
-          className="relative mx-auto h-[520px] w-full max-w-sm"
-          style={{ perspective: "1400px" }}
-        >
+        <div className="relative mx-auto h-[510px] w-full max-w-sm" style={{ perspective: "1600px" }}>
           <div
             className="relative h-full w-full"
             style={{ transformStyle: "preserve-3d" }}
@@ -123,37 +120,41 @@ const MobileCaseRolodex = () => {
                     z: layer.z,
                     rotateY: layer.rotateY,
                     scale: layer.scale,
-                    opacity: layer.opacity,
                   }}
                   initial={false}
                   transition={SPRING}
                   style={{
+                    backfaceVisibility: "hidden",
                     transformStyle: "preserve-3d",
                     transformOrigin: "center center",
                     zIndex: isActive ? 30 : 10,
+                    opacity: layer.shellOpacity,
                     cursor: isActive ? (reduce ? "default" : "grab") : "pointer",
+                    willChange: "transform",
+                    touchAction: "pan-y",
                   }}
                   whileTap={isActive && !reduce ? { cursor: "grabbing" } : undefined}
-                  className="absolute inset-y-0 left-[7%] right-[7%] overflow-visible rounded-[38px]"
+                  className="absolute inset-y-0 left-[8%] right-[8%] overflow-visible rounded-[38px] [contain:layout_style_paint]"
                 >
                   <div
                     aria-hidden
                     className="absolute inset-0 translate-y-8 rounded-[38px] bg-black/24 blur-2xl"
-                    style={{ opacity: isActive ? 0.78 : 0.28 }}
+                    style={{ opacity: isActive ? 0.72 : 0.22 }}
                   />
 
                   <div
                     aria-hidden
-                    className="absolute inset-0 rounded-[38px] bg-[#08090b] p-[5px] shadow-[0_34px_90px_rgba(8,9,11,0.28),0_14px_38px_rgba(8,9,11,0.2),inset_0_1px_0_rgba(255,255,255,0.34),inset_0_-1px_0_rgba(0,0,0,0.42)]"
+                    className="absolute inset-0 rounded-[38px] bg-[#101114] p-[4px] shadow-[0_34px_90px_rgba(8,9,11,0.24),0_14px_38px_rgba(8,9,11,0.18),inset_0_1px_0_rgba(255,255,255,0.34),inset_0_-1px_0_rgba(0,0,0,0.42)]"
                   >
                     <div className="absolute inset-[2px] rounded-[36px] bg-[linear-gradient(135deg,rgba(255,255,255,0.38),transparent_12%,transparent_82%,rgba(255,255,255,0.18))]" />
-                    <div className="absolute inset-[5px] rounded-[33px] bg-[linear-gradient(180deg,#fbfbfb_0%,#f5f5f4_48%,#ececea_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-18px_42px_rgba(0,0,0,0.05),inset_0_0_0_1px_rgba(255,255,255,0.74)]" />
+                    <div className="absolute inset-[4px] rounded-[34px] bg-[linear-gradient(180deg,#fbfbfb_0%,#f7f7f5_50%,#ededeb_100%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-18px_42px_rgba(0,0,0,0.045),inset_0_0_0_1px_rgba(255,255,255,0.76)]" />
                   </div>
 
                   <div
                     aria-hidden
-                    className="absolute inset-[10px] rounded-[30px] opacity-70"
+                    className="absolute inset-[10px] rounded-[30px]"
                     style={{
+                      opacity: isActive ? 0.78 : 0.48,
                       background:
                         "radial-gradient(circle at 28% 4%, rgba(255,255,255,0.92), transparent 22%), radial-gradient(circle at 80% 18%, rgba(255,255,255,0.5), transparent 34%), linear-gradient(115deg, rgba(255,255,255,0.62), transparent 36%, rgba(255,255,255,0.3) 78%, transparent)",
                     }}
@@ -192,45 +193,46 @@ const MobileCaseRolodex = () => {
                     }}
                   />
 
-                  {/* Content — only visible on the active card so back cards don't bleed through */}
-                  <div
-                    className="relative z-10 flex h-full flex-col px-8 pb-8 pt-8 text-foreground transition-opacity duration-200"
-                    style={{ opacity: isActive ? 1 : 0 }}
-                    aria-hidden={!isActive}
-                  >
-                    <span className="ml-1 w-fit rounded-full border border-black/5 bg-white/70 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.24em] text-foreground/58 shadow-[0_12px_24px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.98)] backdrop-blur-xl">
-                      {c.tag}
-                    </span>
-
-                    <div className="mt-14 flex items-end gap-5">
-                      <span className="font-display text-[5.75rem] font-black leading-[0.72] tracking-[-0.085em] text-foreground">
-                        {c.metric}
+                  {isActive && (
+                    <motion.div
+                      key={c.title}
+                      className="relative z-10 flex h-full flex-col px-8 pb-8 pt-8 text-foreground"
+                      initial={reduce ? false : { opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                      <span className="ml-1 w-fit rounded-full border border-black/5 bg-white/72 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.28em] text-foreground/60 shadow-[0_12px_24px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.98)] backdrop-blur-xl">
+                        {c.tag}
                       </span>
-                      <span className="mb-2 max-w-[7rem] text-[1.62rem] font-medium leading-[1.05] text-foreground/68">
-                        {c.label}
-                      </span>
-                    </div>
 
-                    <div className="my-10 h-px w-full bg-foreground/18" />
+                      <div className="mt-14 flex items-end gap-5">
+                        <span className="font-display text-[5.5rem] font-black leading-[0.72] tracking-[-0.085em] text-foreground sm:text-[5.75rem]">
+                          {c.metric}
+                        </span>
+                        <span className="mb-2 max-w-[7rem] text-[1.5rem] font-medium leading-[1.06] text-foreground/70">
+                          {c.label}
+                        </span>
+                      </div>
 
-                    <div className="mt-auto">
-                      <h3 className="font-display text-[2rem] font-bold leading-tight tracking-[-0.045em]">
-                        {c.title}
-                      </h3>
-                      <p className="mt-5 text-[1.24rem] leading-[1.55] text-foreground/62">
-                        {c.detail}
-                      </p>
+                      <div className="my-10 h-px w-full bg-foreground/16" />
 
-                      {isActive && (
+                      <div className="mt-auto">
+                        <h3 className="font-display text-[1.95rem] font-bold leading-tight tracking-[-0.045em]">
+                          {c.title}
+                        </h3>
+                        <p className="mt-5 text-[1.14rem] leading-[1.55] text-foreground/64">
+                          {c.detail}
+                        </p>
+
                         <Link
                           to="/book-a-call"
-                          className="mt-10 inline-flex items-center gap-2 text-[1.18rem] font-medium text-foreground/70"
+                          className="mt-10 inline-flex items-center gap-2 text-[1.05rem] font-medium text-foreground/70 transition-colors hover:text-foreground"
                         >
                           Build this system
                         </Link>
-                      )}
-                    </div>
-                  </div>
+                      </div>
+                    </motion.div>
+                  )}
                 </motion.article>
               );
             })}
