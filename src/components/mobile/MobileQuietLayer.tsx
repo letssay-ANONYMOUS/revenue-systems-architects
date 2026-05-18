@@ -323,16 +323,14 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
       if (e.key === "Escape") close();
     };
     window.addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
     return () => {
       window.removeEventListener("keydown", onKey);
-      document.body.style.overflow = "";
     };
   }, [close]);
 
   return createPortal(
     <motion.div
-      className="fixed inset-0 z-[120] flex items-end justify-center md:hidden"
+      className="zoom-safe fixed inset-0 z-[120] flex items-end justify-center md:hidden"
       role="dialog"
       aria-modal="true"
       aria-label={`${card.label} details`}
@@ -350,17 +348,11 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
       />
 
       <motion.div
-        className="relative w-full max-h-[92dvh] overflow-y-auto rounded-t-[1.8rem] border-t border-white/70 bg-white/85 p-5 pb-[calc(2rem+env(safe-area-inset-bottom))] text-[#111827] shadow-[0_-30px_80px_rgba(10,18,30,0.32),inset_0_1px_0_rgba(255,255,255,0.95)] backdrop-blur-2xl"
+        className="zoom-safe relative max-h-[92svh] w-full overflow-y-auto rounded-t-[1.8rem] border-t border-white/70 bg-white/85 p-5 pb-[calc(2rem+env(safe-area-inset-bottom))] text-[#111827] shadow-[0_-30px_80px_rgba(10,18,30,0.32),inset_0_1px_0_rgba(255,255,255,0.95)] backdrop-blur-2xl"
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", stiffness: 520, damping: 42, mass: 0.72 }}
-        drag="y"
-        dragConstraints={{ top: 0, bottom: 0 }}
-        dragElastic={{ top: 0, bottom: 0.4 }}
-        onDragEnd={(_, info) => {
-          if (info.offset.y > 120 || info.velocity.y > 600) close();
-        }}
       >
         {/* Drag handle */}
         <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[#111827]/15" />
@@ -392,12 +384,12 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
           </motion.button>
         </div>
 
-        <div className="mt-5 overflow-hidden rounded-2xl border border-white/60 bg-[#eef3f7]/70 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
+        <div className="zoom-safe mt-5 overflow-hidden rounded-2xl border border-white/60 bg-[#eef3f7]/70 p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]">
           <div className="aspect-[16/9] overflow-hidden rounded-xl bg-white">
             <motion.img
               src={card.imageSrc}
               alt={`${card.label} detail`}
-              className="h-full w-full object-cover"
+              className="zoom-safe h-full w-full object-cover"
               initial={{ opacity: 0, scale: 1.04 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}

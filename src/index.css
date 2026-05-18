@@ -108,6 +108,23 @@
     min-height: 100%;
   }
 
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+  }
+
+  .zoom-safe,
+  .zoom-safe * {
+    touch-action: pan-x pan-y pinch-zoom;
+  }
+
+  .zoom-safe img {
+    -webkit-user-drag: none;
+    user-select: auto;
+  }
+
   h1, h2, h3, h4, h5, h6 {
     @apply font-display;
   }
