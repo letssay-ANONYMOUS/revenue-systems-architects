@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion, PanInfo } from "framer-motion";
+import { useEffect, useRef, useState, type TouchEvent } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { Link } from "react-router-dom";
 
 const cases = [
@@ -36,7 +36,7 @@ const LAYOUT = [
   { x: -96, y: 12, z: -120, rotateY: 4.5, scale: 0.93, shellOpacity: 0.7 },
 ];
 
-const SPRING = { type: "spring" as const, stiffness: 210, damping: 30, mass: 0.72 };
+const SPRING = { type: "spring" as const, stiffness: 300, damping: 34, mass: 0.52 };
 
 const MobileCaseRolodex = () => {
   const reduce = useReducedMotion();
@@ -44,6 +44,7 @@ const MobileCaseRolodex = () => {
   const [paused, setPaused] = useState(false);
   const [hintGone, setHintGone] = useState(false);
   const interactedRef = useRef(false);
+  const touchStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
 
   useEffect(() => {
     if (reduce || paused) return;
@@ -66,12 +67,27 @@ const MobileCaseRolodex = () => {
 
   const next = () => setActive((i) => (i + 1) % cases.length);
   const prev = () => setActive((i) => (i - 1 + cases.length) % cases.length);
-  const onDragEnd = (_: unknown, info: PanInfo) => {
-    const { offset, velocity } = info;
-    const swipe = Math.abs(offset.x) > 60 || Math.abs(velocity.x) > 400;
-    if (!swipe) return;
+
+  const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+    const touch = event.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY, t: performance.now() };
+  };
+
+  const handleTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
+    const start = touchStartRef.current;
+    touchStartRef.current = null;
+    if (!start) return;
+
+    const touch = event.changedTouches[0];
+    const dx = touch.clientX - start.x;
+    const dy = touch.clientY - start.y;
+    const elapsed = performance.now() - start.t;
+    const horizontalIntent = Math.abs(dx) > 26 && Math.abs(dx) > Math.abs(dy) * 1.08;
+    const flick = elapsed < 280 && Math.abs(dx) > 18 && Math.abs(dx) > Math.abs(dy) * 0.9;
+
+    if (!horizontalIntent && !flick) return;
     markInteracted();
-    if (offset.x < 0) next();
+    if (dx < 0) next();
     else prev();
   };
 
@@ -92,6 +108,8 @@ const MobileCaseRolodex = () => {
           <div
             className="relative h-full w-full"
             style={{ transformStyle: "preserve-3d" }}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
           >
             {cases.map((c, i) => {
               const offset = (i - active + cases.length) % cases.length;
@@ -110,10 +128,6 @@ const MobileCaseRolodex = () => {
                       goTo(i);
                     }
                   }}
-                  drag={isActive && !reduce ? "x" : false}
-                  dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.25}
-                  onDragEnd={isActive ? onDragEnd : undefined}
                   animate={{
                     x: layer.x,
                     y: layer.y,
@@ -129,11 +143,11 @@ const MobileCaseRolodex = () => {
                     transformOrigin: "center center",
                     zIndex: isActive ? 30 : 10,
                     opacity: layer.shellOpacity,
-                    cursor: isActive ? (reduce ? "default" : "grab") : "pointer",
+                    cursor: isActive ? "grab" : "pointer",
                     willChange: "transform",
                     touchAction: "pan-y",
                   }}
-                  whileTap={isActive && !reduce ? { cursor: "grabbing" } : undefined}
+                  whileTap={reduce ? undefined : { scale: layer.scale * 0.992 }}
                   className="absolute inset-y-0 left-[1.5%] right-[1.5%] overflow-visible rounded-[34px] [contain:layout_style_paint]"
                 >
                   <div
@@ -199,7 +213,7 @@ const MobileCaseRolodex = () => {
                       className="relative z-10 flex h-full flex-col px-7 pb-7 pt-7 text-foreground"
                       initial={reduce ? false : { opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+                      transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
                     >
                       <span className="ml-1 w-fit rounded-full border border-black/5 bg-white/72 px-4 py-1.5 text-[9px] font-semibold uppercase tracking-[0.28em] text-foreground/60 shadow-[0_12px_24px_rgba(0,0,0,0.12),inset_0_1px_0_rgba(255,255,255,0.98)] backdrop-blur-xl">
                         {c.tag}
@@ -254,7 +268,7 @@ const MobileCaseRolodex = () => {
                   className="block h-full rounded-full bg-foreground"
                   initial={false}
                   animate={{ width: i === active ? "100%" : "0%" }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
                 />
               </button>
             ))}
