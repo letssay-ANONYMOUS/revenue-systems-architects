@@ -267,8 +267,6 @@ const HERO_VIDEO_SOURCES = [
 ];
 
 const isTestMediaEnvironment = () => window.navigator.userAgent.toLowerCase().includes("jsdom");
-const isTouchRuntime = () =>
-  window.matchMedia("(hover: none) and (pointer: coarse)").matches || "ontouchstart" in window;
 
 const ReliableHeroVideo = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -328,17 +326,16 @@ const ReliableHeroVideo = () => {
 
     const video = videoRef.current;
     if (!video) return;
-    const isTouch = isTouchRuntime();
 
     setIsReady(false);
     clearReadyFallbackTimer();
     video.load();
-    if (!isTouch) playVideo();
+    playVideo();
 
     readyFallbackTimerRef.current = window.setTimeout(() => {
       setIsReady(true);
       playVideo();
-    }, isTouch ? 620 : 1400);
+    }, 1400);
 
     const markReady = () => {
       clearStallTimer();
@@ -364,7 +361,7 @@ const ReliableHeroVideo = () => {
     const heartbeat = window.setInterval(() => {
       if (document.hidden) return;
       if (video.paused || video.ended || video.readyState < 2) resetAndRecoverVideo();
-    }, isTouch ? 7200 : 2400);
+    }, 2400);
 
     video.addEventListener("loadeddata", markReady);
     video.addEventListener("canplay", markReady);
@@ -408,7 +405,7 @@ const ReliableHeroVideo = () => {
         muted
         loop
         playsInline
-        preload={isTouchRuntime() ? "metadata" : "auto"}
+        preload="auto"
         disablePictureInPicture
         controlsList="nodownload noplaybackrate noremoteplayback"
       />

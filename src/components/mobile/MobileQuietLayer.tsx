@@ -144,9 +144,9 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
           src={card.imageSrc}
           alt=""
           className="h-full w-full object-cover saturate-[1.04]"
-          loading={index === 0 ? "eager" : "lazy"}
+          loading="eager"
           decoding="async"
-          fetchpriority={index === 0 ? "high" : "auto"}
+          fetchpriority="high"
           animate={{ scale: pressed ? 1.05 : 1 }}
           transition={{ type: "spring", stiffness: 260, damping: 24 }}
         />
@@ -180,7 +180,7 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
 
   useEffect(() => {
     const preloadLinks: HTMLLinkElement[] = [];
-    cards.slice(0, 1).forEach(({ imageSrc }) => {
+    cards.forEach(({ imageSrc }) => {
       if (!imageSrc) return;
 
       const image = new Image();

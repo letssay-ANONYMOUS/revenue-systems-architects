@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { useEffect, lazy, Suspense, useState } from "react";
-import { AnimatePresence, MotionConfig, motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import PageTransition from "@/components/PageTransition";
 import SmoothScroll from "@/components/SmoothScroll";
 import FilmGrain from "@/components/FilmGrain";
@@ -19,11 +19,6 @@ const BookACall = lazy(() => import("./pages/BookACall"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient();
-
-const getIsTouchDevice = () => (
-  typeof window !== "undefined" &&
-  (window.matchMedia("(hover: none) and (pointer: coarse)").matches || "ontouchstart" in window)
-);
 
 const BrandLoadingScreen = () => (
   <motion.div
@@ -88,7 +83,7 @@ function InitialLoader() {
   useEffect(() => {
     let hideTimer = 0;
     let removeTimer = 0;
-    const showMinimum = getIsTouchDevice() ? 420 : 1050;
+    const showMinimum = 1050;
     const startedAt = performance.now();
     const finish = () => {
       window.clearTimeout(hideTimer);
@@ -174,30 +169,20 @@ const PageRouteFallback = () => (
   </div>
 );
 
-const App = () => {
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
-
-  useEffect(() => {
-    setIsTouchDevice(getIsTouchDevice());
-  }, []);
-
-  return (
-    <MotionConfig reducedMotion={isTouchDevice ? "always" : "user"}>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <SmoothScroll />
-          {!isTouchDevice && <FilmGrain />}
-          <BrowserRouter>
-            <InitialLoader />
-            <ScrollToTop />
-            <AnimatedRoutes />
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </MotionConfig>
-  );
-};
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <SmoothScroll />
+      <FilmGrain />
+      <BrowserRouter>
+        <InitialLoader />
+        <ScrollToTop />
+        <AnimatedRoutes />
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
 
 export default App;
