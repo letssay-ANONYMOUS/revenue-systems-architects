@@ -1146,7 +1146,7 @@ const HeroScrollTransition = () => {
   return (
     <section
       ref={transitionRef}
-      className="relative hidden h-[108svh] overflow-hidden bg-white md:block"
+      className="relative hidden h-[100svh] min-h-screen overflow-hidden bg-white md:block"
       aria-label="Scroll transition"
     >
       <motion.div
@@ -1244,7 +1244,7 @@ const Index = () => {
       <Navbar />
 
       {/* HERO — immediate, no lazy loading */}
-      <section ref={heroRef} className="mobile-stable-hero relative touch-pan-y overflow-hidden bg-black">
+      <section ref={heroRef} className="mobile-stable-hero relative touch-pan-y overflow-hidden bg-[#f7f9fc]">
         <ReliableHeroVideo />
 
         <div className="pointer-events-none absolute inset-x-0 top-0 h-[100svh] min-h-screen pt-20 md:pt-0">

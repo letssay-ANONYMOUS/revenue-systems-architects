@@ -31,13 +31,13 @@ const CTASection = ({
     : [headline];
 
   return (
-    <section ref={sectionRef} className="relative flex min-h-[132svh] items-center overflow-hidden bg-[#f6f8fb] py-24 text-[#07101f] md:min-h-[145svh] md:py-40">
+    <section ref={sectionRef} className="relative flex min-h-[100svh] items-center overflow-hidden bg-[#f6f8fb] py-20 text-[#07101f] md:py-28">
       <SeamlessCTAVideo />
 
       <div className="relative z-10 mx-auto w-full max-w-[1340px] px-5 md:section-padding">
         <SectionReveal>
           <motion.div
-            className="relative isolate mx-auto flex min-h-[520px] flex-col items-center justify-center overflow-visible px-7 py-12 text-center md:min-h-[620px] md:px-16 md:py-20 lg:px-20"
+            className="relative isolate mx-auto flex min-h-[440px] flex-col items-center justify-center overflow-visible px-7 py-10 text-center md:min-h-[520px] md:px-16 md:py-16 lg:px-20"
             style={{
               y: cardY,
               scale: cardScale,
@@ -46,9 +46,9 @@ const CTASection = ({
               transformStyle: "preserve-3d",
             }}
           >
-          <div className="relative z-20 flex min-h-[420px] flex-col items-center justify-center md:min-h-[480px]">
+          <div className="relative z-20 flex min-h-[360px] flex-col items-center justify-center md:min-h-[420px]">
             <h2
-              className="mb-6 max-w-5xl font-['Cormorant_Garamond'] text-[3.35rem] font-bold leading-[0.84] tracking-normal text-[#07101f] sm:text-[4.2rem] md:mb-8 md:text-[6.15rem] lg:text-[7.05rem]"
+              className="mb-6 max-w-5xl font-['Cormorant_Garamond'] text-[3.35rem] font-bold leading-[0.84] tracking-normal text-[#07101f] sm:text-[4.2rem] md:mb-8 md:text-[5.3rem] lg:text-[6.2rem] xl:text-[7.05rem]"
               aria-label={headline}
             >
               {headlineLines.map((line, index) => (
@@ -195,7 +195,6 @@ const SeamlessCTAVideo = () => {
 
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
-      <div className="sticky top-0 h-[100svh] min-h-screen w-full overflow-hidden">
       <video
         ref={primaryRef}
         className={`${videoClass} ${activeLayer === 0 ? "opacity-100" : "opacity-0"}`}
@@ -221,7 +220,6 @@ const SeamlessCTAVideo = () => {
       >
         <source src={CTA_VIDEO_SRC} type="video/mp4" />
       </video>
-      </div>
     </div>
   );
 };
