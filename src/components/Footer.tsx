@@ -1,4 +1,4 @@
-import { ArrowRight, Mail, Phone } from "lucide-react";
+import { Mail, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const contactLinks = [
@@ -34,13 +34,6 @@ const Footer = () => {
             <p className="mt-5 max-w-sm text-sm leading-relaxed text-[#314052]/78 md:text-base">
               AI systems, conversion websites, and automation built to answer faster, capture more demand, and keep operations moving.
             </p>
-            <Link
-              to="/book-a-call"
-              className="mt-7 inline-flex items-center gap-3 rounded-full bg-[#101831] px-5 py-3 text-xs font-semibold uppercase tracking-[0.16em] text-white shadow-[0_16px_38px_rgba(16,24,49,0.18)] transition-transform duration-300 hover:-translate-y-0.5 active:scale-95"
-            >
-              Book a Call
-              <ArrowRight className="h-4 w-4" />
-            </Link>
           </div>
 
           <div>

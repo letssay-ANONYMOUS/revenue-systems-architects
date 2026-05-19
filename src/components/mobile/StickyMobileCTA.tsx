@@ -5,28 +5,17 @@ import { ArrowRight, X, Phone } from "lucide-react";
 
 const StickyMobileCTA = () => {
   const location = useLocation();
-  const [visible, setVisible] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
     setDismissed(false);
   }, [location.pathname]);
 
-  useEffect(() => {
-    if (location.pathname === "/book-a-call") return;
-    const onScroll = () => {
-      setVisible(window.scrollY > window.innerHeight * 0.35);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [location.pathname]);
-
   if (location.pathname === "/book-a-call") return null;
 
   return (
     <AnimatePresence>
-      {visible && !dismissed && (
+      {!dismissed && (
         <motion.div
           className="pointer-events-none fixed inset-x-0 bottom-0 z-[1350] flex justify-center px-4 pb-[calc(0.9rem+env(safe-area-inset-bottom))] md:hidden"
           initial={{ y: 120, opacity: 0 }}
