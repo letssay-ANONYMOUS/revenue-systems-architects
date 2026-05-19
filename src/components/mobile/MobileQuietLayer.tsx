@@ -175,6 +175,8 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
 const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
   const trackRef = useRef<HTMLDivElement>(null);
   const settleTimerRef = useRef(0);
+  const intendedTargetRef = useRef<number | null>(null);
+  const intendedTargetTimerRef = useRef(0);
   const touchingRef = useRef(false);
   const touchStartRef = useRef<{ x: number; y: number; left: number; t: number } | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
@@ -193,11 +195,28 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
     [cards.length, getCardStride],
   );
 
+  const settleTo = useCallback(
+    (index: number, delay = 24) => {
+      const target = Math.max(0, Math.min(cards.length - 1, index));
+      intendedTargetRef.current = target;
+      setActiveIndex(target);
+      window.clearTimeout(settleTimerRef.current);
+      window.clearTimeout(intendedTargetTimerRef.current);
+      settleTimerRef.current = window.setTimeout(() => scrollTo(target), delay);
+      intendedTargetTimerRef.current = window.setTimeout(() => {
+        intendedTargetRef.current = null;
+      }, 760);
+    },
+    [cards.length, scrollTo],
+  );
+
   const steerToNearest = useCallback(() => {
     const el = trackRef.current;
     if (!el || touchingRef.current) return;
     const cardStride = getCardStride(el);
-    const nearest = Math.max(0, Math.min(cards.length - 1, Math.round(el.scrollLeft / cardStride)));
+    const intendedTarget = intendedTargetRef.current;
+    const nearest =
+      intendedTarget ?? Math.max(0, Math.min(cards.length - 1, Math.round(el.scrollLeft / cardStride)));
     const targetLeft = nearest * cardStride;
     if (Math.abs(el.scrollLeft - targetLeft) > 3) {
       el.scrollTo({ left: targetLeft, behavior: "smooth" });
@@ -248,6 +267,7 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
       el.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(raf);
       window.clearTimeout(settleTimerRef.current);
+      window.clearTimeout(intendedTargetTimerRef.current);
     };
   }, [cards.length, getCardStride, steerToNearest]);
 
@@ -256,6 +276,8 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
     const touch = event.touches[0];
     if (!el || !touch) return;
     window.clearTimeout(settleTimerRef.current);
+    window.clearTimeout(intendedTargetTimerRef.current);
+    intendedTargetRef.current = null;
     touchingRef.current = true;
     touchStartRef.current = { x: touch.clientX, y: touch.clientY, left: el.scrollLeft, t: performance.now() };
   };
@@ -266,7 +288,7 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
     touchingRef.current = false;
     touchStartRef.current = null;
     if (!el || !start) {
-      settleTimerRef.current = window.setTimeout(steerToNearest, 140);
+      settleTimerRef.current = window.setTimeout(steerToNearest, 90);
       return;
     }
 
@@ -281,16 +303,15 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
     const isHorizontal = Math.abs(dx) > 22 && Math.abs(dx) > Math.abs(dy) * 1.05;
 
     if (!isHorizontal) {
-      settleTimerRef.current = window.setTimeout(steerToNearest, 140);
+      settleTimerRef.current = window.setTimeout(steerToNearest, 90);
       return;
     }
 
     const direction = dx < 0 ? 1 : -1;
-    const hardSwipe = speed > 0.95 || Math.abs(dx) > el.clientWidth * 0.46;
-    const step = hardSwipe ? 2 : 1;
+    const veryStrongSwipe = speed > 1.55 || Math.abs(dx) > el.clientWidth * 0.62;
+    const step = veryStrongSwipe ? 2 : 1;
     const targetIndex = Math.max(0, Math.min(cards.length - 1, startIndex + direction * step));
-    setActiveIndex(targetIndex);
-    settleTimerRef.current = window.setTimeout(() => scrollTo(targetIndex), hardSwipe ? 90 : 120);
+    settleTo(targetIndex, veryStrongSwipe ? 18 : 34);
   };
 
   return (
@@ -335,7 +356,7 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
         onTouchCancel={() => {
           touchingRef.current = false;
           touchStartRef.current = null;
-          settleTimerRef.current = window.setTimeout(steerToNearest, 140);
+          settleTimerRef.current = window.setTimeout(steerToNearest, 90);
         }}
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}

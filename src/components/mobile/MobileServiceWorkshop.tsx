@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValue, useSpring, useReducedMotion } from "framer-motion";
-import { Link } from "react-router-dom";
 import { Phone, Bot, Globe, ArrowRight, CheckCircle2, Send, CalendarCheck, Pause, Play } from "lucide-react";
 
 type Service = {
@@ -11,10 +10,12 @@ type Service = {
   Icon: React.ComponentType<{ className?: string }>;
 };
 
+const SITE_URL = "https://www.sterk.systems";
+
 const services: Service[] = [
-  { key: "call", label: "AI Calls", title: "Answers every call.", href: "/book-a-call", Icon: Phone },
-  { key: "chat", label: "Chatbots", title: "Replies instantly.", href: "/book-a-call", Icon: Bot },
-  { key: "web", label: "Websites", title: "Built to convert.", href: "/book-a-call", Icon: Globe },
+  { key: "call", label: "AI Calls", title: "Answers every call.", href: SITE_URL, Icon: Phone },
+  { key: "chat", label: "Chatbots", title: "Replies instantly.", href: SITE_URL, Icon: Bot },
+  { key: "web", label: "Websites", title: "Built to convert.", href: SITE_URL, Icon: Globe },
 ];
 
 const Waveform = () => (
@@ -183,7 +184,7 @@ const WebScene = () => {
         <span className="h-2 w-2 rounded-full bg-[#8fb4ff]/70" />
         <span className="h-2 w-2 rounded-full bg-emerald-400/70" />
         <div className="ml-2 flex-1 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[8px] text-white/45">
-          yourbrand.com
+          sterk.systems
         </div>
       </div>
       <motion.div
@@ -576,13 +577,13 @@ const MobileServiceWorkshop = () => {
         </div>
 
         {/* Single CTA */}
-        <Link
-          to={service.href}
+        <a
+          href={service.href}
           className="mt-6 flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/10 px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-white backdrop-blur transition-colors active:bg-white/20"
         >
           Explore {service.label}
           <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
+        </a>
       </div>
     </section>
   );
