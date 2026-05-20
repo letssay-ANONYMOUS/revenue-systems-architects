@@ -178,6 +178,12 @@
     box-shadow: 0 0 18px rgba(20, 71, 212, 0.34);
   }
 
+  .mobile-performance-surface {
+    transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+
   .sterk-system-thread {
     position: fixed;
     inset: 0;
@@ -750,6 +756,20 @@
       0 4px 13px rgba(15, 31, 69, 0.16);
     -webkit-text-stroke: 0.72px rgba(255, 255, 255, 0.32);
     filter: drop-shadow(0 14px 18px rgba(20, 54, 116, 0.12));
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  button,
+  a,
+  [role="button"],
+  [data-native-press] {
+    touch-action: manipulation;
+  }
+
+  .mobile-performance-surface {
+    contain: paint;
+    will-change: transform, opacity;
   }
 }
 

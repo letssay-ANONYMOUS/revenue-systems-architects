@@ -260,6 +260,8 @@ const MobileServiceWorkshop = () => {
   const [paused, setPaused] = useState(false);
   const reduceMotion = useReducedMotion();
   const phoneWrapRef = useRef<HTMLDivElement>(null);
+  const orientationFrameRef = useRef(0);
+  const orientationRef = useRef({ x: 0, y: 0 });
 
   // Scroll-driven tilt
   const { scrollYProgress } = useScroll({
@@ -278,14 +280,22 @@ const MobileServiceWorkshop = () => {
   useEffect(() => {
     if (reduceMotion) return;
     const handler = (e: DeviceOrientationEvent) => {
-      // gamma: left-right (-90..90), beta: front-back (-180..180)
       const g = Math.max(-30, Math.min(30, e.gamma ?? 0));
       const b = Math.max(-30, Math.min(30, (e.beta ?? 0) - 30));
-      gyroY.set(g * 0.25);
-      gyroX.set(-b * 0.18);
+      orientationRef.current = { x: -b * 0.18, y: g * 0.25 };
+      if (orientationFrameRef.current) return;
+
+      orientationFrameRef.current = window.requestAnimationFrame(() => {
+        gyroX.set(orientationRef.current.x);
+        gyroY.set(orientationRef.current.y);
+        orientationFrameRef.current = 0;
+      });
     };
     window.addEventListener("deviceorientation", handler);
-    return () => window.removeEventListener("deviceorientation", handler);
+    return () => {
+      window.removeEventListener("deviceorientation", handler);
+      if (orientationFrameRef.current) window.cancelAnimationFrame(orientationFrameRef.current);
+    };
   }, [gyroX, gyroY, reduceMotion]);
 
   const rotateY = useTransform([scrollRotY, gyroYSpring], ([s, g]: number[]) => s + g);
@@ -336,7 +346,7 @@ const MobileServiceWorkshop = () => {
         {/* Phone frame — realistic */}
         <motion.div
           ref={phoneWrapRef}
-          className="relative mx-auto mb-5 w-full max-w-[290px]"
+          className="mobile-performance-surface relative mx-auto mb-5 w-full max-w-[290px]"
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.15}

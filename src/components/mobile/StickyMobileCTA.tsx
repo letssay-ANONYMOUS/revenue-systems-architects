@@ -17,7 +17,7 @@ const StickyMobileCTA = () => {
     <AnimatePresence>
       {!dismissed && (
         <motion.div
-          className="pointer-events-none fixed inset-x-0 bottom-0 z-[1350] flex justify-center px-4 pb-[calc(0.9rem+env(safe-area-inset-bottom))] md:hidden"
+          className="mobile-performance-surface pointer-events-none fixed inset-x-0 bottom-0 z-[1350] flex justify-center px-4 pb-[calc(0.9rem+env(safe-area-inset-bottom))] md:hidden"
           initial={{ y: 120, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 120, opacity: 0 }}
