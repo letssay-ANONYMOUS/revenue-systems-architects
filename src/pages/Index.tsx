@@ -104,7 +104,7 @@ const AnimatedHeroHeadline = () => {
   return (
     <h1
       aria-label="Your Business, Answered. Automated. Accelerated."
-      className="hero-floating-copy-edge font-['Cormorant_Garamond'] text-[2.7rem] font-semibold leading-[0.86] tracking-normal text-[#07101f] sm:text-[3.15rem] md:text-[3.85rem] lg:text-[4.25rem] xl:text-[4.85rem]"
+      className="hero-floating-copy-edge font-['Cormorant_Garamond'] text-[2.7rem] font-semibold leading-[0.86] tracking-normal text-[#07101f] sm:text-[3.15rem] md:text-[3.35rem] lg:text-[3.65rem] xl:text-[4.85rem]"
       style={{ perspective: "600px" }}
     >
       {heroHeadlineLines.map((line) => (
@@ -1256,7 +1256,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background relative">
       <div className="aurora-bg" />
-      <div className="sterk-system-thread hidden md:block" aria-hidden="true" />
+      <div className="sterk-system-thread hidden xl:block" aria-hidden="true" />
       <Navbar />
 
       {/* HERO — immediate, no lazy loading */}
@@ -1264,31 +1264,31 @@ const Index = () => {
         <ReliableHeroVideo />
 
         <div className="pointer-events-none absolute inset-x-0 top-0 h-[100svh] min-h-screen pt-20 md:pt-0">
-          <div className="mx-auto flex h-full max-w-[1480px] items-end justify-center px-4 pb-10 sm:px-6 md:items-end md:justify-end md:px-6 md:pb-[13vh] lg:px-8 lg:pb-[12vh] xl:translate-x-8 xl:pb-[8vh] 2xl:translate-x-12">
+          <div className="mx-auto flex h-full max-w-[1480px] items-end justify-center px-4 pb-10 sm:px-6 md:items-end md:justify-end md:px-8 md:pb-[9vh] lg:px-10 lg:pb-[8vh] xl:translate-x-8 xl:px-8 xl:pb-[8vh] 2xl:translate-x-12">
             <motion.div
               initial={{ opacity: 0, y: 18, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="pointer-events-auto w-full max-w-[370px] sm:max-w-[430px] md:max-w-[500px] lg:max-w-[540px] xl:max-w-[600px]"
+              className="pointer-events-auto w-full max-w-[370px] sm:max-w-[430px] md:max-w-[440px] lg:max-w-[470px] xl:max-w-[600px]"
             >
-              <div className="mb-5 inline-flex items-center gap-3 rounded-full border border-white/55 bg-white/55 px-3.5 py-2 shadow-[0_16px_50px_rgba(11,31,79,0.13),inset_0_1px_0_rgba(255,255,255,0.86)] backdrop-blur-2xl md:mb-8 md:px-4">
+              <div className="mb-5 inline-flex items-center gap-2.5 rounded-full border border-white/55 bg-white/55 px-3 py-2 shadow-[0_16px_50px_rgba(11,31,79,0.13),inset_0_1px_0_rgba(255,255,255,0.86)] backdrop-blur-2xl md:mb-5 md:px-3.5 xl:mb-8 xl:gap-3 xl:px-4">
                 <span className="hero-signal-dot relative flex h-3 w-3 items-center justify-center">
                   <span className="hero-signal-ring hero-signal-ring-1" />
                   <span className="hero-signal-core" />
                 </span>
                 <span className="h-px w-9 bg-gradient-to-r from-[#1447d4]/45 to-transparent" />
-                <p className="text-[9px] font-semibold uppercase tracking-[0.28em] text-foreground/70 sm:text-[10px] md:tracking-[0.36em]">
+                <p className="text-[9px] font-semibold uppercase tracking-[0.28em] text-foreground/70 sm:text-[10px] md:tracking-[0.3em] xl:tracking-[0.36em]">
                   AI Automation Studio
                 </p>
               </div>
 
               <AnimatedHeroHeadline />
 
-              <p className="hero-floating-body-edge mt-4 hidden max-w-[34rem] text-xs leading-relaxed text-muted-foreground sm:text-sm md:mt-6 md:block md:text-base">
+              <p className="hero-floating-body-edge mt-4 hidden max-w-[34rem] text-xs leading-relaxed text-muted-foreground sm:text-sm md:mt-5 md:block md:text-[0.95rem] xl:mt-6 xl:text-base">
                 AI agents, chatbots, websites and automation that capture leads, book appointments, and run your operations.
               </p>
 
-              <div className="mt-5 hidden flex-wrap gap-2 md:flex">
+              <div className="mt-4 hidden flex-wrap gap-2 xl:flex">
                 {operationalChips.map((chip) => (
                   <span key={chip} className="sterk-status-chip">
                     {chip}
@@ -1298,14 +1298,14 @@ const Index = () => {
 
               <MobileHeroExtras />
 
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center md:mt-8 md:gap-4">
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center md:mt-6 md:gap-4 xl:mt-8">
                 <Link to="/book-a-call" className="premium-btn inline-flex items-center justify-center gap-3 rounded-full px-6 py-3 text-[11px] md:px-7 md:py-4 md:text-xs">
                   Book a Call
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
 
-              <div className="hero-floating-body-edge mt-8 flex items-center gap-4 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground/48 md:text-xs md:tracking-[0.28em]">
+              <div className="hero-floating-body-edge mt-6 flex items-center gap-4 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground/48 md:text-[11px] md:tracking-[0.22em] xl:mt-8 xl:text-xs xl:tracking-[0.28em]">
                 <span className="h-px w-9 bg-foreground/16" />
                 <span>Built for businesses that want speed, clarity, and execution.</span>
               </div>

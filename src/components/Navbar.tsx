@@ -59,14 +59,14 @@ const Navbar = () => {
         }}
       >
         <div
-          className="mx-auto flex h-16 items-center justify-end md:h-[82px] lg:justify-center xl:justify-between"
+          className="mx-auto flex h-16 items-center justify-end md:h-[82px] xl:justify-between"
           style={{ maxWidth: "1400px" }}
         >
           <div className="hidden w-[12rem] shrink-0 xl:block" aria-hidden="true" />
 
           {/* Center links — only this morphs into frosted pill */}
           <div
-            className={`hidden lg:flex items-center gap-1 transform-gpu ${scrolled ? "nav-glass" : "bg-transparent"}`}
+            className={`hidden xl:flex items-center gap-1 transform-gpu ${scrolled ? "nav-glass" : "bg-transparent"}`}
             style={{
               padding: scrolled ? "13px 38px" : "8px 14px",
               borderRadius: scrolled ? "9999px" : "14px",
@@ -103,7 +103,7 @@ const Navbar = () => {
 
           <button
             type="button"
-            className="relative z-[1300] -mr-1 flex h-12 w-12 items-center justify-center rounded-full border border-white/70 bg-white/68 text-foreground shadow-[0_16px_42px_rgba(20,32,50,0.13),inset_0_1px_0_rgba(255,255,255,0.96)] backdrop-blur-2xl transition-transform duration-200 active:scale-95 lg:hidden"
+            className="relative z-[1300] -mr-1 flex h-12 w-12 items-center justify-center rounded-full border border-white/70 bg-white/68 text-foreground shadow-[0_16px_42px_rgba(20,32,50,0.13),inset_0_1px_0_rgba(255,255,255,0.96)] backdrop-blur-2xl transition-transform duration-200 active:scale-95 xl:hidden"
             onPointerDown={(event) => {
               event.preventDefault();
               setMobileOpen((open) => !open);
@@ -126,7 +126,7 @@ const Navbar = () => {
             animate={{ opacity: 1, filter: "blur(0px)" }}
             exit={{ opacity: 0, filter: "blur(10px)" }}
             transition={{ duration: 0.34, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-[1400] flex flex-col overflow-hidden bg-[#f8fafc]/96 backdrop-blur-2xl lg:hidden"
+            className="fixed inset-0 z-[1400] flex flex-col overflow-hidden bg-[#f8fafc]/96 backdrop-blur-2xl xl:hidden"
         >
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_22%_0%,rgba(255,255,255,0.96),transparent_38%),radial-gradient(ellipse_at_80%_18%,rgba(199,216,255,0.42),transparent_38%),linear-gradient(180deg,#ffffff_0%,#f7faff_48%,#edf3f9_100%)]" />
             <div
