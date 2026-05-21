@@ -773,6 +773,32 @@
   }
 }
 
+.is-android {
+  scroll-behavior: smooth;
+}
+
+.is-android .android-snap-proximity {
+  scroll-snap-type: x proximity;
+}
+
+.is-android .mobile-performance-surface {
+  contain: layout paint;
+  transform: translate3d(0, 0, 0);
+}
+
+.is-android .android-lite-glass {
+  backdrop-filter: blur(14px) saturate(1.18) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.18) !important;
+}
+
+.is-android .android-no-filter {
+  filter: none !important;
+}
+
+.is-android .film-grain {
+  display: none;
+}
+
 @layer utilities {
   .delay-100 { animation-delay: 100ms; }
   .delay-200 { animation-delay: 200ms; }
@@ -882,6 +908,22 @@
     1px 0 0 rgba(255, 255, 255, 0.62),
     -1px 0 0 rgba(255, 255, 255, 0.58),
     0 12px 30px rgba(255, 255, 255, 0.22),
+    0 22px 60px rgba(255, 255, 255, 0.16);
+}
+
+.is-android .hero-floating-copy-edge,
+.is-samsung-browser .hero-floating-copy-edge {
+  -webkit-text-stroke: 0.42px rgba(255, 255, 255, 0.74);
+  paint-order: stroke fill;
+  text-shadow:
+    0 0 0.75px rgba(255, 255, 255, 1),
+    0 1px 0 rgba(255, 255, 255, 0.94),
+    0 -1px 0 rgba(255, 255, 255, 0.8),
+    1px 0 0 rgba(255, 255, 255, 0.82),
+    -1px 0 0 rgba(255, 255, 255, 0.82),
+    1px 1px 0 rgba(255, 255, 255, 0.62),
+    -1px 1px 0 rgba(255, 255, 255, 0.58),
+    0 13px 30px rgba(255, 255, 255, 0.24),
     0 22px 60px rgba(255, 255, 255, 0.16);
 }
 

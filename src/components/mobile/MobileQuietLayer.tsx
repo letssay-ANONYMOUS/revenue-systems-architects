@@ -81,7 +81,7 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
     pointerStartRef.current = null;
     setPressed(false);
     if (shouldOpen) openingRef.current = true;
-    await controls.start({
+    const release = controls.start({
       scale: 1,
       y: 0,
       rotateX: 0,
@@ -92,12 +92,13 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
       onOpen();
       openingRef.current = false;
     }
+    await release;
   };
 
   return (
     <motion.article
       ref={articleRef as React.RefObject<HTMLElement>}
-      className="mobile-performance-surface group relative w-[86vw] shrink-0 snap-start cursor-pointer overflow-hidden rounded-[1.55rem] border border-white/55 bg-white/40 p-2.5 text-left shadow-[0_30px_70px_rgba(20,29,38,0.18),inset_0_1px_0_rgba(255,255,255,0.78)] backdrop-blur-2xl"
+      className="mobile-performance-surface android-lite-glass group relative w-[86vw] shrink-0 snap-start cursor-pointer overflow-hidden rounded-[1.55rem] border border-white/55 bg-white/40 p-2.5 text-left shadow-[0_30px_70px_rgba(20,29,38,0.18),inset_0_1px_0_rgba(255,255,255,0.78)] backdrop-blur-2xl"
       initial={{ opacity: 0, y: 60, scale: 0.92 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-15% 0px" }}
@@ -128,7 +129,7 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
 
       {/* Press glow ring */}
       <motion.div
-        className="pointer-events-none absolute -inset-1 rounded-[1.7rem]"
+        className="android-no-filter pointer-events-none absolute -inset-1 rounded-[1.7rem]"
         animate={{ opacity: pressed ? 1 : 0 }}
         transition={{ duration: 0.18 }}
         style={{
@@ -350,7 +351,7 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
       {/* Horizontal scroller */}
       <motion.div
         ref={trackRef}
-        className="mobile-performance-surface relative z-10 flex snap-x snap-mandatory scroll-smooth gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain px-[7vw] pb-8 pt-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        className="mobile-performance-surface android-snap-proximity relative z-10 flex snap-x snap-mandatory scroll-smooth gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain px-[7vw] pb-8 pt-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onTouchCancel={() => {
@@ -434,7 +435,7 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
     >
       <motion.div
         aria-hidden="true"
-        className="absolute inset-0 bg-[#07101f]/40"
+        className="android-no-filter absolute inset-0 bg-[#07101f]/40"
         initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
         animate={{ opacity: 1, backdropFilter: "blur(8px)" }}
         exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
@@ -443,7 +444,7 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
       />
 
       <motion.div
-        className="zoom-safe relative max-h-[92svh] w-full overflow-y-auto rounded-t-[1.8rem] border-t border-white/70 bg-white/85 p-5 pb-[calc(2rem+env(safe-area-inset-bottom))] text-[#111827] shadow-[0_-30px_80px_rgba(10,18,30,0.32),inset_0_1px_0_rgba(255,255,255,0.95)] backdrop-blur-2xl"
+        className="zoom-safe android-lite-glass relative max-h-[92svh] w-full overflow-y-auto rounded-t-[1.8rem] border-t border-white/70 bg-white/85 p-5 pb-[calc(2rem+env(safe-area-inset-bottom))] text-[#111827] shadow-[0_-30px_80px_rgba(10,18,30,0.32),inset_0_1px_0_rgba(255,255,255,0.95)] backdrop-blur-2xl"
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}

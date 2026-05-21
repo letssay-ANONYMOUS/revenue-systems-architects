@@ -24,7 +24,7 @@ const StickyMobileCTA = () => {
           transition={{ type: "spring", stiffness: 320, damping: 30, mass: 0.7 }}
         >
           <div
-            className="pointer-events-auto relative flex w-full max-w-[28rem] items-center gap-2 overflow-hidden rounded-full border border-white/65 bg-white/55 p-1.5 pl-3 shadow-[0_24px_60px_rgba(11,31,79,0.28),inset_0_1px_0_rgba(255,255,255,0.95),inset_0_-2px_8px_rgba(17,24,39,0.06)] backdrop-blur-2xl"
+            className="android-lite-glass pointer-events-auto relative flex w-full max-w-[28rem] items-center gap-2 overflow-hidden rounded-full border border-white/65 bg-white/55 p-1.5 pl-3 shadow-[0_24px_60px_rgba(11,31,79,0.28),inset_0_1px_0_rgba(255,255,255,0.95),inset_0_-2px_8px_rgba(17,24,39,0.06)] backdrop-blur-2xl"
             style={{ backdropFilter: "blur(28px) saturate(170%)", WebkitBackdropFilter: "blur(28px) saturate(170%)" }}
           >
             {/* Animated breathing hairline on top edge */}
@@ -41,7 +41,7 @@ const StickyMobileCTA = () => {
             />
             {/* Slow shimmer */}
             <motion.div
-              className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 rotate-12 rounded-full bg-gradient-to-r from-transparent via-white/40 to-transparent blur-sm"
+              className="android-no-filter pointer-events-none absolute inset-y-0 -left-1/3 w-1/3 rotate-12 rounded-full bg-gradient-to-r from-transparent via-white/40 to-transparent blur-sm"
               animate={{ x: ["0%", "420%"] }}
               transition={{ duration: 4.2, repeat: Infinity, ease: [0.16, 1, 0.3, 1], repeatDelay: 1.6 }}
             />

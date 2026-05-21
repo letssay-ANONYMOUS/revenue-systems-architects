@@ -2,6 +2,14 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      (function () {
+        var ua = navigator.userAgent || "";
+        var root = document.documentElement;
+        if (/Android/i.test(ua)) root.classList.add("is-android");
+        if (/SamsungBrowser/i.test(ua)) root.classList.add("is-samsung-browser");
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>STERK.systems — AI Automation Studio for Business</title>
     <meta name="description" content="We build AI calling agents, chatbots, websites, and automation systems that help businesses capture more leads, book more appointments, and operate better.">

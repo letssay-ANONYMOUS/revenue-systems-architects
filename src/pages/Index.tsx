@@ -582,6 +582,9 @@ const WebsiteShowcaseCarousel = () => {
   const selectedWebsite = selectedWebsiteIndex === null ? null : websiteShowcases[selectedWebsiteIndex];
   const selectedWebsiteImageSrc = selectedWebsiteDevice === "phone" ? selectedWebsite?.phoneImageSrc : selectedWebsite?.imageSrc;
   const activePhoneImageSrc = active.phoneImageSrc ?? active.imageSrc;
+  const isAndroidMotion =
+    typeof document !== "undefined" && document.documentElement.classList.contains("is-android");
+  const androidSafeFilter = (filter: string) => (isAndroidMotion ? "none" : filter);
   const showPrevious = () => setActiveSlide(([current]) => [(current - 1 + websiteShowcases.length) % websiteShowcases.length, -1]);
   const showNext = () => setActiveSlide(([current]) => [(current + 1) % websiteShowcases.length, 1]);
   const showSlide = (index: number) => {
@@ -638,7 +641,7 @@ const WebsiteShowcaseCarousel = () => {
       scale: 0.68,
       rotateY: travelDirection >= 0 ? -18 : 18,
       rotateZ: travelDirection >= 0 ? 1.8 : -1.8,
-      filter: "blur(18px)",
+      filter: androidSafeFilter("blur(18px)"),
       transformOrigin: travelDirection >= 0 ? "100% 50%" : "0% 50%",
     }),
     center: (travelDirection: number) => ({
@@ -647,11 +650,11 @@ const WebsiteShowcaseCarousel = () => {
       scale: 1,
       rotateY: 0,
       rotateZ: 0,
-      filter: "blur(0px)",
+      filter: androidSafeFilter("blur(0px)"),
       transformOrigin: "50% 50%",
       transition: {
         delay: travelDirection === 0 ? 0 : 0.22,
-        duration: 0.98,
+        duration: isAndroidMotion ? 0.64 : 0.98,
         ease: [0.16, 1, 0.3, 1],
       },
     }),
@@ -661,10 +664,10 @@ const WebsiteShowcaseCarousel = () => {
       scale: 0.62,
       rotateY: travelDirection >= 0 ? 16 : -16,
       rotateZ: travelDirection >= 0 ? -2.2 : 2.2,
-      filter: "blur(16px)",
+      filter: androidSafeFilter("blur(16px)"),
       transformOrigin: travelDirection >= 0 ? "0% 50%" : "100% 50%",
       transition: {
-        duration: 0.68,
+        duration: isAndroidMotion ? 0.44 : 0.68,
         ease: [0.55, 0, 0.1, 1],
       },
     }),
@@ -675,15 +678,15 @@ const WebsiteShowcaseCarousel = () => {
       x: travelDirection >= 0 ? "46%" : "-46%",
       opacity: 0,
       scale: 0.975,
-      filter: "blur(12px)",
+      filter: androidSafeFilter("blur(12px)"),
     }),
     center: {
       x: "0%",
       opacity: 1,
       scale: 1,
-      filter: "blur(0px)",
+      filter: androidSafeFilter("blur(0px)"),
       transition: {
-        duration: 0.72,
+        duration: isAndroidMotion ? 0.48 : 0.72,
         ease: [0.16, 1, 0.3, 1],
       },
     },
@@ -691,9 +694,9 @@ const WebsiteShowcaseCarousel = () => {
       x: travelDirection >= 0 ? "-38%" : "38%",
       opacity: 0,
       scale: 0.985,
-      filter: "blur(9px)",
+      filter: androidSafeFilter("blur(9px)"),
       transition: {
-        duration: 0.48,
+        duration: isAndroidMotion ? 0.32 : 0.48,
         ease: [0.55, 0, 0.1, 1],
       },
     }),
@@ -703,12 +706,12 @@ const WebsiteShowcaseCarousel = () => {
     enter: (travelDirection: number) => ({
       y: travelDirection >= 0 ? 8 : -8,
       opacity: 0,
-      filter: "blur(6px)",
+      filter: androidSafeFilter("blur(6px)"),
     }),
     center: {
       y: 0,
       opacity: 1,
-      filter: "blur(0px)",
+      filter: androidSafeFilter("blur(0px)"),
       transition: {
         duration: 0.34,
         ease: [0.16, 1, 0.3, 1],
@@ -717,7 +720,7 @@ const WebsiteShowcaseCarousel = () => {
     exit: (travelDirection: number) => ({
       y: travelDirection >= 0 ? -8 : 8,
       opacity: 0,
-      filter: "blur(6px)",
+      filter: androidSafeFilter("blur(6px)"),
       transition: {
         duration: 0.22,
         ease: [0.55, 0, 0.1, 1],
@@ -729,10 +732,10 @@ const WebsiteShowcaseCarousel = () => {
     <>
       <div className="zoom-safe mb-10 flex justify-center overflow-visible py-2 md:mb-18">
         <div className="relative w-full max-w-[1240px]">
-          <div className="pointer-events-none absolute -inset-10 rounded-[3.5rem] bg-[radial-gradient(ellipse_at_50%_12%,rgba(255,255,255,0.96),transparent_44%),radial-gradient(ellipse_at_78%_46%,rgba(20,71,212,0.08),transparent_42%),radial-gradient(ellipse_at_18%_70%,rgba(213,170,90,0.08),transparent_38%)] blur-2xl" />
+          <div className="android-no-filter pointer-events-none absolute -inset-10 rounded-[3.5rem] bg-[radial-gradient(ellipse_at_50%_12%,rgba(255,255,255,0.96),transparent_44%),radial-gradient(ellipse_at_78%_46%,rgba(20,71,212,0.08),transparent_42%),radial-gradient(ellipse_at_18%_70%,rgba(213,170,90,0.08),transparent_38%)] blur-2xl" />
 
           <div className="relative z-20 mb-6 flex justify-center">
-            <div className="relative inline-flex rounded-full border border-white/78 bg-white/48 p-1 shadow-[0_18px_48px_rgba(20,32,50,0.13),inset_0_1px_0_rgba(255,255,255,0.96),inset_0_-10px_24px_rgba(17,24,39,0.05)] backdrop-blur-2xl backdrop-saturate-150">
+            <div className="android-lite-glass relative inline-flex rounded-full border border-white/78 bg-white/48 p-1 shadow-[0_18px_48px_rgba(20,32,50,0.13),inset_0_1px_0_rgba(255,255,255,0.96),inset_0_-10px_24px_rgba(17,24,39,0.05)] backdrop-blur-2xl backdrop-saturate-150">
               <div className="pointer-events-none absolute inset-0 rounded-full bg-[linear-gradient(135deg,rgba(255,255,255,0.92),rgba(255,255,255,0.18)_45%,rgba(20,71,212,0.07))]" />
               {(["desktop", "phone"] as const).map((view) => (
                 <button
@@ -762,10 +765,10 @@ const WebsiteShowcaseCarousel = () => {
             <motion.div
               key="desktop-website-preview"
               className="relative"
-              initial={{ opacity: 0, y: 18, scale: 0.985, filter: "blur(10px)" }}
-              animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-              exit={{ opacity: 0, y: -16, scale: 0.985, filter: "blur(10px)" }}
-              transition={{ duration: 0.46, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ opacity: 0, y: 18, scale: 0.985, filter: androidSafeFilter("blur(10px)") }}
+              animate={{ opacity: 1, y: 0, scale: 1, filter: androidSafeFilter("blur(0px)") }}
+              exit={{ opacity: 0, y: -16, scale: 0.985, filter: androidSafeFilter("blur(10px)") }}
+              transition={{ duration: isAndroidMotion ? 0.34 : 0.46, ease: [0.16, 1, 0.3, 1] }}
             >
               <motion.div
                 className="relative [perspective:1600px]"
@@ -787,7 +790,7 @@ const WebsiteShowcaseCarousel = () => {
                         willChange: "transform, opacity, filter",
                         backfaceVisibility: "hidden",
                       }}
-                      className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.65rem] border border-white/76 bg-white/58 p-2.5 text-left shadow-[0_38px_105px_rgba(24,38,60,0.15),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-1px_0_rgba(17,24,39,0.05)] backdrop-blur-2xl [transform-style:preserve-3d] md:rounded-[2rem] md:p-3"
+                      className="android-lite-glass pointer-events-none absolute inset-0 overflow-hidden rounded-[1.65rem] border border-white/76 bg-white/58 p-2.5 text-left shadow-[0_38px_105px_rgba(24,38,60,0.15),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-1px_0_rgba(17,24,39,0.05)] backdrop-blur-2xl [transform-style:preserve-3d] md:rounded-[2rem] md:p-3"
                     >
                       <div className="flex h-8 items-center justify-between border-b border-[#111827]/8 px-3 md:h-10 md:px-4">
                         <div className="flex items-center gap-1.5">
@@ -895,10 +898,10 @@ const WebsiteShowcaseCarousel = () => {
             <motion.div
               key="phone-website-preview"
               className="relative mx-auto flex w-full max-w-[390px] flex-col items-center justify-center px-3 pb-2 pt-1 sm:max-w-[430px] md:max-w-[470px] md:px-8"
-              initial={{ opacity: 0, y: 22, scale: 0.96, rotateY: -8, filter: "blur(12px)" }}
-              animate={{ opacity: 1, y: 0, scale: 1, rotateY: 0, filter: "blur(0px)" }}
-              exit={{ opacity: 0, y: -18, scale: 0.965, rotateY: 7, filter: "blur(12px)" }}
-              transition={{ duration: 0.54, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ opacity: 0, y: 22, scale: 0.96, rotateY: -8, filter: androidSafeFilter("blur(12px)") }}
+              animate={{ opacity: 1, y: 0, scale: 1, rotateY: 0, filter: androidSafeFilter("blur(0px)") }}
+              exit={{ opacity: 0, y: -18, scale: 0.965, rotateY: 7, filter: androidSafeFilter("blur(12px)") }}
+              transition={{ duration: isAndroidMotion ? 0.38 : 0.54, ease: [0.16, 1, 0.3, 1] }}
             >
               <motion.div
                 role="button"
@@ -908,7 +911,7 @@ const WebsiteShowcaseCarousel = () => {
                 onKeyDown={(event) => {
                   if (event.key === "Enter" || event.key === " ") openActivePreview("phone");
                 }}
-                className="group relative block w-full max-w-[332px] rounded-[2.6rem] border border-white/80 bg-white/62 p-3 text-left shadow-[0_46px_110px_rgba(24,38,60,0.2),inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-12px_28px_rgba(17,24,39,0.06)] backdrop-blur-2xl transition-transform duration-300 active:translate-y-0.5 active:scale-[0.985] sm:max-w-[365px] md:max-w-[335px]"
+                className="android-lite-glass group relative block w-full max-w-[332px] rounded-[2.6rem] border border-white/80 bg-white/62 p-3 text-left shadow-[0_46px_110px_rgba(24,38,60,0.2),inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-12px_28px_rgba(17,24,39,0.06)] backdrop-blur-2xl transition-transform duration-300 active:translate-y-0.5 active:scale-[0.985] sm:max-w-[365px] md:max-w-[335px]"
                 style={{ touchAction: "pan-x pan-y pinch-zoom" }}
               >
                 <div className="pointer-events-none absolute inset-0 rounded-[2.6rem] bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(255,255,255,0.16)_42%,rgba(20,71,212,0.08))]" />
@@ -1068,21 +1071,26 @@ const WebsiteShowcaseCarousel = () => {
                 aria-hidden="true"
                 className="absolute inset-0"
                 initial={{ opacity: 0, backdropFilter: "blur(0px)", WebkitBackdropFilter: "blur(0px)", backgroundColor: "rgba(248,250,252,0)" }}
-                animate={{ opacity: 1, backdropFilter: "blur(18px)", WebkitBackdropFilter: "blur(18px)", backgroundColor: "rgba(248,250,252,0.72)" }}
+                animate={{
+                  opacity: 1,
+                  backdropFilter: isAndroidMotion ? "blur(8px)" : "blur(18px)",
+                  WebkitBackdropFilter: isAndroidMotion ? "blur(8px)" : "blur(18px)",
+                  backgroundColor: "rgba(248,250,252,0.72)",
+                }}
                 exit={{ opacity: 0, backdropFilter: "blur(0px)", WebkitBackdropFilter: "blur(0px)", backgroundColor: "rgba(248,250,252,0)" }}
-                transition={{ duration: 0.84, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: isAndroidMotion ? 0.46 : 0.84, ease: [0.16, 1, 0.3, 1] }}
               />
               <motion.div
                 role="dialog"
                 aria-modal="true"
                 aria-label={`${selectedWebsite.title} full website preview`}
-                className={`zoom-safe relative z-10 flex max-h-[calc(100svh-1rem)] w-full flex-col overflow-hidden rounded-[1.95rem] border border-white/76 bg-white/64 p-2.5 shadow-[0_44px_130px_rgba(24,38,60,0.24),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-1px_0_rgba(17,24,39,0.06)] backdrop-blur-2xl md:rounded-[2.35rem] md:p-3 ${
+                className={`zoom-safe android-lite-glass relative z-10 flex max-h-[calc(100svh-1rem)] w-full flex-col overflow-hidden rounded-[1.95rem] border border-white/76 bg-white/64 p-2.5 shadow-[0_44px_130px_rgba(24,38,60,0.24),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-1px_0_rgba(17,24,39,0.06)] backdrop-blur-2xl md:rounded-[2.35rem] md:p-3 ${
                   selectedWebsiteDevice === "phone" ? "max-w-[min(97vw,560px)]" : "max-w-[min(98vw,1720px)]"
                 }`}
-                initial={{ y: "104%", opacity: 0, scale: 0.94, filter: "blur(16px)" }}
-                animate={{ y: 0, opacity: 1, scale: 1, filter: "blur(0px)" }}
-                exit={{ y: "112%", opacity: 0.98, scale: 0.98, filter: "blur(8px)" }}
-                transition={{ duration: 0.84, ease: [0.16, 1, 0.3, 1] }}
+                initial={{ y: "104%", opacity: 0, scale: 0.94, filter: androidSafeFilter("blur(16px)") }}
+                animate={{ y: 0, opacity: 1, scale: 1, filter: androidSafeFilter("blur(0px)") }}
+                exit={{ y: "112%", opacity: 0.98, scale: 0.98, filter: androidSafeFilter("blur(8px)") }}
+                transition={{ duration: isAndroidMotion ? 0.48 : 0.84, ease: [0.16, 1, 0.3, 1] }}
                 onClick={(event) => event.stopPropagation()}
               >
                 <div className="flex h-9 shrink-0 items-center justify-between border-b border-[#111827]/8 px-3 md:h-11 md:px-4">
