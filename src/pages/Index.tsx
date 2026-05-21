@@ -1313,9 +1313,15 @@ const Index = () => {
                 </Link>
               </div>
 
-              <div className="hero-floating-body-edge mt-6 flex items-center gap-4 text-[10px] font-semibold uppercase tracking-[0.22em] text-foreground/48 md:text-[11px] md:tracking-[0.22em] xl:mt-8 xl:text-xs xl:tracking-[0.28em]">
-                <span className="h-px w-9 bg-foreground/16" />
-                <span>Built for businesses that want speed, clarity, and execution.</span>
+              <div className="hero-floating-body-edge android-lite-glass mt-6 inline-flex max-w-full items-center gap-2.5 rounded-full border border-white/55 bg-white/55 px-3 py-2 shadow-[0_16px_50px_rgba(11,31,79,0.11),inset_0_1px_0_rgba(255,255,255,0.86)] backdrop-blur-2xl md:mt-6 md:px-3.5 xl:mt-8 xl:gap-3 xl:px-4">
+                <span className="hero-signal-dot relative flex h-3 w-3 shrink-0 items-center justify-center">
+                  <span className="hero-signal-ring hero-signal-ring-1" />
+                  <span className="hero-signal-core" />
+                </span>
+                <span className="h-px w-7 shrink-0 bg-gradient-to-r from-[#1447d4]/38 to-transparent xl:w-9" />
+                <span className="text-[8px] font-semibold uppercase leading-relaxed tracking-[0.2em] text-foreground/58 sm:text-[9px] md:text-[9px] md:tracking-[0.22em] xl:text-[10px] xl:tracking-[0.28em]">
+                  Built for businesses that want speed, clarity, and execution.
+                </span>
               </div>
             </motion.div>
           </div>
