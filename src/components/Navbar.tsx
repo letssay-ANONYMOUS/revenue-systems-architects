@@ -8,9 +8,9 @@ const navLinks = [
   { label: "About", path: "/about" },
 ];
 
-const SCROLL_ENTER = 6;
+const SCROLL_ENTER = 2;
 const SCROLL_EXIT = 1;
-const SHELL_TRANSITION = "max-width 760ms cubic-bezier(0.16, 1, 0.3, 1), border-radius 760ms cubic-bezier(0.16, 1, 0.3, 1), background-color 760ms cubic-bezier(0.16, 1, 0.3, 1), border-color 760ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 760ms cubic-bezier(0.16, 1, 0.3, 1), transform 760ms cubic-bezier(0.16, 1, 0.3, 1), padding 760ms cubic-bezier(0.16, 1, 0.3, 1)";
+const SHELL_TRANSITION = "max-width 560ms cubic-bezier(0.16, 1, 0.3, 1), border-radius 560ms cubic-bezier(0.16, 1, 0.3, 1), background-color 560ms cubic-bezier(0.16, 1, 0.3, 1), border-color 560ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 560ms cubic-bezier(0.16, 1, 0.3, 1), transform 560ms cubic-bezier(0.16, 1, 0.3, 1), padding 560ms cubic-bezier(0.16, 1, 0.3, 1)";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -70,7 +70,7 @@ const Navbar = () => {
             style={{
               padding: scrolled ? "13px 38px" : "8px 14px",
               borderRadius: scrolled ? "9999px" : "14px",
-              transform: scrolled ? "translateY(14px) scale(1.035)" : "translateY(0px) scale(0.985)",
+              transform: scrolled ? "translateY(8px) scale(1.025)" : "translateY(0px) scale(0.985)",
               transition: SHELL_TRANSITION,
               willChange: "background-color, border-color, box-shadow, border-radius, transform",
             }}
@@ -101,9 +101,18 @@ const Navbar = () => {
             </motion.div>
           </div>
 
-          <button
+          <motion.button
             type="button"
             className="relative z-[1300] -mr-1 flex h-12 w-12 items-center justify-center rounded-full border border-white/70 bg-white/68 text-foreground shadow-[0_16px_42px_rgba(20,32,50,0.13),inset_0_1px_0_rgba(255,255,255,0.96)] backdrop-blur-2xl transition-transform duration-200 active:scale-95 xl:hidden"
+            animate={{
+              y: scrolled ? 6 : 0,
+              scale: scrolled ? 1.04 : 1,
+              backgroundColor: scrolled ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.68)",
+              boxShadow: scrolled
+                ? "0 18px 48px rgba(20,32,50,0.18), inset 0 1px 0 rgba(255,255,255,0.98), inset 0 -10px 22px rgba(17,24,39,0.06)"
+                : "0 16px 42px rgba(20,32,50,0.13), inset 0 1px 0 rgba(255,255,255,0.96)",
+            }}
+            transition={{ type: "spring", stiffness: 520, damping: 38, mass: 0.5 }}
             onPointerDown={(event) => {
               event.preventDefault();
               setMobileOpen((open) => !open);
@@ -113,8 +122,19 @@ const Navbar = () => {
             aria-expanded={mobileOpen}
             aria-controls="mobile-navigation"
           >
-            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={mobileOpen ? "close" : "menu"}
+                className="absolute"
+                initial={{ opacity: 0, y: mobileOpen ? 8 : -8, rotate: mobileOpen ? -18 : 18, scale: 0.82 }}
+                animate={{ opacity: 1, y: 0, rotate: 0, scale: 1 }}
+                exit={{ opacity: 0, y: mobileOpen ? -8 : 8, rotate: mobileOpen ? 18 : -18, scale: 0.82 }}
+                transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+              >
+                {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+              </motion.span>
+            </AnimatePresence>
+          </motion.button>
         </div>
       </motion.nav>
 

@@ -268,6 +268,7 @@ const ReliableHeroVideo = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const stallTimerRef = useRef<number | null>(null);
   const readyFallbackTimerRef = useRef<number | null>(null);
+  const announcedReadyRef = useRef(false);
   const [sourceIndex, setSourceIndex] = useState(0);
   const [isReady, setIsReady] = useState(false);
   const source = HERO_VIDEO_SOURCES[sourceIndex];
@@ -295,6 +296,13 @@ const ReliableHeroVideo = () => {
     if (playback && typeof playback.catch === "function") {
       void playback.catch(() => undefined);
     }
+  }, []);
+
+  const announceHeroReady = useCallback(() => {
+    if (announcedReadyRef.current) return;
+    announcedReadyRef.current = true;
+    (window as typeof window & { __STERK_HERO_VIDEO_READY__?: boolean }).__STERK_HERO_VIDEO_READY__ = true;
+    window.dispatchEvent(new CustomEvent("sterk:hero-video-ready"));
   }, []);
 
   const resetAndRecoverVideo = useCallback(() => {
@@ -331,12 +339,13 @@ const ReliableHeroVideo = () => {
     readyFallbackTimerRef.current = window.setTimeout(() => {
       setIsReady(true);
       playVideo();
-    }, 1400);
+    }, 2200);
 
     const markReady = () => {
       clearStallTimer();
       clearReadyFallbackTimer();
       setIsReady(true);
+      announceHeroReady();
       playVideo();
     };
     const handleError = () => {
@@ -387,7 +396,7 @@ const ReliableHeroVideo = () => {
       window.removeEventListener("pageshow", handlePageShow);
       window.removeEventListener("focus", handlePageShow);
     };
-  }, [clearReadyFallbackTimer, clearStallTimer, playVideo, resetAndRecoverVideo, source, sourceIndex]);
+  }, [announceHeroReady, clearReadyFallbackTimer, clearStallTimer, playVideo, resetAndRecoverVideo, source, sourceIndex]);
 
   return (
     <div aria-hidden="true" className="pointer-events-none sticky top-0 h-[100svh] min-h-screen w-full overflow-hidden bg-[#f7f9fc]">
@@ -402,6 +411,8 @@ const ReliableHeroVideo = () => {
         loop
         playsInline
         preload="auto"
+        crossOrigin="anonymous"
+        fetchPriority="high"
         disablePictureInPicture
         controlsList="nodownload noplaybackrate noremoteplayback"
       />
@@ -573,6 +584,19 @@ const WebsiteShowcaseCarousel = () => {
   const [selectedWebsiteIndex, setSelectedWebsiteIndex] = useState<number | null>(null);
   const [selectedWebsiteDevice, setSelectedWebsiteDevice] = useState<"desktop" | "phone">("desktop");
   const [deviceView, setDeviceView] = useState<"desktop" | "phone">("desktop");
+  const previewImageRef = useRef<HTMLImageElement | null>(null);
+  const previewZoomRef = useRef({ scale: 1, x: 0, y: 0 });
+  const previewGestureRef = useRef<{
+    mode: "pinch" | "pan";
+    distance?: number;
+    scale: number;
+    x: number;
+    y: number;
+    centerX?: number;
+    centerY?: number;
+    touchX?: number;
+    touchY?: number;
+  } | null>(null);
   const active = websiteShowcases[activeIndex];
   const selectedWebsite = selectedWebsiteIndex === null ? null : websiteShowcases[selectedWebsiteIndex];
   const selectedWebsiteImageSrc = selectedWebsiteDevice === "phone" ? selectedWebsite?.phoneImageSrc : selectedWebsite?.imageSrc;
@@ -593,6 +617,101 @@ const WebsiteShowcaseCarousel = () => {
     setSelectedWebsiteDevice(device);
     setSelectedWebsiteIndex(activeIndex);
   }, [active.imageSrc, activeIndex, activePhoneImageSrc, deviceView]);
+
+  const applyPreviewZoom = useCallback(() => {
+    const img = previewImageRef.current;
+    if (!img) return;
+    const { scale, x, y } = previewZoomRef.current;
+    img.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
+  }, []);
+
+  const resetPreviewZoom = useCallback(() => {
+    previewZoomRef.current = { scale: 1, x: 0, y: 0 };
+    applyPreviewZoom();
+  }, [applyPreviewZoom]);
+
+  const getTouchDistance = (touches: React.TouchList) => {
+    const a = touches[0];
+    const b = touches[1];
+    return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+  };
+
+  const getTouchCenter = (touches: React.TouchList) => ({
+    x: (touches[0].clientX + touches[1].clientX) / 2,
+    y: (touches[0].clientY + touches[1].clientY) / 2,
+  });
+
+  const handlePreviewTouchStart = useCallback((event: React.TouchEvent<HTMLDivElement>) => {
+    if (event.touches.length === 2) {
+      event.stopPropagation();
+      const center = getTouchCenter(event.touches);
+      previewGestureRef.current = {
+        mode: "pinch",
+        distance: getTouchDistance(event.touches),
+        scale: previewZoomRef.current.scale,
+        x: previewZoomRef.current.x,
+        y: previewZoomRef.current.y,
+        centerX: center.x,
+        centerY: center.y,
+      };
+      return;
+    }
+
+    if (event.touches.length === 1 && previewZoomRef.current.scale > 1.02) {
+      event.stopPropagation();
+      previewGestureRef.current = {
+        mode: "pan",
+        scale: previewZoomRef.current.scale,
+        x: previewZoomRef.current.x,
+        y: previewZoomRef.current.y,
+        touchX: event.touches[0].clientX,
+        touchY: event.touches[0].clientY,
+      };
+    }
+  }, []);
+
+  const handlePreviewTouchMove = useCallback((event: React.TouchEvent<HTMLDivElement>) => {
+    const gesture = previewGestureRef.current;
+    if (!gesture) return;
+
+    if (gesture.mode === "pinch" && event.touches.length === 2 && gesture.distance) {
+      event.preventDefault();
+      event.stopPropagation();
+      const center = getTouchCenter(event.touches);
+      const nextScale = Math.max(1, Math.min(3.25, gesture.scale * (getTouchDistance(event.touches) / gesture.distance)));
+      const scaleDelta = nextScale / gesture.scale;
+      previewZoomRef.current = {
+        scale: nextScale,
+        x: gesture.x + (center.x - (gesture.centerX ?? center.x)) * 0.5 + (gesture.x * (scaleDelta - 1)),
+        y: gesture.y + (center.y - (gesture.centerY ?? center.y)) * 0.5 + (gesture.y * (scaleDelta - 1)),
+      };
+      applyPreviewZoom();
+      return;
+    }
+
+    if (gesture.mode === "pan" && event.touches.length === 1 && gesture.touchX !== undefined && gesture.touchY !== undefined) {
+      event.preventDefault();
+      event.stopPropagation();
+      const nextX = gesture.x + event.touches[0].clientX - gesture.touchX;
+      const nextY = gesture.y + event.touches[0].clientY - gesture.touchY;
+      const maxX = 260 * previewZoomRef.current.scale;
+      const maxY = 520 * previewZoomRef.current.scale;
+      previewZoomRef.current = {
+        scale: previewZoomRef.current.scale,
+        x: Math.max(-maxX, Math.min(maxX, nextX)),
+        y: Math.max(-maxY, Math.min(maxY, nextY)),
+      };
+      applyPreviewZoom();
+    }
+  }, [applyPreviewZoom]);
+
+  const handlePreviewTouchEnd = useCallback((event: React.TouchEvent<HTMLDivElement>) => {
+    if (event.touches.length > 0) return;
+    previewGestureRef.current = null;
+    if (previewZoomRef.current.scale < 1.04) {
+      resetPreviewZoom();
+    }
+  }, [resetPreviewZoom]);
 
   useEffect(() => {
     const preloadLinks: HTMLLinkElement[] = [];
@@ -617,6 +736,7 @@ const WebsiteShowcaseCarousel = () => {
 
   useEffect(() => {
     if (!selectedWebsite) return;
+    resetPreviewZoom();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") closePreview();
@@ -627,7 +747,7 @@ const WebsiteShowcaseCarousel = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [closePreview, selectedWebsite]);
+  }, [closePreview, resetPreviewZoom, selectedWebsite]);
 
   const panelVariants: Variants = {
     enter: (travelDirection: number) => ({
@@ -1106,11 +1226,24 @@ const WebsiteShowcaseCarousel = () => {
                     <X className="h-4 w-4" />
                   </button>
                 </div>
-                <div className="zoom-safe max-h-[calc(100svh-4.25rem)] overflow-auto overscroll-contain rounded-b-[1.45rem] bg-[#07101f] md:rounded-b-[1.85rem]">
+                <div
+                  className="zoom-safe max-h-[calc(100svh-4.25rem)] overflow-auto overscroll-contain rounded-b-[1.45rem] bg-[#07101f] md:rounded-b-[1.85rem]"
+                  onTouchStart={handlePreviewTouchStart}
+                  onTouchMove={handlePreviewTouchMove}
+                  onTouchEnd={handlePreviewTouchEnd}
+                  onTouchCancel={handlePreviewTouchEnd}
+                  onDoubleClick={(event) => {
+                    event.preventDefault();
+                    resetPreviewZoom();
+                  }}
+                  style={{ touchAction: "pan-x pan-y pinch-zoom" }}
+                >
                   <img
+                    ref={previewImageRef}
                     src={selectedWebsiteImageSrc}
                     alt={`${selectedWebsite.title} full website design`}
-                    className="zoom-safe h-auto w-full max-w-none"
+                    className="zoom-safe h-auto w-full max-w-none origin-top transform-gpu transition-transform duration-150"
+                    style={{ transformOrigin: "50% 0%" }}
                     loading="eager"
                     decoding="async"
                     fetchpriority="high"

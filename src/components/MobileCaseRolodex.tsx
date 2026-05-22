@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState, type TouchEvent } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion, type PanInfo } from "framer-motion";
 import { Link } from "react-router-dom";
 
 const cases = [
@@ -44,7 +44,6 @@ const MobileCaseRolodex = () => {
   const [paused, setPaused] = useState(false);
   const [hintGone, setHintGone] = useState(false);
   const interactedRef = useRef(false);
-  const touchStartRef = useRef<{ x: number; y: number; t: number } | null>(null);
 
   useEffect(() => {
     if (reduce || paused) return;
@@ -68,24 +67,12 @@ const MobileCaseRolodex = () => {
   const next = () => setActive((i) => (i + 1) % cases.length);
   const prev = () => setActive((i) => (i - 1 + cases.length) % cases.length);
 
-  const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
-    const touch = event.touches[0];
-    touchStartRef.current = { x: touch.clientX, y: touch.clientY, t: performance.now() };
-  };
+  const handleDragEnd = (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+    const dx = info.offset.x;
+    const vx = info.velocity.x;
+    const shouldTurn = Math.abs(dx) > 42 || Math.abs(vx) > 420;
+    if (!shouldTurn) return;
 
-  const handleTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
-    const start = touchStartRef.current;
-    touchStartRef.current = null;
-    if (!start) return;
-
-    const touch = event.changedTouches[0];
-    const dx = touch.clientX - start.x;
-    const dy = touch.clientY - start.y;
-    const elapsed = performance.now() - start.t;
-    const horizontalIntent = Math.abs(dx) > 26 && Math.abs(dx) > Math.abs(dy) * 1.08;
-    const flick = elapsed < 280 && Math.abs(dx) > 18 && Math.abs(dx) > Math.abs(dy) * 0.9;
-
-    if (!horizontalIntent && !flick) return;
     markInteracted();
     if (dx < 0) next();
     else prev();
@@ -108,8 +95,6 @@ const MobileCaseRolodex = () => {
           <div
             className="relative h-full w-full"
             style={{ transformStyle: "preserve-3d" }}
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
           >
             {cases.map((c, i) => {
               const offset = (i - active + cases.length) % cases.length;
@@ -135,6 +120,12 @@ const MobileCaseRolodex = () => {
                     rotateY: layer.rotateY,
                     scale: layer.scale,
                   }}
+                  drag={isActive ? "x" : false}
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.23}
+                  dragMomentum={false}
+                  onDragStart={markInteracted}
+                  onDragEnd={handleDragEnd}
                   initial={false}
                   transition={SPRING}
                   style={{
@@ -145,7 +136,7 @@ const MobileCaseRolodex = () => {
                     opacity: layer.shellOpacity,
                     cursor: isActive ? "grab" : "pointer",
                     willChange: "transform",
-                    touchAction: "pan-y",
+                    touchAction: isActive ? "pan-y pinch-zoom" : "pan-x pan-y pinch-zoom",
                   }}
                   whileTap={reduce ? undefined : { scale: layer.scale * 0.992 }}
                   className="absolute inset-y-0 left-[1.5%] right-[1.5%] overflow-visible rounded-[34px] [contain:layout_style_paint]"

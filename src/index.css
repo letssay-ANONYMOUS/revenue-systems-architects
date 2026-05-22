@@ -785,7 +785,7 @@
 }
 
 .is-android .android-snap-proximity {
-  scroll-snap-type: x mandatory;
+  scroll-snap-type: x proximity;
 }
 
 .is-android .mobile-performance-surface {
@@ -794,8 +794,8 @@
 }
 
 .is-android .android-lite-glass {
-  backdrop-filter: blur(14px) saturate(1.18) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(1.18) !important;
+  backdrop-filter: blur(8px) saturate(1.08) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(1.08) !important;
 }
 
 .is-android .android-no-filter {

@@ -79,9 +79,13 @@ function InitialLoader() {
   useEffect(() => {
     let hideTimer = 0;
     let removeTimer = 0;
-    const showMinimum = 1050;
+    let pageReady = document.readyState === "complete";
+    let heroReady = Boolean((window as typeof window & { __STERK_HERO_VIDEO_READY__?: boolean }).__STERK_HERO_VIDEO_READY__);
+    const showMinimum = 950;
+    const hardMaximum = 4300;
     const startedAt = performance.now();
-    const finish = () => {
+    const finish = (force = false) => {
+      if (!force && (!pageReady || !heroReady)) return;
       window.clearTimeout(hideTimer);
       window.clearTimeout(removeTimer);
       const remaining = Math.max(0, showMinimum - (performance.now() - startedAt));
@@ -90,13 +94,23 @@ function InitialLoader() {
         removeTimer = window.setTimeout(() => setMounted(false), 650);
       }, remaining);
     };
+    const markPageReady = () => {
+      pageReady = true;
+      finish();
+    };
+    const markHeroReady = () => {
+      heroReady = true;
+      finish();
+    };
 
-    if (document.readyState === "complete") finish();
-    else window.addEventListener("load", finish, { once: true });
+    if (pageReady) finish();
+    else window.addEventListener("load", markPageReady, { once: true });
+    window.addEventListener("sterk:hero-video-ready", markHeroReady, { once: true });
 
-    const fallbackTimer = window.setTimeout(finish, 2400);
+    const fallbackTimer = window.setTimeout(() => finish(true), hardMaximum);
     return () => {
-      window.removeEventListener("load", finish);
+      window.removeEventListener("load", markPageReady);
+      window.removeEventListener("sterk:hero-video-ready", markHeroReady);
       window.clearTimeout(hideTimer);
       window.clearTimeout(removeTimer);
       window.clearTimeout(fallbackTimer);

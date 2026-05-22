@@ -15,13 +15,17 @@ const CTASection = ({
   subtext = "Stop losing leads to slow responses and disconnected tools."
 }: CTASectionProps) => {
   const sectionRef = useRef<HTMLElement>(null);
+  const isAndroidMotion =
+    typeof document !== "undefined" && document.documentElement.classList.contains("is-android");
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start 92%", "center 50%"],
   });
-  const flow = useSpring(scrollYProgress, { stiffness: 84, damping: 24, mass: 0.52 });
-  const cardY = useTransform(flow, [0, 1], [72, 0]);
-  const cardScale = useTransform(flow, [0, 1], [0.94, 1]);
+  const flow = useSpring(scrollYProgress, isAndroidMotion
+    ? { stiffness: 68, damping: 28, mass: 0.62 }
+    : { stiffness: 84, damping: 24, mass: 0.52 });
+  const cardY = useTransform(flow, [0, 1], isAndroidMotion ? [46, 0] : [72, 0]);
+  const cardScale = useTransform(flow, [0, 1], isAndroidMotion ? [0.975, 1] : [0.94, 1]);
   const cardOpacity = useTransform(flow, [0, 0.35, 1], [0, 0.92, 1]);
   const subtextY = useTransform(flow, [0.38, 0.82], [34, 0]);
   const subtextOpacity = useTransform(flow, [0.35, 0.78], [0, 1]);
@@ -53,7 +57,7 @@ const CTASection = ({
               aria-label={headline}
             >
               {headlineLines.map((line, index) => (
-                <CTAHeadlineLine key={line} line={line} index={index} progress={flow} />
+                <CTAHeadlineLine key={line} line={line} index={index} progress={flow} disableFilter={isAndroidMotion} />
               ))}
             </h2>
             <motion.p
@@ -232,7 +236,17 @@ const SeamlessCTAVideo = () => {
   );
 };
 
-const CTAHeadlineLine = ({ line, index, progress }: { line: string; index: number; progress: MotionValue<number> }) => {
+const CTAHeadlineLine = ({
+  line,
+  index,
+  progress,
+  disableFilter,
+}: {
+  line: string;
+  index: number;
+  progress: MotionValue<number>;
+  disableFilter?: boolean;
+}) => {
   const start = 0.12 + index * 0.14;
   const y = useTransform(progress, [start, start + 0.38, 1], [70, 0, -4]);
   const opacity = useTransform(progress, [start, start + 0.26], [0, 1]);
@@ -243,7 +257,7 @@ const CTAHeadlineLine = ({ line, index, progress }: { line: string; index: numbe
     <motion.span
       aria-hidden="true"
       className="block origin-bottom transform-gpu"
-      style={{ y, opacity, rotateX, filter }}
+      style={{ y, opacity, rotateX, filter: disableFilter ? undefined : filter }}
     >
       {line}
     </motion.span>

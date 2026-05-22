@@ -50,11 +50,11 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
     const rotX = ny * 5;
     setPressed(true);
     controls.start({
-      scale: 0.95,
-      y: 3,
-      rotateX: rotX,
-      rotateY: rotY,
-      transition: { type: "spring", stiffness: 460, damping: 24 },
+      scale: 0.975,
+      y: 2,
+      rotateX: rotX * 0.55,
+      rotateY: rotY * 0.55,
+      transition: { type: "spring", stiffness: 520, damping: 32, mass: 0.42 },
     });
   };
 
@@ -75,25 +75,24 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
     });
   };
 
-  const pressOut = async (didTap: boolean) => {
+  const pressOut = (didTap: boolean) => {
     if (openingRef.current) return;
     const shouldOpen = didTap && !hasDraggedRef.current;
     pointerStartRef.current = null;
     setPressed(false);
     if (shouldOpen) openingRef.current = true;
-    const release = controls.start({
+    void controls.start({
       scale: 1,
       y: 0,
       rotateX: 0,
       rotateY: 0,
-      transition: { duration: 0.16, ease: [0.16, 1, 0.3, 1] },
+      transition: { duration: 0.18, ease: [0.16, 1, 0.3, 1] },
     });
-    await release;
     if (shouldOpen) {
+      onOpen();
       window.setTimeout(() => {
-        onOpen();
         openingRef.current = false;
-      }, 0);
+      }, 260);
     }
   };
 
@@ -114,8 +113,8 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
         transformPerspective: 900,
         transformStyle: "preserve-3d",
         transformOrigin: "center center",
-        scrollSnapStop: "always",
         willChange: "transform",
+        touchAction: "pan-x pan-y pinch-zoom",
       }}
       onPointerDown={pressIn}
       onPointerMove={pressMove}
@@ -183,7 +182,7 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
 const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
   const trackRef = useRef<HTMLDivElement>(null);
   const settleTimerRef = useRef(0);
-  const settleRepeatTimerRef = useRef(0);
+  const scrollRafRef = useRef(0);
   const intendedTargetRef = useRef<number | null>(null);
   const intendedTargetTimerRef = useRef(0);
   const touchingRef = useRef(false);
@@ -193,15 +192,48 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
 
   const getCardStride = useCallback((el: HTMLDivElement) => el.clientWidth * 0.86 + 16, []);
 
+  const stopScrollAnimation = useCallback(() => {
+    if (scrollRafRef.current) {
+      cancelAnimationFrame(scrollRafRef.current);
+      scrollRafRef.current = 0;
+    }
+  }, []);
+
   const scrollTo = useCallback(
     (index: number, behavior: ScrollBehavior = "smooth") => {
       const el = trackRef.current;
       if (!el) return;
+      stopScrollAnimation();
       const cardStride = getCardStride(el);
       const target = Math.max(0, Math.min(cards.length - 1, index));
-      el.scrollTo({ left: target * cardStride, behavior });
+      const targetLeft = target * cardStride;
+
+      if (behavior === "auto") {
+        el.scrollLeft = targetLeft;
+        return;
+      }
+
+      const startLeft = el.scrollLeft;
+      const distance = targetLeft - startLeft;
+      if (Math.abs(distance) < 1) return;
+
+      const startedAt = performance.now();
+      const duration = Math.min(520, Math.max(280, Math.abs(distance) * 0.95));
+      const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+
+      const step = (time: number) => {
+        const progress = Math.min(1, (time - startedAt) / duration);
+        el.scrollLeft = startLeft + distance * easeOut(progress);
+        if (progress < 1) {
+          scrollRafRef.current = requestAnimationFrame(step);
+        } else {
+          scrollRafRef.current = 0;
+        }
+      };
+
+      scrollRafRef.current = requestAnimationFrame(step);
     },
-    [cards.length, getCardStride],
+    [cards.length, getCardStride, stopScrollAnimation],
   );
 
   const settleTo = useCallback(
@@ -210,10 +242,8 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
       intendedTargetRef.current = target;
       setActiveIndex(target);
       window.clearTimeout(settleTimerRef.current);
-      window.clearTimeout(settleRepeatTimerRef.current);
       window.clearTimeout(intendedTargetTimerRef.current);
       settleTimerRef.current = window.setTimeout(() => scrollTo(target), delay);
-      settleRepeatTimerRef.current = window.setTimeout(() => scrollTo(target), delay + 170);
       intendedTargetTimerRef.current = window.setTimeout(() => {
         intendedTargetRef.current = null;
       }, 920);
@@ -278,17 +308,17 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
       el.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(raf);
       window.clearTimeout(settleTimerRef.current);
-      window.clearTimeout(settleRepeatTimerRef.current);
       window.clearTimeout(intendedTargetTimerRef.current);
+      stopScrollAnimation();
     };
-  }, [cards.length, getCardStride, steerToNearest]);
+  }, [cards.length, getCardStride, steerToNearest, stopScrollAnimation]);
 
   const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
     const el = trackRef.current;
     const touch = event.touches[0];
     if (!el || !touch) return;
+    stopScrollAnimation();
     window.clearTimeout(settleTimerRef.current);
-    window.clearTimeout(settleRepeatTimerRef.current);
     window.clearTimeout(intendedTargetTimerRef.current);
     intendedTargetRef.current = null;
     touchingRef.current = true;
@@ -321,10 +351,10 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
     }
 
     const direction = dx < 0 ? 1 : -1;
-    const veryStrongSwipe = speed > 1.85 || Math.abs(dx) > el.clientWidth * 0.66;
+    const veryStrongSwipe = speed > 2.05 || Math.abs(dx) > el.clientWidth * 0.72;
     const step = veryStrongSwipe ? 2 : 1;
     const targetIndex = Math.max(0, Math.min(cards.length - 1, startIndex + direction * step));
-    settleTo(targetIndex, veryStrongSwipe ? 42 : 78);
+    settleTo(targetIndex, veryStrongSwipe ? 54 : 92);
   };
 
   return (
@@ -363,7 +393,7 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
       {/* Horizontal scroller */}
       <motion.div
         ref={trackRef}
-        className="mobile-performance-surface android-snap-proximity relative z-10 flex snap-x snap-mandatory scroll-smooth gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain px-[7vw] pb-8 pt-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        className="mobile-performance-surface android-snap-proximity relative z-10 flex snap-x snap-proximity gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain px-[7vw] pb-8 pt-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
         onTouchCancel={() => {
@@ -377,10 +407,10 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
         transition={{ duration: 0.5 }}
         style={{
           scrollPaddingLeft: "7vw",
-          touchAction: "auto",
+          touchAction: "pan-x pan-y pinch-zoom",
           WebkitOverflowScrolling: "touch",
           overscrollBehaviorX: "contain",
-          scrollSnapType: "x mandatory",
+          scrollSnapType: "x proximity",
         }}
       >
         {cards.map((card, index) => (
@@ -434,10 +464,10 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
     const body = document.body;
     const previousHtmlOverflow = html.style.overflow;
     const previousBodyOverflow = body.style.overflow;
-    const previousBodyTouchAction = body.style.touchAction;
+    const previousOverscroll = body.style.overscrollBehavior;
     html.style.overflow = "hidden";
     body.style.overflow = "hidden";
-    body.style.touchAction = "none";
+    body.style.overscrollBehavior = "contain";
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
@@ -446,7 +476,7 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
     return () => {
       html.style.overflow = previousHtmlOverflow;
       body.style.overflow = previousBodyOverflow;
-      body.style.touchAction = previousBodyTouchAction;
+      body.style.overscrollBehavior = previousOverscroll;
       window.removeEventListener("keydown", onKey);
     };
   }, [close]);
@@ -468,10 +498,10 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
       <motion.div
         aria-hidden="true"
         className="android-no-filter absolute inset-0 bg-[#07101f]/40"
-        initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
-        animate={{ opacity: 1, backdropFilter: "blur(8px)" }}
-        exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.24, ease: [0.16, 1, 0.3, 1] }}
         onClick={closeFromBackdrop}
       />
 
@@ -480,7 +510,7 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
-        transition={{ type: "spring", stiffness: 520, damping: 42, mass: 0.72 }}
+        transition={{ type: "spring", stiffness: 620, damping: 48, mass: 0.52 }}
         onClick={(event) => event.stopPropagation()}
       >
         {/* Drag handle */}
