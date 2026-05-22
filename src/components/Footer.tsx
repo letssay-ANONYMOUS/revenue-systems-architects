@@ -1,5 +1,6 @@
 import { Mail, Phone } from "lucide-react";
 import { Link } from "react-router-dom";
+import { SITE_IMAGES } from "@/lib/media";
 
 const contactLinks = [
   { label: "050-922-4832", href: "tel:0509224832", Icon: Phone },
@@ -19,7 +20,7 @@ const Footer = () => {
           <div>
             <Link to="/" className="inline-flex items-center gap-3" aria-label="STERK.systems home">
               <img
-                src="/sterk-logo.jpg"
+                src={SITE_IMAGES.logo}
                 alt="STERK.systems"
                 width={512}
                 height={512}

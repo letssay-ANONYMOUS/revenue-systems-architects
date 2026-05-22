@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import CTASection from "@/components/CTASection";
 import SectionReveal from "@/components/SectionReveal";
+import { SITE_IMAGES } from "@/lib/media";
 
 const systems = [
   {
@@ -75,13 +76,13 @@ const About = () => {
             transition={{ duration: 0.85, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
           >
             <div className="absolute left-0 top-8 w-[62%] overflow-hidden rounded-[2rem] border border-white/76 bg-white/62 p-2 shadow-[0_34px_90px_rgba(20,32,50,0.16)] backdrop-blur-2xl">
-              <img src="/calls-captured-card.jpg" alt="AI calling system" className="aspect-[1.22] w-full rounded-[1.45rem] object-cover" loading="eager" decoding="async" />
+              <img src={SITE_IMAGES.callsCaptured} alt="AI calling system" className="aspect-[1.22] w-full rounded-[1.45rem] object-cover" loading="eager" decoding="async" />
             </div>
             <div className="absolute right-0 top-0 w-[55%] overflow-hidden rounded-[2rem] border border-white/76 bg-white/62 p-2 shadow-[0_34px_90px_rgba(20,32,50,0.14)] backdrop-blur-2xl">
-              <img src="/bookings-lifted-card.jpg" alt="Lead booking automation" className="aspect-[1.18] w-full rounded-[1.45rem] object-cover" loading="eager" decoding="async" />
+              <img src={SITE_IMAGES.bookingsLifted} alt="Lead booking automation" className="aspect-[1.18] w-full rounded-[1.45rem] object-cover" loading="eager" decoding="async" />
             </div>
             <div className="absolute bottom-0 right-8 w-[68%] overflow-hidden rounded-[2rem] border border-white/76 bg-white/62 p-2 shadow-[0_34px_90px_rgba(20,32,50,0.15)] backdrop-blur-2xl">
-              <img src="/clinic-website-card.jpg" alt="Conversion website preview" className="aspect-[1.42] w-full rounded-[1.45rem] object-cover" loading="lazy" decoding="async" />
+              <img src={SITE_IMAGES.clinicWebsite} alt="Conversion website preview" className="aspect-[1.42] w-full rounded-[1.45rem] object-cover" loading="lazy" decoding="async" />
             </div>
             <div className="absolute bottom-16 left-2 rounded-[1.5rem] border border-white/78 bg-white/72 px-5 py-4 shadow-[0_24px_70px_rgba(20,32,50,0.13)] backdrop-blur-2xl">
               <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-[#1447d4]">Always On</p>

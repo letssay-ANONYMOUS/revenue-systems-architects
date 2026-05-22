@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
 import { Menu, X, ArrowRight } from "lucide-react";
+import { SITE_IMAGES } from "@/lib/media";
 
 const navLinks = [
   { label: "Home", path: "/" },
@@ -37,7 +38,7 @@ const Navbar = () => {
         aria-label="STERK.systems home"
       >
         <img
-          src="/sterk-logo.jpg"
+          src={SITE_IMAGES.logo}
           alt="STERK.systems"
           width={512}
           height={512}
@@ -155,7 +156,7 @@ const Navbar = () => {
             >
               <Link to="/" className="flex items-center gap-2.5" onClick={() => setMobileOpen(false)}>
                 <img
-                  src="/sterk-logo.jpg"
+                  src={SITE_IMAGES.logo}
                   alt="STERK.systems"
                   width={512}
                   height={512}

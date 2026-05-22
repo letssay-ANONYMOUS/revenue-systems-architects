@@ -9,6 +9,7 @@ import PageTransition from "@/components/PageTransition";
 import SmoothScroll from "@/components/SmoothScroll";
 import FilmGrain from "@/components/FilmGrain";
 import Index from "./pages/Index";
+import { SITE_IMAGES } from "@/lib/media";
 
 const About = lazy(() => import("./pages/About"));
 const BookACall = lazy(() => import("./pages/BookACall"));
@@ -39,7 +40,7 @@ const BrandLoadingScreen = () => (
     >
       <div className="relative h-20 w-20 rounded-[1.7rem] border border-white/80 bg-white/66 p-1.5 shadow-[0_30px_90px_rgba(20,32,50,0.16),inset_0_1px_0_rgba(255,255,255,0.98),inset_0_-16px_30px_rgba(17,24,39,0.06)] backdrop-blur-2xl">
         <img
-          src="/sterk-logo.jpg"
+          src={SITE_IMAGES.logo}
           alt="STERK.systems"
           width={512}
           height={512}

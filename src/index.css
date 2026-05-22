@@ -191,6 +191,16 @@
     -webkit-backface-visibility: hidden;
   }
 
+  .phone-only-cta {
+    display: none;
+  }
+
+  @media (hover: none) and (pointer: coarse) and (max-width: 1024px) {
+    .phone-only-cta {
+      display: flex;
+    }
+  }
+
   .sterk-system-thread {
     position: fixed;
     inset: 0;

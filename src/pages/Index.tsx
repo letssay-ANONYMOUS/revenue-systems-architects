@@ -34,7 +34,7 @@ import MobileDiagnostic from "@/components/mobile/MobileDiagnostic";
 import MobileServiceWorkshop from "@/components/mobile/MobileServiceWorkshop";
 import MobileHeroExtras from "@/components/mobile/MobileHeroExtras";
 import MobileProofStrip from "@/components/mobile/MobileProofStrip";
-import { HERO_VIDEO_SOURCES } from "@/lib/media";
+import { HERO_VIDEO_SOURCES, SITE_IMAGES } from "@/lib/media";
 
 const painPoints = [
   { pain: "Missed calls", solution: "AI answers every call", caption: "Every call. Every time. Instantly.", Visual: MissedCallVisual },
@@ -51,7 +51,7 @@ const transitionCards = [
     value: "97%",
     valueTone: "chrome",
     description: "AI stays on the line when your team is busy.",
-    imageSrc: "/calls-captured-card.jpg",
+    imageSrc: SITE_IMAGES.callsCaptured,
     detail: "Live conversations stay handled when your team is busy, so the first response never depends on someone being free.",
   },
   {
@@ -59,7 +59,7 @@ const transitionCards = [
     value: "3x",
     valueTone: "blue",
     description: "Qualified leads move straight into scheduled calls.",
-    imageSrc: "/bookings-lifted-card.jpg",
+    imageSrc: SITE_IMAGES.bookingsLifted,
     detail: "Qualified prospects move directly from conversation to appointment, with the context preserved for your team.",
   },
   {
@@ -67,7 +67,7 @@ const transitionCards = [
     value: "60%",
     valueTone: "blue",
     description: "Follow-ups, reminders, and routing happen in the background.",
-    imageSrc: "/admin-reduced-card.jpg",
+    imageSrc: SITE_IMAGES.adminReduced,
     detail: "Follow-ups, reminders, and routing keep moving behind the scenes without adding another manual task list.",
   },
 ];
@@ -78,20 +78,20 @@ const websiteShowcases = [
   {
     title: "Real Estate",
     eyebrow: "Luxury property website",
-    imageSrc: "/real-estate-website-card.jpg",
-    phoneImageSrc: "/phone-real-estate-website.jpg",
+    imageSrc: SITE_IMAGES.realEstateWebsite,
+    phoneImageSrc: SITE_IMAGES.phoneRealEstateWebsite,
   },
   {
     title: "Cafe Orders",
     eyebrow: "Cafe ordering system",
-    imageSrc: "/cafe-website-card.jpg",
-    phoneImageSrc: "/phone-cafe-website.jpg",
+    imageSrc: SITE_IMAGES.cafeWebsite,
+    phoneImageSrc: SITE_IMAGES.phoneCafeWebsite,
   },
   {
     title: "Clinics",
     eyebrow: "Clinic booking system",
-    imageSrc: "/clinic-website-card.jpg",
-    phoneImageSrc: "/phone-clinic-website.jpg",
+    imageSrc: SITE_IMAGES.clinicWebsite,
+    phoneImageSrc: SITE_IMAGES.phoneClinicWebsite,
   },
 ];
 

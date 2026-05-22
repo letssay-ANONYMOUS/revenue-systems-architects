@@ -6,22 +6,51 @@ import { ArrowRight, X, Phone } from "lucide-react";
 const StickyMobileCTA = () => {
   const location = useLocation();
   const [dismissed, setDismissed] = useState(false);
+  const [pastHero, setPastHero] = useState(location.pathname !== "/");
 
   useEffect(() => {
     setDismissed(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (location.pathname !== "/") {
+      setPastHero(true);
+      return;
+    }
+
+    let raf = 0;
+    const updateVisibility = () => {
+      raf = 0;
+      const threshold = Math.max(420, window.innerHeight * 0.82);
+      setPastHero(window.scrollY > threshold);
+    };
+    const scheduleUpdate = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(updateVisibility);
+    };
+
+    updateVisibility();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate);
+
+    return () => {
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
   }, [location.pathname]);
 
   if (location.pathname === "/book-a-call") return null;
 
   return (
     <AnimatePresence>
-      {!dismissed && (
+      {!dismissed && pastHero && (
         <motion.div
-          className="mobile-performance-surface pointer-events-none fixed inset-x-0 bottom-0 z-[1350] flex justify-center px-4 pb-[calc(0.9rem+env(safe-area-inset-bottom))] md:hidden"
+          className="phone-only-cta mobile-performance-surface pointer-events-none fixed inset-x-0 bottom-0 z-[1350] justify-center px-4 pb-[calc(0.9rem+env(safe-area-inset-bottom))]"
           initial={{ y: 120, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 120, opacity: 0 }}
-          transition={{ type: "spring", stiffness: 320, damping: 30, mass: 0.7 }}
+          transition={{ type: "spring", stiffness: 380, damping: 34, mass: 0.62 }}
         >
           <div
             className="android-lite-glass pointer-events-auto relative flex w-full max-w-[28rem] items-center gap-2 overflow-hidden rounded-full border border-white/65 bg-white/55 p-1.5 pl-3 shadow-[0_24px_60px_rgba(11,31,79,0.28),inset_0_1px_0_rgba(255,255,255,0.95),inset_0_-2px_8px_rgba(17,24,39,0.06)] backdrop-blur-2xl"
