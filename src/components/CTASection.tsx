@@ -3,6 +3,7 @@ import { motion, useScroll, useSpring, useTransform, type MotionValue } from "fr
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import SectionReveal from "./SectionReveal";
+import { CTA_VIDEO_SOURCES } from "@/lib/media";
 
 interface CTASectionProps {
   headline?: string;
@@ -78,7 +79,6 @@ const CTASection = ({
   );
 };
 
-const CTA_VIDEO_SRC = "/cta-croc-generated-video.mp4";
 const CTA_VIDEO_FADE_SECONDS = 1.35;
 const CTA_VIDEO_FALLBACK_SECONDS = 10;
 
@@ -86,6 +86,8 @@ const SeamlessCTAVideo = () => {
   const primaryRef = useRef<HTMLVideoElement>(null);
   const secondaryRef = useRef<HTMLVideoElement>(null);
   const [activeLayer, setActiveLayer] = useState<0 | 1>(0);
+  const [sourceIndex, setSourceIndex] = useState(0);
+  const source = CTA_VIDEO_SOURCES[sourceIndex];
 
   useEffect(() => {
     if (window.navigator.userAgent.toLowerCase().includes("jsdom")) return;
@@ -109,6 +111,10 @@ const SeamlessCTAVideo = () => {
     };
     const recover = () => {
       if (document.hidden) return;
+      if (current.error && sourceIndex < CTA_VIDEO_SOURCES.length - 1) {
+        setSourceIndex((index) => Math.min(index + 1, CTA_VIDEO_SOURCES.length - 1));
+        return;
+      }
       if (current.paused || current.ended || current.readyState < 2) {
         if (current.readyState < 2 && current.networkState !== HTMLMediaElement.NETWORK_LOADING) {
           current.load();
@@ -185,7 +191,7 @@ const SeamlessCTAVideo = () => {
       window.removeEventListener("pageshow", handleWake);
       window.removeEventListener("focus", handleWake);
     };
-  }, [activeLayer]);
+  }, [activeLayer, source, sourceIndex]);
 
   const videoClass = "absolute inset-0 h-full w-full object-cover transition-opacity";
   const videoStyle = {
@@ -196,29 +202,31 @@ const SeamlessCTAVideo = () => {
   return (
     <div aria-hidden="true" className="pointer-events-none absolute inset-0 overflow-hidden">
       <video
+        key={`primary-${source}`}
         ref={primaryRef}
         className={`${videoClass} ${activeLayer === 0 ? "opacity-100" : "opacity-0"}`}
         style={videoStyle}
         autoPlay
         muted
         playsInline
-        preload="auto"
+        preload="metadata"
         disablePictureInPicture
         controlsList="nodownload noplaybackrate noremoteplayback"
       >
-        <source src={CTA_VIDEO_SRC} type="video/mp4" />
+        <source src={source} type="video/mp4" />
       </video>
       <video
+        key={`secondary-${source}`}
         ref={secondaryRef}
         className={`${videoClass} ${activeLayer === 1 ? "opacity-100" : "opacity-0"}`}
         style={videoStyle}
         muted
         playsInline
-        preload="auto"
+        preload="metadata"
         disablePictureInPicture
         controlsList="nodownload noplaybackrate noremoteplayback"
       >
-        <source src={CTA_VIDEO_SRC} type="video/mp4" />
+        <source src={source} type="video/mp4" />
       </video>
     </div>
   );

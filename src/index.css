@@ -65,6 +65,7 @@
     overflow-x: hidden;
     overflow-y: auto;
     height: auto;
+    touch-action: pan-x pan-y pinch-zoom;
   }
 
   * {
@@ -102,10 +103,16 @@
     overflow-y: auto;
     overscroll-behavior-y: auto;
     min-height: 100%;
+    touch-action: pan-x pan-y pinch-zoom;
   }
 
   #root {
     min-height: 100%;
+    touch-action: pan-x pan-y pinch-zoom;
+  }
+
+  :where(main, section, article, div, img, video) {
+    touch-action: pan-x pan-y pinch-zoom;
   }
 
   img,
@@ -778,7 +785,7 @@
 }
 
 .is-android .android-snap-proximity {
-  scroll-snap-type: x proximity;
+  scroll-snap-type: x mandatory;
 }
 
 .is-android .mobile-performance-surface {

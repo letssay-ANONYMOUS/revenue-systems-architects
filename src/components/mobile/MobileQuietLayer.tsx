@@ -88,11 +88,13 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
       rotateY: 0,
       transition: { duration: 0.16, ease: [0.16, 1, 0.3, 1] },
     });
-    if (shouldOpen) {
-      onOpen();
-      openingRef.current = false;
-    }
     await release;
+    if (shouldOpen) {
+      window.setTimeout(() => {
+        onOpen();
+        openingRef.current = false;
+      }, 0);
+    }
   };
 
   return (
@@ -112,6 +114,7 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
         transformPerspective: 900,
         transformStyle: "preserve-3d",
         transformOrigin: "center center",
+        scrollSnapStop: "always",
         willChange: "transform",
       }}
       onPointerDown={pressIn}
@@ -119,6 +122,10 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
       onPointerUp={() => pressOut(true)}
       onPointerCancel={() => pressOut(false)}
       onPointerLeave={() => pressed && pressOut(false)}
+      onClick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      }}
       onContextMenu={(event) => event.preventDefault()}
     >
       {/* Inner gloss */}
@@ -176,6 +183,7 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
 const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
   const trackRef = useRef<HTMLDivElement>(null);
   const settleTimerRef = useRef(0);
+  const settleRepeatTimerRef = useRef(0);
   const intendedTargetRef = useRef<number | null>(null);
   const intendedTargetTimerRef = useRef(0);
   const touchingRef = useRef(false);
@@ -202,11 +210,13 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
       intendedTargetRef.current = target;
       setActiveIndex(target);
       window.clearTimeout(settleTimerRef.current);
+      window.clearTimeout(settleRepeatTimerRef.current);
       window.clearTimeout(intendedTargetTimerRef.current);
       settleTimerRef.current = window.setTimeout(() => scrollTo(target), delay);
+      settleRepeatTimerRef.current = window.setTimeout(() => scrollTo(target), delay + 170);
       intendedTargetTimerRef.current = window.setTimeout(() => {
         intendedTargetRef.current = null;
-      }, 760);
+      }, 920);
     },
     [cards.length, scrollTo],
   );
@@ -268,6 +278,7 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
       el.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(raf);
       window.clearTimeout(settleTimerRef.current);
+      window.clearTimeout(settleRepeatTimerRef.current);
       window.clearTimeout(intendedTargetTimerRef.current);
     };
   }, [cards.length, getCardStride, steerToNearest]);
@@ -277,6 +288,7 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
     const touch = event.touches[0];
     if (!el || !touch) return;
     window.clearTimeout(settleTimerRef.current);
+    window.clearTimeout(settleRepeatTimerRef.current);
     window.clearTimeout(intendedTargetTimerRef.current);
     intendedTargetRef.current = null;
     touchingRef.current = true;
@@ -367,6 +379,8 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
           scrollPaddingLeft: "7vw",
           touchAction: "auto",
           WebkitOverflowScrolling: "touch",
+          overscrollBehaviorX: "contain",
+          scrollSnapType: "x mandatory",
         }}
       >
         {cards.map((card, index) => (
@@ -412,21 +426,39 @@ interface SheetProps {
 }
 
 const MobileCardSheet = ({ card, onClose }: SheetProps) => {
+  const openedAtRef = useRef(performance.now());
   const close = useCallback(() => onClose(), [onClose]);
 
   useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const previousHtmlOverflow = html.style.overflow;
+    const previousBodyOverflow = body.style.overflow;
+    const previousBodyTouchAction = body.style.touchAction;
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    body.style.touchAction = "none";
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
     };
     window.addEventListener("keydown", onKey);
     return () => {
+      html.style.overflow = previousHtmlOverflow;
+      body.style.overflow = previousBodyOverflow;
+      body.style.touchAction = previousBodyTouchAction;
       window.removeEventListener("keydown", onKey);
     };
   }, [close]);
 
+  const closeFromBackdrop = useCallback(() => {
+    if (performance.now() - openedAtRef.current < 450) return;
+    close();
+  }, [close]);
+
   return createPortal(
     <motion.div
-      className="zoom-safe fixed inset-0 z-[120] flex items-end justify-center md:hidden"
+      className="zoom-safe fixed inset-0 z-[1600] flex items-end justify-center overflow-hidden overscroll-contain md:hidden"
       role="dialog"
       aria-modal="true"
       aria-label={`${card.label} details`}
@@ -440,7 +472,7 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
         animate={{ opacity: 1, backdropFilter: "blur(8px)" }}
         exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        onClick={close}
+        onClick={closeFromBackdrop}
       />
 
       <motion.div
@@ -449,6 +481,7 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
         transition={{ type: "spring", stiffness: 520, damping: 42, mass: 0.72 }}
+        onClick={(event) => event.stopPropagation()}
       >
         {/* Drag handle */}
         <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-[#111827]/15" />
@@ -465,7 +498,11 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
           <motion.button
             type="button"
             aria-label="Close"
-            onClick={close}
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              close();
+            }}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-white/70 bg-white/70 text-[#111827]/80 shadow-[0_10px_24px_rgba(14,23,36,0.16),inset_0_1px_0_rgba(255,255,255,0.85)] backdrop-blur-xl"
             whileHover={{ scale: 1.06, y: -1 }}
             whileTap={{

@@ -34,6 +34,7 @@ import MobileDiagnostic from "@/components/mobile/MobileDiagnostic";
 import MobileServiceWorkshop from "@/components/mobile/MobileServiceWorkshop";
 import MobileHeroExtras from "@/components/mobile/MobileHeroExtras";
 import MobileProofStrip from "@/components/mobile/MobileProofStrip";
+import { HERO_VIDEO_SOURCES } from "@/lib/media";
 
 const painPoints = [
   { pain: "Missed calls", solution: "AI answers every call", caption: "Every call. Every time. Instantly.", Visual: MissedCallVisual },
@@ -260,12 +261,6 @@ const RisingShowcaseCard = ({ card, index, progress, onSelect }: RisingShowcaseC
     </motion.article>
   );
 };
-
-const HERO_VIDEO_SOURCES = [
-  "/hero-background-framed-pingpong.mp4",
-  "/hero-background-pingpong.mp4",
-  "/hero-background.mp4",
-];
 
 const isTestMediaEnvironment = () => window.navigator.userAgent.toLowerCase().includes("jsdom");
 
