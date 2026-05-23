@@ -795,7 +795,7 @@
 }
 
 .is-android .android-snap-proximity {
-  scroll-snap-type: x proximity;
+  scroll-snap-type: x mandatory;
 }
 
 .is-android .mobile-performance-surface {
@@ -804,8 +804,10 @@
 }
 
 .is-android .android-lite-glass {
-  backdrop-filter: blur(8px) saturate(1.08) !important;
-  -webkit-backdrop-filter: blur(8px) saturate(1.08) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-image:
+    linear-gradient(135deg, rgba(255,255,255,0.82), rgba(245,248,253,0.58) 44%, rgba(223,232,246,0.28)) !important;
 }
 
 .is-android .android-no-filter {
@@ -814,6 +816,51 @@
 
 .is-android .film-grain {
   display: none;
+}
+
+.modal-focus-overlay {
+  background:
+    radial-gradient(ellipse at 50% 10%, rgba(255, 255, 255, 0.5), transparent 40%),
+    radial-gradient(ellipse at 50% 92%, rgba(12, 22, 38, 0.24), transparent 54%),
+    linear-gradient(180deg, rgba(248, 250, 252, 0.66), rgba(225, 234, 247, 0.78));
+}
+
+.modal-focus-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgba(16,24,49,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16,24,49,0.035) 1px, transparent 1px);
+  background-size: 56px 56px;
+  opacity: 0.45;
+  mask-image: linear-gradient(180deg, transparent, black 16%, black 86%, transparent);
+  -webkit-mask-image: linear-gradient(180deg, transparent, black 16%, black 86%, transparent);
+}
+
+.static-sheet-glass {
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.92), transparent 48%),
+    linear-gradient(135deg, rgba(255,255,255,0.92), rgba(244,248,253,0.82) 48%, rgba(230,238,249,0.78));
+}
+
+.static-sheet-glass::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  pointer-events: none;
+  border: 1px solid rgba(255,255,255,0.5);
+  box-shadow:
+    inset 0 22px 54px rgba(255,255,255,0.34),
+    inset 0 -18px 36px rgba(17,24,39,0.055);
+}
+
+.static-pill-glass {
+  background-image:
+    radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.96), transparent 62%),
+    linear-gradient(135deg, rgba(255,255,255,0.9), rgba(246,249,253,0.72) 48%, rgba(228,237,250,0.64));
 }
 
 @layer utilities {

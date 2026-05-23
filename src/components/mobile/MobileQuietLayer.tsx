@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { AnimatePresence, motion, useAnimationControls } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 
 export interface QuietCard {
@@ -28,7 +28,6 @@ interface PressableCardProps {
 }
 
 const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
-  const controls = useAnimationControls();
   const articleRef = useRef<HTMLElement | null>(null);
   const [pressed, setPressed] = useState(false);
   const openingRef = useRef(false);
@@ -41,21 +40,7 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
     if (!el) return;
     pointerStartRef.current = { x: e.clientX, y: e.clientY };
     hasDraggedRef.current = false;
-    const rect = el.getBoundingClientRect();
-    // Normalized offset from center: -1..1
-    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;
-    const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
-    // Tilt away from finger: left tap -> right edge lifts (rotateY positive)
-    const rotY = -nx * 6;
-    const rotX = ny * 5;
     setPressed(true);
-    controls.start({
-      scale: 0.975,
-      y: 2,
-      rotateX: rotX * 0.55,
-      rotateY: rotY * 0.55,
-      transition: { type: "spring", stiffness: 520, damping: 32, mass: 0.42 },
-    });
   };
 
   const pressMove = (e: React.PointerEvent<HTMLElement>) => {
@@ -66,13 +51,6 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
 
     hasDraggedRef.current = true;
     setPressed(false);
-    controls.start({
-      scale: 1,
-      y: 0,
-      rotateX: 0,
-      rotateY: 0,
-      transition: { duration: 0.14, ease: [0.16, 1, 0.3, 1] },
-    });
   };
 
   const pressOut = (didTap: boolean) => {
@@ -81,13 +59,6 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
     pointerStartRef.current = null;
     setPressed(false);
     if (shouldOpen) openingRef.current = true;
-    void controls.start({
-      scale: 1,
-      y: 0,
-      rotateX: 0,
-      rotateY: 0,
-      transition: { duration: 0.18, ease: [0.16, 1, 0.3, 1] },
-    });
     if (shouldOpen) {
       onOpen();
       window.setTimeout(() => {
@@ -104,14 +75,15 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-15% 0px" }}
       transition={{
-        duration: 0.75,
+        duration: 0.58,
         delay: index * 0.12,
         ease: [0.16, 1, 0.3, 1],
       }}
-      animate={controls}
+      animate={{
+        scale: pressed ? 0.985 : 1,
+        y: pressed ? 1 : 0,
+      }}
       style={{
-        transformPerspective: 900,
-        transformStyle: "preserve-3d",
         transformOrigin: "center center",
         willChange: "transform",
         touchAction: "pan-x pan-y pinch-zoom",
@@ -182,91 +154,26 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
 const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
   const trackRef = useRef<HTMLDivElement>(null);
   const settleTimerRef = useRef(0);
-  const scrollRafRef = useRef(0);
-  const intendedTargetRef = useRef<number | null>(null);
-  const intendedTargetTimerRef = useRef(0);
-  const touchingRef = useRef(false);
-  const touchStartRef = useRef<{ x: number; y: number; left: number; t: number } | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [selected, setSelected] = useState<QuietCard | null>(null);
 
   const getCardStride = useCallback((el: HTMLDivElement) => el.clientWidth * 0.86 + 16, []);
 
-  const stopScrollAnimation = useCallback(() => {
-    if (scrollRafRef.current) {
-      cancelAnimationFrame(scrollRafRef.current);
-      scrollRafRef.current = 0;
-    }
-  }, []);
-
   const scrollTo = useCallback(
-    (index: number, behavior: ScrollBehavior = "smooth") => {
+    (index: number) => {
       const el = trackRef.current;
       if (!el) return;
-      stopScrollAnimation();
       const cardStride = getCardStride(el);
       const target = Math.max(0, Math.min(cards.length - 1, index));
-      const targetLeft = target * cardStride;
-
-      if (behavior === "auto") {
-        el.scrollLeft = targetLeft;
-        return;
-      }
-
-      const startLeft = el.scrollLeft;
-      const distance = targetLeft - startLeft;
-      if (Math.abs(distance) < 1) return;
-
-      const startedAt = performance.now();
-      const duration = Math.min(520, Math.max(280, Math.abs(distance) * 0.95));
-      const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
-
-      const step = (time: number) => {
-        const progress = Math.min(1, (time - startedAt) / duration);
-        el.scrollLeft = startLeft + distance * easeOut(progress);
-        if (progress < 1) {
-          scrollRafRef.current = requestAnimationFrame(step);
-        } else {
-          scrollRafRef.current = 0;
-        }
-      };
-
-      scrollRafRef.current = requestAnimationFrame(step);
-    },
-    [cards.length, getCardStride, stopScrollAnimation],
-  );
-
-  const settleTo = useCallback(
-    (index: number, delay = 24) => {
-      const target = Math.max(0, Math.min(cards.length - 1, index));
-      intendedTargetRef.current = target;
       setActiveIndex(target);
-      window.clearTimeout(settleTimerRef.current);
-      window.clearTimeout(intendedTargetTimerRef.current);
-      settleTimerRef.current = window.setTimeout(() => scrollTo(target), delay);
-      intendedTargetTimerRef.current = window.setTimeout(() => {
-        intendedTargetRef.current = null;
-      }, 920);
+      el.scrollTo({ left: target * cardStride, behavior: "smooth" });
     },
-    [cards.length, scrollTo],
+    [cards.length, getCardStride],
   );
-
-  const steerToNearest = useCallback(() => {
-    const el = trackRef.current;
-    if (!el || touchingRef.current) return;
-    const cardStride = getCardStride(el);
-    const intendedTarget = intendedTargetRef.current;
-    const nearest =
-      intendedTarget ?? Math.max(0, Math.min(cards.length - 1, Math.round(el.scrollLeft / cardStride)));
-    const targetLeft = nearest * cardStride;
-    if (Math.abs(el.scrollLeft - targetLeft) > 3) {
-      el.scrollTo({ left: targetLeft, behavior: "smooth" });
-    }
-  }, [cards.length, getCardStride]);
 
   useEffect(() => {
     const preloadLinks: HTMLLinkElement[] = [];
-    cards.forEach(({ imageSrc }) => {
+    cards.slice(0, 2).forEach(({ imageSrc }) => {
       if (!imageSrc) return;
 
       const image = new Image();
@@ -286,7 +193,6 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
     };
   }, [cards]);
 
-  // Track active card via scroll position, then softly steer to the closest card after scrolling settles.
   useEffect(() => {
     const el = trackRef.current;
     if (!el) return;
@@ -299,63 +205,14 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
         const idx = Math.round(el.scrollLeft / cardWidth);
         setActiveIndex(Math.max(0, Math.min(cards.length - 1, idx)));
       });
-      if (!touchingRef.current) {
-        settleTimerRef.current = window.setTimeout(steerToNearest, 150);
-      }
     };
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       el.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(raf);
       window.clearTimeout(settleTimerRef.current);
-      window.clearTimeout(intendedTargetTimerRef.current);
-      stopScrollAnimation();
     };
-  }, [cards.length, getCardStride, steerToNearest, stopScrollAnimation]);
-
-  const handleTouchStart = (event: React.TouchEvent<HTMLDivElement>) => {
-    const el = trackRef.current;
-    const touch = event.touches[0];
-    if (!el || !touch) return;
-    stopScrollAnimation();
-    window.clearTimeout(settleTimerRef.current);
-    window.clearTimeout(intendedTargetTimerRef.current);
-    intendedTargetRef.current = null;
-    touchingRef.current = true;
-    touchStartRef.current = { x: touch.clientX, y: touch.clientY, left: el.scrollLeft, t: performance.now() };
-  };
-
-  const handleTouchEnd = (event: React.TouchEvent<HTMLDivElement>) => {
-    const el = trackRef.current;
-    const start = touchStartRef.current;
-    touchingRef.current = false;
-    touchStartRef.current = null;
-    if (!el || !start) {
-      settleTimerRef.current = window.setTimeout(steerToNearest, 90);
-      return;
-    }
-
-    const touch = event.changedTouches[0];
-    if (!touch) return;
-    const dx = touch.clientX - start.x;
-    const dy = touch.clientY - start.y;
-    const elapsed = Math.max(1, performance.now() - start.t);
-    const speed = Math.abs(dx) / elapsed;
-    const cardStride = getCardStride(el);
-    const startIndex = Math.round(start.left / cardStride);
-    const isHorizontal = Math.abs(dx) > 20 && Math.abs(dx) > Math.abs(dy) * 1.04;
-
-    if (!isHorizontal) {
-      settleTimerRef.current = window.setTimeout(steerToNearest, 90);
-      return;
-    }
-
-    const direction = dx < 0 ? 1 : -1;
-    const veryStrongSwipe = speed > 2.05 || Math.abs(dx) > el.clientWidth * 0.72;
-    const step = veryStrongSwipe ? 2 : 1;
-    const targetIndex = Math.max(0, Math.min(cards.length - 1, startIndex + direction * step));
-    settleTo(targetIndex, veryStrongSwipe ? 54 : 92);
-  };
+  }, [cards.length, getCardStride]);
 
   return (
     <section
@@ -393,14 +250,7 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
       {/* Horizontal scroller */}
       <motion.div
         ref={trackRef}
-        className="mobile-performance-surface android-snap-proximity relative z-10 flex snap-x snap-proximity gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain px-[7vw] pb-8 pt-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        onTouchCancel={() => {
-          touchingRef.current = false;
-          touchStartRef.current = null;
-          settleTimerRef.current = window.setTimeout(steerToNearest, 90);
-        }}
+        className="mobile-performance-surface android-snap-proximity relative z-10 flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain px-[7vw] pb-8 pt-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-5% 0px" }}
@@ -410,7 +260,7 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
           touchAction: "pan-x pan-y pinch-zoom",
           WebkitOverflowScrolling: "touch",
           overscrollBehaviorX: "contain",
-          scrollSnapType: "x proximity",
+          scrollSnapType: "x mandatory",
         }}
       >
         {cards.map((card, index) => (
@@ -419,7 +269,7 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
             card={card}
             index={index}
             onOpen={() => {
-              scrollTo(index);
+              setActiveIndex(index);
               setSelected(card);
             }}
           />
@@ -497,7 +347,7 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
     >
       <motion.div
         aria-hidden="true"
-        className="android-no-filter absolute inset-0 bg-[#07101f]/40"
+        className="modal-focus-overlay absolute inset-0"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
@@ -506,7 +356,7 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
       />
 
       <motion.div
-        className="zoom-safe android-lite-glass relative max-h-[92svh] w-full overflow-y-auto rounded-t-[1.8rem] border-t border-white/70 bg-white/85 p-5 pb-[calc(2rem+env(safe-area-inset-bottom))] text-[#111827] shadow-[0_-30px_80px_rgba(10,18,30,0.32),inset_0_1px_0_rgba(255,255,255,0.95)] backdrop-blur-2xl"
+        className="zoom-safe static-sheet-glass relative max-h-[92svh] w-full overflow-y-auto rounded-t-[1.8rem] border-t border-white/70 bg-white/85 p-5 pb-[calc(2rem+env(safe-area-inset-bottom))] text-[#111827] shadow-[0_-30px_80px_rgba(10,18,30,0.32),inset_0_1px_0_rgba(255,255,255,0.95)]"
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}

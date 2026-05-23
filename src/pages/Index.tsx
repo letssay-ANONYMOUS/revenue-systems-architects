@@ -2,48 +2,34 @@ import { Link } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion, useScroll, useSpring, useTransform, type MotionValue, type Variants } from "framer-motion";
 import {
-  Phone, CalendarCheck, Globe, Smartphone,
-  Bot, UserCheck, BarChart3,
-  Zap, Target, Shield, ArrowRight, CheckCircle2, TrendingUp,
-  Layers, Database,
+  Phone, CalendarCheck,
+  Bot, UserCheck,
+  Zap, Shield, ArrowRight, CheckCircle2, TrendingUp,
+  Layers,
   Headphones, Send, X, ChevronLeft, ChevronRight, Maximize2
 } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import CTASection from "@/components/CTASection";
 import SectionReveal from "@/components/SectionReveal";
-import GradientMesh from "@/components/GradientMesh";
 import TiltCard from "@/components/TiltCard";
 import LazySection from "@/components/LazySection";
-import ProcessGraph from "@/components/ProcessGraph";
-import LiquidCaseStudyCards from "@/components/LiquidCaseStudyCards";
-import MobileCaseRolodex from "@/components/MobileCaseRolodex";
-import InboundCallingConsole from "@/components/calling/InboundCallingConsole";
-import OutboundAnalyticsPanel from "@/components/calling/OutboundAnalyticsPanel";
-import PainPointCard from "@/components/painpoints/PainPointCard";
-import MissedCallVisual from "@/components/painpoints/visuals/MissedCallVisual";
-import InstantReplyVisual from "@/components/painpoints/visuals/InstantReplyVisual";
-import RemindersVisual from "@/components/painpoints/visuals/RemindersVisual";
-import LighthouseVisual from "@/components/painpoints/visuals/LighthouseVisual";
-import WorkflowNodesVisual from "@/components/painpoints/visuals/WorkflowNodesVisual";
-import ConnectedToolsVisual from "@/components/painpoints/visuals/ConnectedToolsVisual";
 import MobileQuietLayer from "@/components/mobile/MobileQuietLayer";
 import StickyMobileCTA from "@/components/mobile/StickyMobileCTA";
-import MobileDiagnostic from "@/components/mobile/MobileDiagnostic";
-import MobileServiceWorkshop from "@/components/mobile/MobileServiceWorkshop";
 import MobileHeroExtras from "@/components/mobile/MobileHeroExtras";
-import MobileProofStrip from "@/components/mobile/MobileProofStrip";
 import { HERO_VIDEO_SOURCES, SITE_IMAGES } from "@/lib/media";
 
-const painPoints = [
-  { pain: "Missed calls", solution: "AI answers every call", caption: "Every call. Every time. Instantly.", Visual: MissedCallVisual },
-  { pain: "Slow responses", solution: "Instant voice & chat", caption: "Respond in seconds. Book more.", Visual: InstantReplyVisual },
-  { pain: "No-show chaos", solution: "Automated reminders", caption: "Reduce no-shows. Increase show-ups.", Visual: RemindersVisual },
-  { pain: "Weak web presence", solution: "Premium conversion site", caption: "Beautiful. Fast. Built to convert.", Visual: LighthouseVisual },
-  { pain: "Manual admin", solution: "Automated workflows", caption: "Save time. Eliminate busywork.", Visual: WorkflowNodesVisual },
-  { pain: "Fragmented tools", solution: "One connected system", caption: "All your tools. One intelligent hub.", Visual: ConnectedToolsVisual },
-];
+const CTASection = lazy(() => import("@/components/CTASection"));
+const Footer = lazy(() => import("@/components/Footer"));
+const DesktopPainPointsGrid = lazy(() => import("@/components/DesktopPainPointsGrid"));
+const GradientMesh = lazy(() => import("@/components/GradientMesh"));
+const ProcessGraph = lazy(() => import("@/components/ProcessGraph"));
+const LiquidCaseStudyCards = lazy(() => import("@/components/LiquidCaseStudyCards"));
+const InboundCallingConsole = lazy(() => import("@/components/calling/InboundCallingConsole"));
+const OutboundAnalyticsPanel = lazy(() => import("@/components/calling/OutboundAnalyticsPanel"));
+const MobileCaseRolodex = lazy(() => import("@/components/MobileCaseRolodex"));
+const MobileDiagnostic = lazy(() => import("@/components/mobile/MobileDiagnostic"));
+const MobileProofStrip = lazy(() => import("@/components/mobile/MobileProofStrip"));
+const MobileServiceWorkshop = lazy(() => import("@/components/mobile/MobileServiceWorkshop"));
 
 const transitionCards = [
   {
@@ -485,10 +471,10 @@ const RisingCardDetail = ({ card, onClose }: RisingCardDetailProps) => {
     >
       <motion.div
         aria-hidden="true"
-        className="absolute inset-0 bg-[#07101f]/24"
-        initial={{ opacity: 0, backdropFilter: "blur(0px)" } as any}
-        animate={{ opacity: 1, backdropFilter: "blur(5px)" } as any}
-        exit={{ opacity: 0, backdropFilter: "blur(0px)" } as any}
+        className="modal-focus-overlay absolute inset-0"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
         transition={{ duration: 0.58, ease: [0.16, 1, 0.3, 1] }}
       />
       <motion.button
@@ -503,7 +489,7 @@ const RisingCardDetail = ({ card, onClose }: RisingCardDetailProps) => {
       />
 
       <motion.div
-        className="relative w-[min(1320px,95vw)] overflow-hidden rounded-[2.2rem] border border-white/60 bg-white/56 p-4 text-[#111827] shadow-[0_50px_140px_rgba(10,18,30,0.36),inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(17,24,39,0.1)] backdrop-blur-2xl"
+        className="static-sheet-glass relative w-[min(1320px,95vw)] overflow-hidden rounded-[2.2rem] border border-white/60 bg-white/56 p-4 text-[#111827] shadow-[0_50px_140px_rgba(10,18,30,0.36),inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-1px_0_rgba(17,24,39,0.1)]"
         initial={{ y: "104%", scale: 0.96, opacity: 0.96 }}
         animate={{ y: 0, scale: 1, opacity: 1 }}
         exit={{ y: "104%", scale: 0.985, opacity: 0, pointerEvents: "none" }}
@@ -715,7 +701,10 @@ const WebsiteShowcaseCarousel = () => {
 
   useEffect(() => {
     const preloadLinks: HTMLLinkElement[] = [];
-    websiteShowcases.flatMap(({ imageSrc, phoneImageSrc }) => [imageSrc, phoneImageSrc]).forEach((imageSrc) => {
+    const adjacentIndex = (activeIndex + 1) % websiteShowcases.length;
+    [websiteShowcases[activeIndex], websiteShowcases[adjacentIndex]]
+      .flatMap(({ imageSrc, phoneImageSrc }) => [imageSrc, phoneImageSrc])
+      .forEach((imageSrc) => {
       if (!imageSrc) return;
       const img = new Image();
       img.decoding = "async";
@@ -732,7 +721,7 @@ const WebsiteShowcaseCarousel = () => {
     return () => {
       preloadLinks.forEach((link) => link.remove());
     };
-  }, []);
+  }, [activeIndex]);
 
   useEffect(() => {
     if (!selectedWebsite) return;
@@ -1184,22 +1173,17 @@ const WebsiteShowcaseCarousel = () => {
             >
               <motion.div
                 aria-hidden="true"
-                className="absolute inset-0"
-                initial={{ opacity: 0, backdropFilter: "blur(0px)", WebkitBackdropFilter: "blur(0px)", backgroundColor: "rgba(248,250,252,0)" }}
-                animate={{
-                  opacity: 1,
-                  backdropFilter: isAndroidMotion ? "blur(8px)" : "blur(18px)",
-                  WebkitBackdropFilter: isAndroidMotion ? "blur(8px)" : "blur(18px)",
-                  backgroundColor: "rgba(248,250,252,0.72)",
-                }}
-                exit={{ opacity: 0, backdropFilter: "blur(0px)", WebkitBackdropFilter: "blur(0px)", backgroundColor: "rgba(248,250,252,0)" }}
+                className="modal-focus-overlay absolute inset-0"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 transition={{ duration: isAndroidMotion ? 0.46 : 0.84, ease: [0.16, 1, 0.3, 1] }}
               />
               <motion.div
                 role="dialog"
                 aria-modal="true"
                 aria-label={`${selectedWebsite.title} full website preview`}
-                className={`zoom-safe android-lite-glass relative z-10 flex max-h-[calc(100svh-1rem)] w-full flex-col overflow-hidden rounded-[1.95rem] border border-white/76 bg-white/64 p-2.5 shadow-[0_44px_130px_rgba(24,38,60,0.24),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-1px_0_rgba(17,24,39,0.06)] backdrop-blur-2xl md:rounded-[2.35rem] md:p-3 ${
+                className={`zoom-safe static-sheet-glass relative z-10 flex max-h-[calc(100svh-1rem)] w-full flex-col overflow-hidden rounded-[1.95rem] border border-white/76 bg-white/64 p-2.5 shadow-[0_44px_130px_rgba(24,38,60,0.24),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-1px_0_rgba(17,24,39,0.06)] md:rounded-[2.35rem] md:p-3 ${
                   selectedWebsiteDevice === "phone" ? "max-w-[min(97vw,560px)]" : "max-w-[min(98vw,1720px)]"
                 }`}
                 initial={{ y: "104%", opacity: 0, scale: 0.94, filter: androidSafeFilter("blur(16px)") }}
@@ -1236,14 +1220,14 @@ const WebsiteShowcaseCarousel = () => {
                     event.preventDefault();
                     resetPreviewZoom();
                   }}
-                  style={{ touchAction: "pan-x pan-y pinch-zoom" }}
+                  style={{ touchAction: "none" }}
                 >
                   <img
                     ref={previewImageRef}
                     src={selectedWebsiteImageSrc}
                     alt={`${selectedWebsite.title} full website design`}
                     className="zoom-safe h-auto w-full max-w-none origin-top transform-gpu transition-transform duration-150"
-                    style={{ transformOrigin: "50% 0%" }}
+                    style={{ transformOrigin: "50% 0%", touchAction: "none", userSelect: "none" }}
                     loading="eager"
                     decoding="async"
                     fetchpriority="high"
@@ -1486,29 +1470,34 @@ const Index = () => {
                 </p>
               </SectionReveal>
               {/* Desktop: 6-card grid */}
-              <div className="hidden grid-cols-1 gap-5 md:grid md:grid-cols-2 xl:grid-cols-3">
-                {painPoints.map((pp, i) => (
-                  <SectionReveal key={i} delay={i * 0.05}>
-                    <PainPointCard
-                      pain={pp.pain}
-                      solution={pp.solution}
-                      caption={pp.caption}
-                      visual={<pp.Visual />}
-                    />
-                  </SectionReveal>
-                ))}
-              </div>
+              <LazySection rootMargin="500px" minHeight="28rem">
+                <Suspense fallback={null}>
+                  <DesktopPainPointsGrid />
+                </Suspense>
+              </LazySection>
 
               {/* Mobile: single tabbed diagnostic */}
-              <MobileDiagnostic />
+              <LazySection rootMargin="500px" minHeight="31rem">
+                <Suspense fallback={null}>
+                  <MobileDiagnostic />
+                </Suspense>
+              </LazySection>
             </div>
           </section>
 
         {/* MOBILE: Proof strip between sections */}
-        <MobileProofStrip />
+        <LazySection rootMargin="500px" minHeight="4rem">
+          <Suspense fallback={null}>
+            <MobileProofStrip />
+          </Suspense>
+        </LazySection>
 
         {/* MOBILE: Service Workshop replaces 3 service sections */}
-        <MobileServiceWorkshop />
+        <LazySection rootMargin="500px" minHeight="42rem">
+          <Suspense fallback={null}>
+            <MobileServiceWorkshop />
+          </Suspense>
+        </LazySection>
 
         {/* AI CALLING AGENT SHOWCASE — desktop/tablet only */}
         <LazySection rootMargin="300px" minHeight="500px">
@@ -1531,7 +1520,9 @@ const Index = () => {
               <SectionReveal>
                 <TiltCard>
                   <div className="h-full rounded-xl border border-white/35 bg-white/55 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.38)] md:rounded-2xl md:p-8">
-                    <InboundCallingConsole />
+                    <Suspense fallback={null}>
+                      <InboundCallingConsole />
+                    </Suspense>
                   </div>
                 </TiltCard>
               </SectionReveal>
@@ -1540,7 +1531,9 @@ const Index = () => {
               <SectionReveal delay={0.15}>
                 <TiltCard>
                   <div className="h-full rounded-xl border border-white/35 bg-white/55 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.38)] md:rounded-2xl md:p-8">
-                    <OutboundAnalyticsPanel />
+                    <Suspense fallback={null}>
+                      <OutboundAnalyticsPanel />
+                    </Suspense>
                   </div>
                 </TiltCard>
               </SectionReveal>
@@ -1713,7 +1706,9 @@ const Index = () => {
 
       {/* PROCESS — lazy loaded */}
       <LazySection rootMargin="300px" minHeight="300px">
-        <ProcessGraph />
+        <Suspense fallback={null}>
+          <ProcessGraph />
+        </Suspense>
       </LazySection>
 
       {/* CASE STUDIES — lazy loaded */}
@@ -1726,9 +1721,13 @@ const Index = () => {
                 Real Systems. <span className="sterk-chrome-text">Measurable Impact.</span>
               </h2>
             </SectionReveal>
-            <MobileCaseRolodex />
+            <Suspense fallback={null}>
+              <MobileCaseRolodex />
+            </Suspense>
             <div className="hidden md:block">
-              <LiquidCaseStudyCards />
+              <Suspense fallback={null}>
+                <LiquidCaseStudyCards />
+              </Suspense>
             </div>
           </div>
         </section>
@@ -1737,7 +1736,9 @@ const Index = () => {
       {/* WHY US — lazy loaded */}
       <LazySection rootMargin="300px" minHeight="300px">
         <section className="py-14 md:py-32 surface-elevated relative overflow-hidden">
-          <GradientMesh />
+          <Suspense fallback={null}>
+            <GradientMesh />
+          </Suspense>
           <div className="max-w-7xl mx-auto px-5 md:section-padding relative z-10">
             <div className="grid lg:grid-cols-2 gap-6 md:gap-16 items-center">
               <SectionReveal>
@@ -1782,8 +1783,10 @@ const Index = () => {
 
       {/* CTA & Footer — lazy loaded */}
       <LazySection rootMargin="300px" minHeight="200px">
-        <CTASection />
-        <Footer />
+        <Suspense fallback={null}>
+          <CTASection />
+          <Footer />
+        </Suspense>
       </LazySection>
 
       <StickyMobileCTA />

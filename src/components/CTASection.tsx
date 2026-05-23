@@ -92,6 +92,9 @@ const SeamlessCTAVideo = () => {
   const [activeLayer, setActiveLayer] = useState<0 | 1>(0);
   const [sourceIndex, setSourceIndex] = useState(0);
   const source = CTA_VIDEO_SOURCES[sourceIndex];
+  const useSingleLayer =
+    typeof window !== "undefined" &&
+    window.matchMedia("(hover: none) and (pointer: coarse)").matches;
 
   useEffect(() => {
     if (window.navigator.userAgent.toLowerCase().includes("jsdom")) return;
@@ -151,6 +154,34 @@ const SeamlessCTAVideo = () => {
       setActiveLayer(activeLayer === 0 ? 1 : 0);
     };
 
+    if (useSingleLayer) {
+      current.loop = true;
+      play(current);
+      const heartbeat = window.setInterval(recover, 3000);
+      const handleVisibility = () => recover();
+      const handleWake = () => recover();
+      current.addEventListener("stalled", recover);
+      current.addEventListener("waiting", recover);
+      current.addEventListener("error", recover);
+      document.addEventListener("visibilitychange", handleVisibility);
+      document.addEventListener("pointerdown", handleWake, { passive: true });
+      document.addEventListener("touchstart", handleWake, { passive: true });
+      window.addEventListener("pageshow", handleWake);
+      window.addEventListener("focus", handleWake);
+
+      return () => {
+        window.clearInterval(heartbeat);
+        current.removeEventListener("stalled", recover);
+        current.removeEventListener("waiting", recover);
+        current.removeEventListener("error", recover);
+        document.removeEventListener("visibilitychange", handleVisibility);
+        document.removeEventListener("pointerdown", handleWake);
+        document.removeEventListener("touchstart", handleWake);
+        window.removeEventListener("pageshow", handleWake);
+        window.removeEventListener("focus", handleWake);
+      };
+    }
+
     play(current);
 
     if (previous) {
@@ -195,7 +226,7 @@ const SeamlessCTAVideo = () => {
       window.removeEventListener("pageshow", handleWake);
       window.removeEventListener("focus", handleWake);
     };
-  }, [activeLayer, source, sourceIndex]);
+  }, [activeLayer, source, sourceIndex, useSingleLayer]);
 
   const videoClass = "absolute inset-0 h-full w-full object-cover transition-opacity";
   const videoStyle = {
@@ -208,10 +239,11 @@ const SeamlessCTAVideo = () => {
       <video
         key={`primary-${source}`}
         ref={primaryRef}
-        className={`${videoClass} ${activeLayer === 0 ? "opacity-100" : "opacity-0"}`}
+        className={`${videoClass} ${useSingleLayer || activeLayer === 0 ? "opacity-100" : "opacity-0"}`}
         style={videoStyle}
         autoPlay
         muted
+        loop={useSingleLayer}
         playsInline
         preload="metadata"
         disablePictureInPicture
@@ -219,19 +251,21 @@ const SeamlessCTAVideo = () => {
       >
         <source src={source} type="video/mp4" />
       </video>
-      <video
-        key={`secondary-${source}`}
-        ref={secondaryRef}
-        className={`${videoClass} ${activeLayer === 1 ? "opacity-100" : "opacity-0"}`}
-        style={videoStyle}
-        muted
-        playsInline
-        preload="metadata"
-        disablePictureInPicture
-        controlsList="nodownload noplaybackrate noremoteplayback"
-      >
-        <source src={source} type="video/mp4" />
-      </video>
+      {!useSingleLayer && (
+        <video
+          key={`secondary-${source}`}
+          ref={secondaryRef}
+          className={`${videoClass} ${activeLayer === 1 ? "opacity-100" : "opacity-0"}`}
+          style={videoStyle}
+          muted
+          playsInline
+          preload="metadata"
+          disablePictureInPicture
+          controlsList="nodownload noplaybackrate noremoteplayback"
+        >
+          <source src={source} type="video/mp4" />
+        </video>
+      )}
     </div>
   );
 };

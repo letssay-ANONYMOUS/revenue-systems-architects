@@ -1,4 +1,4 @@
-import { ReactNode, Suspense } from "react";
+import { ReactNode, Suspense, useEffect, useRef, useState } from "react";
 
 interface LazySectionProps {
   children: ReactNode;
@@ -9,16 +9,38 @@ interface LazySectionProps {
 
 const LazySection = ({
   children,
-  rootMargin,
-  minHeight,
+  rootMargin = "300px",
+  minHeight = "1px",
   fallback,
 }: LazySectionProps) => {
-  void rootMargin;
-  void minHeight;
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    const node = containerRef.current;
+    if (!node || shouldRender) return;
+
+    if (!("IntersectionObserver" in window)) {
+      setShouldRender(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setShouldRender(true);
+        observer.disconnect();
+      },
+      { rootMargin },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [rootMargin, shouldRender]);
 
   return (
-    <div>
-      <Suspense fallback={fallback || null}>{children}</Suspense>
+    <div ref={containerRef} style={!shouldRender ? { minHeight } : undefined}>
+      {shouldRender ? <Suspense fallback={fallback || null}>{children}</Suspense> : fallback || null}
     </div>
   );
 };

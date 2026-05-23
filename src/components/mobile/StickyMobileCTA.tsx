@@ -52,10 +52,7 @@ const StickyMobileCTA = () => {
           exit={{ y: 120, opacity: 0 }}
           transition={{ type: "spring", stiffness: 380, damping: 34, mass: 0.62 }}
         >
-          <div
-            className="android-lite-glass pointer-events-auto relative flex w-full max-w-[28rem] items-center gap-2 overflow-hidden rounded-full border border-white/65 bg-white/55 p-1.5 pl-3 shadow-[0_24px_60px_rgba(11,31,79,0.28),inset_0_1px_0_rgba(255,255,255,0.95),inset_0_-2px_8px_rgba(17,24,39,0.06)] backdrop-blur-2xl"
-            style={{ backdropFilter: "blur(28px) saturate(170%)", WebkitBackdropFilter: "blur(28px) saturate(170%)" }}
-          >
+          <div className="static-pill-glass pointer-events-auto relative flex w-full max-w-[28rem] items-center gap-2 overflow-hidden rounded-full border border-white/65 bg-white/55 p-1.5 pl-3 shadow-[0_24px_60px_rgba(11,31,79,0.28),inset_0_1px_0_rgba(255,255,255,0.95),inset_0_-2px_8px_rgba(17,24,39,0.06)]">
             {/* Animated breathing hairline on top edge */}
             <motion.div
               className="pointer-events-none absolute inset-x-6 top-0 h-px"
