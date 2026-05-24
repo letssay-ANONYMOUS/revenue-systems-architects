@@ -443,19 +443,66 @@ interface RisingCardDetailProps {
 }
 
 const RisingCardDetail = ({ card, onClose }: RisingCardDetailProps) => {
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const closeDetail = useCallback(() => {
     onClose();
   }, [onClose]);
 
   useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const previousHtmlOverflow = html.style.overflow;
+    const previousBodyOverflow = body.style.overflow;
+    const previousOverscroll = body.style.overscrollBehavior;
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    body.style.overscrollBehavior = "contain";
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") closeDetail();
     };
+    const handleDocumentPress = (event: PointerEvent | MouseEvent | TouchEvent) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      if (!target.closest("[data-card-detail-close]")) return;
+      event.preventDefault();
+      event.stopPropagation();
+      closeDetail();
+    };
 
     window.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("pointerdown", handleDocumentPress, { capture: true });
+    document.addEventListener("mousedown", handleDocumentPress, { capture: true });
+    document.addEventListener("touchstart", handleDocumentPress, { capture: true });
 
     return () => {
+      html.style.overflow = previousHtmlOverflow;
+      body.style.overflow = previousBodyOverflow;
+      body.style.overscrollBehavior = previousOverscroll;
       window.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("pointerdown", handleDocumentPress, { capture: true });
+      document.removeEventListener("mousedown", handleDocumentPress, { capture: true });
+      document.removeEventListener("touchstart", handleDocumentPress, { capture: true });
+    };
+  }, [closeDetail]);
+
+  useEffect(() => {
+    const closeButton = closeButtonRef.current;
+    if (!closeButton) return;
+    const handleClosePress = (event: Event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      closeDetail();
+    };
+    closeButton.addEventListener("pointerdown", handleClosePress, { capture: true });
+    closeButton.addEventListener("mousedown", handleClosePress, { capture: true });
+    closeButton.addEventListener("touchstart", handleClosePress, { capture: true });
+    closeButton.addEventListener("click", handleClosePress, { capture: true });
+    return () => {
+      closeButton.removeEventListener("pointerdown", handleClosePress, { capture: true });
+      closeButton.removeEventListener("mousedown", handleClosePress, { capture: true });
+      closeButton.removeEventListener("touchstart", handleClosePress, { capture: true });
+      closeButton.removeEventListener("click", handleClosePress, { capture: true });
     };
   }, [closeDetail]);
 
@@ -479,8 +526,13 @@ const RisingCardDetail = ({ card, onClose }: RisingCardDetailProps) => {
       />
       <motion.button
         type="button"
+        data-card-detail-close
         aria-label="Close card details"
         className="absolute inset-0 cursor-default"
+        onPointerDown={(event) => {
+          event.preventDefault();
+          closeDetail();
+        }}
         onClick={closeDetail}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -499,24 +551,34 @@ const RisingCardDetail = ({ card, onClose }: RisingCardDetailProps) => {
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.78),rgba(255,255,255,0.24)_42%,rgba(20,71,212,0.08))]" />
         <div className="pointer-events-none absolute inset-[1px] rounded-[1.9rem] border border-white/44 shadow-[inset_0_26px_80px_rgba(255,255,255,0.24)]" />
 
-        <motion.button
+        <button
+          ref={closeButtonRef}
           type="button"
+          data-card-detail-close
           aria-label="Close card details"
           className="absolute right-6 top-6 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/68 bg-white/64 text-[#111827]/80 shadow-[0_16px_38px_rgba(14,23,36,0.18),inset_0_1px_0_rgba(255,255,255,0.84),inset_0_-8px_18px_rgba(17,24,39,0.055)] backdrop-blur-xl transition-[background-color,box-shadow,color] duration-300 hover:bg-white/84 hover:text-[#111827]"
-          onClick={(event) => {
+          onPointerDownCapture={(event) => {
+            event.preventDefault();
             event.stopPropagation();
             closeDetail();
           }}
-          whileHover={{ scale: 1.06, y: -1 }}
-          whileTap={{
-            scale: 0.9,
-            y: 2,
-            boxShadow: "0 7px 18px rgba(14,23,36,0.16), inset 0 4px 12px rgba(17,24,39,0.1), inset 0 1px 0 rgba(255,255,255,0.72)",
+          onMouseDownCapture={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            closeDetail();
           }}
-          transition={{ type: "spring", stiffness: 520, damping: 24, mass: 0.42 }}
+          onTouchStartCapture={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            closeDetail();
+          }}
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+          }}
         >
           <X className="h-4 w-4" />
-        </motion.button>
+        </button>
 
         <div className="relative z-10 grid gap-5 lg:grid-cols-[1.65fr_0.8fr]">
           <div className="overflow-hidden rounded-[1.65rem] border border-white/64 bg-[#eef3f7]/68 p-2 shadow-[0_28px_80px_rgba(26,39,55,0.18),inset_0_1px_0_rgba(255,255,255,0.8)]">
@@ -570,19 +632,6 @@ const WebsiteShowcaseCarousel = () => {
   const [selectedWebsiteIndex, setSelectedWebsiteIndex] = useState<number | null>(null);
   const [selectedWebsiteDevice, setSelectedWebsiteDevice] = useState<"desktop" | "phone">("desktop");
   const [deviceView, setDeviceView] = useState<"desktop" | "phone">("desktop");
-  const previewImageRef = useRef<HTMLImageElement | null>(null);
-  const previewZoomRef = useRef({ scale: 1, x: 0, y: 0 });
-  const previewGestureRef = useRef<{
-    mode: "pinch" | "pan";
-    distance?: number;
-    scale: number;
-    x: number;
-    y: number;
-    centerX?: number;
-    centerY?: number;
-    touchX?: number;
-    touchY?: number;
-  } | null>(null);
   const active = websiteShowcases[activeIndex];
   const selectedWebsite = selectedWebsiteIndex === null ? null : websiteShowcases[selectedWebsiteIndex];
   const selectedWebsiteImageSrc = selectedWebsiteDevice === "phone" ? selectedWebsite?.phoneImageSrc : selectedWebsite?.imageSrc;
@@ -604,100 +653,22 @@ const WebsiteShowcaseCarousel = () => {
     setSelectedWebsiteIndex(activeIndex);
   }, [active.imageSrc, activeIndex, activePhoneImageSrc, deviceView]);
 
-  const applyPreviewZoom = useCallback(() => {
-    const img = previewImageRef.current;
-    if (!img) return;
-    const { scale, x, y } = previewZoomRef.current;
-    img.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
-  }, []);
-
-  const resetPreviewZoom = useCallback(() => {
-    previewZoomRef.current = { scale: 1, x: 0, y: 0 };
-    applyPreviewZoom();
-  }, [applyPreviewZoom]);
-
-  const getTouchDistance = (touches: React.TouchList) => {
-    const a = touches[0];
-    const b = touches[1];
-    return Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
-  };
-
-  const getTouchCenter = (touches: React.TouchList) => ({
-    x: (touches[0].clientX + touches[1].clientX) / 2,
-    y: (touches[0].clientY + touches[1].clientY) / 2,
-  });
-
-  const handlePreviewTouchStart = useCallback((event: React.TouchEvent<HTMLDivElement>) => {
-    if (event.touches.length === 2) {
-      event.stopPropagation();
-      const center = getTouchCenter(event.touches);
-      previewGestureRef.current = {
-        mode: "pinch",
-        distance: getTouchDistance(event.touches),
-        scale: previewZoomRef.current.scale,
-        x: previewZoomRef.current.x,
-        y: previewZoomRef.current.y,
-        centerX: center.x,
-        centerY: center.y,
-      };
-      return;
-    }
-
-    if (event.touches.length === 1 && previewZoomRef.current.scale > 1.02) {
-      event.stopPropagation();
-      previewGestureRef.current = {
-        mode: "pan",
-        scale: previewZoomRef.current.scale,
-        x: previewZoomRef.current.x,
-        y: previewZoomRef.current.y,
-        touchX: event.touches[0].clientX,
-        touchY: event.touches[0].clientY,
-      };
-    }
-  }, []);
-
-  const handlePreviewTouchMove = useCallback((event: React.TouchEvent<HTMLDivElement>) => {
-    const gesture = previewGestureRef.current;
-    if (!gesture) return;
-
-    if (gesture.mode === "pinch" && event.touches.length === 2 && gesture.distance) {
-      event.preventDefault();
-      event.stopPropagation();
-      const center = getTouchCenter(event.touches);
-      const nextScale = Math.max(1, Math.min(3.25, gesture.scale * (getTouchDistance(event.touches) / gesture.distance)));
-      const scaleDelta = nextScale / gesture.scale;
-      previewZoomRef.current = {
-        scale: nextScale,
-        x: gesture.x + (center.x - (gesture.centerX ?? center.x)) * 0.5 + (gesture.x * (scaleDelta - 1)),
-        y: gesture.y + (center.y - (gesture.centerY ?? center.y)) * 0.5 + (gesture.y * (scaleDelta - 1)),
-      };
-      applyPreviewZoom();
-      return;
-    }
-
-    if (gesture.mode === "pan" && event.touches.length === 1 && gesture.touchX !== undefined && gesture.touchY !== undefined) {
-      event.preventDefault();
-      event.stopPropagation();
-      const nextX = gesture.x + event.touches[0].clientX - gesture.touchX;
-      const nextY = gesture.y + event.touches[0].clientY - gesture.touchY;
-      const maxX = 260 * previewZoomRef.current.scale;
-      const maxY = 520 * previewZoomRef.current.scale;
-      previewZoomRef.current = {
-        scale: previewZoomRef.current.scale,
-        x: Math.max(-maxX, Math.min(maxX, nextX)),
-        y: Math.max(-maxY, Math.min(maxY, nextY)),
-      };
-      applyPreviewZoom();
-    }
-  }, [applyPreviewZoom]);
-
-  const handlePreviewTouchEnd = useCallback((event: React.TouchEvent<HTMLDivElement>) => {
-    if (event.touches.length > 0) return;
-    previewGestureRef.current = null;
-    if (previewZoomRef.current.scale < 1.04) {
-      resetPreviewZoom();
-    }
-  }, [resetPreviewZoom]);
+  useEffect(() => {
+    if (selectedWebsiteIndex === null) return;
+    const html = document.documentElement;
+    const body = document.body;
+    const previousHtmlOverflow = html.style.overflow;
+    const previousBodyOverflow = body.style.overflow;
+    const previousOverscroll = body.style.overscrollBehavior;
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+    body.style.overscrollBehavior = "contain";
+    return () => {
+      html.style.overflow = previousHtmlOverflow;
+      body.style.overflow = previousBodyOverflow;
+      body.style.overscrollBehavior = previousOverscroll;
+    };
+  }, [selectedWebsiteIndex]);
 
   useEffect(() => {
     const preloadLinks: HTMLLinkElement[] = [];
@@ -725,7 +696,6 @@ const WebsiteShowcaseCarousel = () => {
 
   useEffect(() => {
     if (!selectedWebsite) return;
-    resetPreviewZoom();
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") closePreview();
@@ -736,7 +706,7 @@ const WebsiteShowcaseCarousel = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [closePreview, resetPreviewZoom, selectedWebsite]);
+  }, [closePreview, selectedWebsite]);
 
   const panelVariants: Variants = {
     enter: (travelDirection: number) => ({
@@ -1212,22 +1182,13 @@ const WebsiteShowcaseCarousel = () => {
                 </div>
                 <div
                   className="zoom-safe max-h-[calc(100svh-4.25rem)] overflow-auto overscroll-contain rounded-b-[1.45rem] bg-[#07101f] md:rounded-b-[1.85rem]"
-                  onTouchStart={handlePreviewTouchStart}
-                  onTouchMove={handlePreviewTouchMove}
-                  onTouchEnd={handlePreviewTouchEnd}
-                  onTouchCancel={handlePreviewTouchEnd}
-                  onDoubleClick={(event) => {
-                    event.preventDefault();
-                    resetPreviewZoom();
-                  }}
-                  style={{ touchAction: "none" }}
+                  style={{ touchAction: "pan-x pan-y pinch-zoom" }}
                 >
                   <img
-                    ref={previewImageRef}
                     src={selectedWebsiteImageSrc}
                     alt={`${selectedWebsite.title} full website design`}
-                    className="zoom-safe h-auto w-full max-w-none origin-top transform-gpu transition-transform duration-150"
-                    style={{ transformOrigin: "50% 0%", touchAction: "none", userSelect: "none" }}
+                    className="zoom-safe h-auto w-full max-w-none origin-top"
+                    style={{ touchAction: "pan-x pan-y pinch-zoom" }}
                     loading="eager"
                     decoding="async"
                     fetchpriority="high"
@@ -1326,7 +1287,7 @@ const HeroScrollTransition = () => {
           </p>
         </motion.div>
 
-        <div className="pointer-events-none absolute inset-x-0 top-[50%] z-20 flex justify-center px-6">
+        <div className="quiet-layer-card-stage pointer-events-none absolute inset-x-0 top-[50%] z-20 flex justify-center px-6">
           <div className="absolute -top-14 left-[8vw] hidden items-center gap-2 md:flex">
             {["Call captured", "Route synced"].map((label) => (
               <span key={label} className="sterk-status-chip">
@@ -1384,12 +1345,12 @@ const Index = () => {
         <ReliableHeroVideo />
 
         <div className="pointer-events-none absolute inset-x-0 top-0 h-[100svh] min-h-screen pt-20 md:pt-0">
-          <div className="mx-auto flex h-full max-w-[1480px] items-end justify-center px-4 pb-10 sm:px-6 md:items-end md:justify-end md:px-8 md:pb-[9vh] lg:px-10 lg:pb-[8vh] xl:translate-x-8 xl:px-8 xl:pb-[8vh] 2xl:translate-x-12">
+          <div className="hero-copy-shell mx-auto flex h-full max-w-[1480px] items-end justify-center px-4 pb-10 sm:px-6 md:items-end md:justify-end md:px-8 md:pb-[9vh] lg:px-10 lg:pb-[8vh] xl:translate-x-8 xl:px-8 xl:pb-[8vh] 2xl:translate-x-12">
             <motion.div
               initial={{ opacity: 0, y: 18, scale: 0.98 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="pointer-events-auto w-full max-w-[370px] sm:max-w-[430px] md:max-w-[440px] lg:max-w-[470px] xl:max-w-[600px]"
+              className="hero-copy-panel pointer-events-auto w-full max-w-[370px] sm:max-w-[430px] md:max-w-[440px] lg:max-w-[470px] xl:max-w-[600px]"
             >
               <div className="mb-5 inline-flex items-center gap-2.5 rounded-full border border-white/55 bg-white/55 px-3 py-2 shadow-[0_16px_50px_rgba(11,31,79,0.13),inset_0_1px_0_rgba(255,255,255,0.86)] backdrop-blur-2xl md:mb-5 md:px-3.5 xl:mb-8 xl:gap-3 xl:px-4">
                 <span className="hero-signal-dot relative flex h-3 w-3 items-center justify-center">

@@ -154,6 +154,7 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
 const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
   const trackRef = useRef<HTMLDivElement>(null);
   const settleTimerRef = useRef(0);
+  const gestureRef = useRef<{ left: number; time: number; index: number } | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [selected, setSelected] = useState<QuietCard | null>(null);
 
@@ -170,6 +171,35 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
     },
     [cards.length, getCardStride],
   );
+
+  const settleToCard = useCallback(() => {
+    const el = trackRef.current;
+    if (!el) return;
+    const cardStride = getCardStride(el);
+    const now = performance.now();
+    const gesture = gestureRef.current;
+    const rawIndex = el.scrollLeft / cardStride;
+    let target = Math.round(rawIndex);
+
+    if (gesture) {
+      const delta = el.scrollLeft - gesture.left;
+      const elapsed = Math.max(80, now - gesture.time);
+      const velocity = Math.abs(delta / elapsed);
+      const distance = Math.abs(delta / cardStride);
+      const direction = delta >= 0 ? 1 : -1;
+
+      if (distance < 0.16) {
+        target = gesture.index;
+      } else if (distance > 1.18 || velocity > 1.22) {
+        target = gesture.index + direction * Math.min(2, Math.max(1, Math.round(distance)));
+      } else {
+        target = gesture.index + direction;
+      }
+    }
+
+    gestureRef.current = null;
+    scrollTo(Math.max(0, Math.min(cards.length - 1, target)));
+  }, [cards.length, getCardStride, scrollTo]);
 
   useEffect(() => {
     const preloadLinks: HTMLLinkElement[] = [];
@@ -205,6 +235,7 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
         const idx = Math.round(el.scrollLeft / cardWidth);
         setActiveIndex(Math.max(0, Math.min(cards.length - 1, idx)));
       });
+      settleTimerRef.current = window.setTimeout(settleToCard, 170);
     };
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => {
@@ -212,7 +243,7 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
       cancelAnimationFrame(raf);
       window.clearTimeout(settleTimerRef.current);
     };
-  }, [cards.length, getCardStride]);
+  }, [cards.length, getCardStride, settleToCard]);
 
   return (
     <section
@@ -250,7 +281,7 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
       {/* Horizontal scroller */}
       <motion.div
         ref={trackRef}
-        className="mobile-performance-surface android-snap-proximity relative z-10 flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain px-[7vw] pb-8 pt-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        className="mobile-performance-surface android-snap-proximity relative z-10 flex snap-x snap-proximity gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain px-[7vw] pb-8 pt-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-5% 0px" }}
@@ -260,7 +291,22 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
           touchAction: "pan-x pan-y pinch-zoom",
           WebkitOverflowScrolling: "touch",
           overscrollBehaviorX: "contain",
-          scrollSnapType: "x mandatory",
+          scrollSnapType: "x proximity",
+        }}
+        onPointerDown={() => {
+          const el = trackRef.current;
+          if (!el) return;
+          const cardStride = getCardStride(el);
+          gestureRef.current = {
+            left: el.scrollLeft,
+            time: performance.now(),
+            index: Math.max(0, Math.min(cards.length - 1, Math.round(el.scrollLeft / cardStride))),
+          };
+        }}
+        onPointerUp={settleToCard}
+        onPointerCancel={() => {
+          gestureRef.current = null;
+          settleToCard();
         }}
       >
         {cards.map((card, index) => (

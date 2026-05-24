@@ -795,7 +795,7 @@
 }
 
 .is-android .android-snap-proximity {
-  scroll-snap-type: x mandatory;
+  scroll-snap-type: x proximity;
 }
 
 .is-android .mobile-performance-surface {
@@ -989,6 +989,47 @@
     -1px 1px 0 rgba(255, 255, 255, 0.58),
     0 13px 30px rgba(255, 255, 255, 0.24),
     0 22px 60px rgba(255, 255, 255, 0.16);
+}
+
+@media (min-width: 768px) and (max-width: 1180px) and (orientation: portrait) {
+  .hero-copy-shell {
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 3.5vh;
+  }
+
+  .hero-copy-panel {
+    max-width: min(40vw, 25rem);
+    transform: translate3d(0, 3vh, 0);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1180px) and (orientation: landscape) {
+  .hero-copy-shell {
+    padding-bottom: 5vh;
+  }
+
+  .hero-copy-panel {
+    max-width: min(40vw, 29rem);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1180px) {
+  .hero-copy-panel .hero-floating-copy-edge {
+    text-wrap: balance;
+  }
+
+  .quiet-layer-card-stage {
+    top: 58%;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1180px) and (orientation: portrait) {
+  .quiet-layer-card-stage {
+    top: 60%;
+  }
 }
 
 .hero-floating-body-edge {

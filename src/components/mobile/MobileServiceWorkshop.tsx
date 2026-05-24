@@ -262,6 +262,8 @@ const MobileServiceWorkshop = () => {
   const phoneWrapRef = useRef<HTMLDivElement>(null);
   const orientationFrameRef = useRef(0);
   const orientationRef = useRef({ x: 0, y: 0 });
+  const isAndroidMotion =
+    typeof document !== "undefined" && document.documentElement.classList.contains("is-android");
 
   // Scroll-driven tilt
   const { scrollYProgress } = useScroll({
@@ -278,7 +280,7 @@ const MobileServiceWorkshop = () => {
   const gyroXSpring = useSpring(gyroX, { stiffness: 80, damping: 18 });
 
   useEffect(() => {
-    if (reduceMotion) return;
+    if (reduceMotion || isAndroidMotion) return;
     const handler = (e: DeviceOrientationEvent) => {
       const g = Math.max(-30, Math.min(30, e.gamma ?? 0));
       const b = Math.max(-30, Math.min(30, (e.beta ?? 0) - 30));
@@ -296,7 +298,7 @@ const MobileServiceWorkshop = () => {
       window.removeEventListener("deviceorientation", handler);
       if (orientationFrameRef.current) window.cancelAnimationFrame(orientationFrameRef.current);
     };
-  }, [gyroX, gyroY, reduceMotion]);
+  }, [gyroX, gyroY, isAndroidMotion, reduceMotion]);
 
   const rotateY = useTransform([scrollRotY, gyroYSpring], ([s, g]: number[]) => s + g);
   const rotateX = useTransform([scrollRotX, gyroXSpring], ([s, g]: number[]) => s + g);
