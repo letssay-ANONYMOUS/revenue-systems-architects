@@ -16,7 +16,7 @@ import LazySection from "@/components/LazySection";
 import MobileQuietLayer from "@/components/mobile/MobileQuietLayer";
 import StickyMobileCTA from "@/components/mobile/StickyMobileCTA";
 import MobileHeroExtras from "@/components/mobile/MobileHeroExtras";
-import { HERO_VIDEO_SOURCES, SITE_IMAGES } from "@/lib/media";
+import { HERO_VIDEO_MOBILE_SOURCES, HERO_VIDEO_SOURCES, SITE_IMAGES } from "@/lib/media";
 
 const CTASection = lazy(() => import("@/components/CTASection"));
 const Footer = lazy(() => import("@/components/Footer"));
@@ -249,15 +249,34 @@ const RisingShowcaseCard = ({ card, index, progress, onSelect }: RisingShowcaseC
 };
 
 const isTestMediaEnvironment = () => window.navigator.userAgent.toLowerCase().includes("jsdom");
+const shouldUseMobileVideo = () =>
+  typeof window !== "undefined" &&
+  window.matchMedia("(max-width: 767px)").matches;
 
 const ReliableHeroVideo = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const stallTimerRef = useRef<number | null>(null);
   const readyFallbackTimerRef = useRef<number | null>(null);
   const announcedReadyRef = useRef(false);
+  const [sources, setSources] = useState(() =>
+    shouldUseMobileVideo() ? HERO_VIDEO_MOBILE_SOURCES : HERO_VIDEO_SOURCES
+  );
   const [sourceIndex, setSourceIndex] = useState(0);
   const [isReady, setIsReady] = useState(false);
-  const source = HERO_VIDEO_SOURCES[sourceIndex];
+  const source = sources[sourceIndex] ?? sources[0];
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+    const updateSources = () => {
+      setSources(mediaQuery.matches ? HERO_VIDEO_MOBILE_SOURCES : HERO_VIDEO_SOURCES);
+      setSourceIndex(0);
+      announcedReadyRef.current = false;
+    };
+    updateSources();
+    mediaQuery.addEventListener("change", updateSources);
+    return () => mediaQuery.removeEventListener("change", updateSources);
+  }, []);
 
   const clearStallTimer = useCallback(() => {
     if (stallTimerRef.current === null) return;
@@ -296,8 +315,8 @@ const ReliableHeroVideo = () => {
     const video = videoRef.current;
     if (!video) return;
 
-    if (video.error && sourceIndex < HERO_VIDEO_SOURCES.length - 1) {
-      setSourceIndex((index) => Math.min(index + 1, HERO_VIDEO_SOURCES.length - 1));
+    if (video.error && sourceIndex < sources.length - 1) {
+      setSourceIndex((index) => Math.min(index + 1, sources.length - 1));
       return;
     }
 
@@ -306,7 +325,7 @@ const ReliableHeroVideo = () => {
     }
 
     playVideo();
-  }, [playVideo, sourceIndex]);
+  }, [playVideo, sourceIndex, sources.length]);
 
   useEffect(() => {
     if (isTestMediaEnvironment()) {
@@ -336,8 +355,8 @@ const ReliableHeroVideo = () => {
     };
     const handleError = () => {
       clearStallTimer();
-      if (sourceIndex < HERO_VIDEO_SOURCES.length - 1) {
-        setSourceIndex((index) => Math.min(index + 1, HERO_VIDEO_SOURCES.length - 1));
+      if (sourceIndex < sources.length - 1) {
+        setSourceIndex((index) => Math.min(index + 1, sources.length - 1));
       }
     };
     const handleStall = () => {
@@ -382,7 +401,7 @@ const ReliableHeroVideo = () => {
       window.removeEventListener("pageshow", handlePageShow);
       window.removeEventListener("focus", handlePageShow);
     };
-  }, [announceHeroReady, clearReadyFallbackTimer, clearStallTimer, playVideo, resetAndRecoverVideo, source, sourceIndex]);
+  }, [announceHeroReady, clearReadyFallbackTimer, clearStallTimer, playVideo, resetAndRecoverVideo, source, sourceIndex, sources.length]);
 
   return (
     <div aria-hidden="true" className="pointer-events-none sticky top-0 h-[100svh] min-h-screen w-full overflow-hidden bg-[#f7f9fc]">

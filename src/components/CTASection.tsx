@@ -3,7 +3,7 @@ import { motion, useScroll, useSpring, useTransform, type MotionValue } from "fr
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import SectionReveal from "./SectionReveal";
-import { CTA_VIDEO_SOURCES } from "@/lib/media";
+import { CTA_VIDEO_MOBILE_SOURCES, CTA_VIDEO_SOURCES } from "@/lib/media";
 
 interface CTASectionProps {
   headline?: string;
@@ -85,16 +85,34 @@ const CTASection = ({
 
 const CTA_VIDEO_FADE_SECONDS = 1.35;
 const CTA_VIDEO_FALLBACK_SECONDS = 10;
+const shouldUseMobileVideo = () =>
+  typeof window !== "undefined" &&
+  window.matchMedia("(max-width: 767px)").matches;
 
 const SeamlessCTAVideo = () => {
   const primaryRef = useRef<HTMLVideoElement>(null);
   const secondaryRef = useRef<HTMLVideoElement>(null);
   const [activeLayer, setActiveLayer] = useState<0 | 1>(0);
+  const [sources, setSources] = useState(() =>
+    shouldUseMobileVideo() ? CTA_VIDEO_MOBILE_SOURCES : CTA_VIDEO_SOURCES
+  );
   const [sourceIndex, setSourceIndex] = useState(0);
-  const source = CTA_VIDEO_SOURCES[sourceIndex];
+  const source = sources[sourceIndex] ?? sources[0];
   const useSingleLayer =
     typeof window !== "undefined" &&
     window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 767px)");
+    const updateSources = () => {
+      setSources(mediaQuery.matches ? CTA_VIDEO_MOBILE_SOURCES : CTA_VIDEO_SOURCES);
+      setSourceIndex(0);
+      setActiveLayer(0);
+    };
+    updateSources();
+    mediaQuery.addEventListener("change", updateSources);
+    return () => mediaQuery.removeEventListener("change", updateSources);
+  }, []);
 
   useEffect(() => {
     if (window.navigator.userAgent.toLowerCase().includes("jsdom")) return;
@@ -118,8 +136,8 @@ const SeamlessCTAVideo = () => {
     };
     const recover = () => {
       if (document.hidden) return;
-      if (current.error && sourceIndex < CTA_VIDEO_SOURCES.length - 1) {
-        setSourceIndex((index) => Math.min(index + 1, CTA_VIDEO_SOURCES.length - 1));
+      if (current.error && sourceIndex < sources.length - 1) {
+        setSourceIndex((index) => Math.min(index + 1, sources.length - 1));
         return;
       }
       if (current.paused || current.ended || current.readyState < 2) {
@@ -226,7 +244,7 @@ const SeamlessCTAVideo = () => {
       window.removeEventListener("pageshow", handleWake);
       window.removeEventListener("focus", handleWake);
     };
-  }, [activeLayer, source, sourceIndex, useSingleLayer]);
+  }, [activeLayer, source, sourceIndex, sources.length, useSingleLayer]);
 
   const videoClass = "absolute inset-0 h-full w-full object-cover transition-opacity";
   const videoStyle = {

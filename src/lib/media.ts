@@ -12,8 +12,18 @@ export const HERO_VIDEO_SOURCES = [
   mediaUrl("hero-section-loop-edited-20260522-175107.mp4"),
 ];
 
+export const HERO_VIDEO_MOBILE_SOURCES = [
+  mediaUrl("hero-section-loop-mobile-h264-960w-20260523.mp4"),
+  ...HERO_VIDEO_SOURCES,
+];
+
 export const CTA_VIDEO_SOURCES = [
   mediaUrl("cta-section-loop-edited-20260522-175107.mp4"),
+];
+
+export const CTA_VIDEO_MOBILE_SOURCES = [
+  mediaUrl("cta-section-loop-mobile-h264-960w-20260523.mp4"),
+  ...CTA_VIDEO_SOURCES,
 ];
 
 export const SITE_IMAGES = {
