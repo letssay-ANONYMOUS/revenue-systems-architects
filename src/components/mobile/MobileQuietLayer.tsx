@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
@@ -153,8 +153,6 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
 
 const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
   const trackRef = useRef<HTMLDivElement>(null);
-  const settleTimerRef = useRef(0);
-  const gestureRef = useRef<{ left: number; time: number; index: number } | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const [selected, setSelected] = useState<QuietCard | null>(null);
 
@@ -171,35 +169,6 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
     },
     [cards.length, getCardStride],
   );
-
-  const settleToCard = useCallback(() => {
-    const el = trackRef.current;
-    if (!el) return;
-    const cardStride = getCardStride(el);
-    const now = performance.now();
-    const gesture = gestureRef.current;
-    const rawIndex = el.scrollLeft / cardStride;
-    let target = Math.round(rawIndex);
-
-    if (gesture) {
-      const delta = el.scrollLeft - gesture.left;
-      const elapsed = Math.max(80, now - gesture.time);
-      const velocity = Math.abs(delta / elapsed);
-      const distance = Math.abs(delta / cardStride);
-      const direction = delta >= 0 ? 1 : -1;
-
-      if (distance < 0.16) {
-        target = gesture.index;
-      } else if (distance > 1.18 || velocity > 1.22) {
-        target = gesture.index + direction * Math.min(2, Math.max(1, Math.round(distance)));
-      } else {
-        target = gesture.index + direction;
-      }
-    }
-
-    gestureRef.current = null;
-    scrollTo(Math.max(0, Math.min(cards.length - 1, target)));
-  }, [cards.length, getCardStride, scrollTo]);
 
   useEffect(() => {
     const preloadLinks: HTMLLinkElement[] = [];
@@ -227,23 +196,22 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
     const el = trackRef.current;
     if (!el) return;
     let raf = 0;
+    // Native CSS scroll-snap handles settling on a card; this only keeps the
+    // pagination dots / activeIndex in sync with the current scroll position.
     const onScroll = () => {
       cancelAnimationFrame(raf);
-      window.clearTimeout(settleTimerRef.current);
       raf = requestAnimationFrame(() => {
         const cardWidth = getCardStride(el);
         const idx = Math.round(el.scrollLeft / cardWidth);
         setActiveIndex(Math.max(0, Math.min(cards.length - 1, idx)));
       });
-      settleTimerRef.current = window.setTimeout(settleToCard, 170);
     };
     el.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       el.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(raf);
-      window.clearTimeout(settleTimerRef.current);
     };
-  }, [cards.length, getCardStride, settleToCard]);
+  }, [cards.length, getCardStride]);
 
   return (
     <section
@@ -281,7 +249,7 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
       {/* Horizontal scroller */}
       <motion.div
         ref={trackRef}
-        className="mobile-performance-surface android-snap-proximity relative z-10 flex snap-x snap-proximity gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain px-[7vw] pb-8 pt-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        className="mobile-performance-surface android-snap-mandatory relative z-10 flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain px-[7vw] pb-8 pt-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-5% 0px" }}
@@ -291,22 +259,7 @@ const MobileQuietLayer = ({ cards }: MobileQuietLayerProps) => {
           touchAction: "pan-x pan-y pinch-zoom",
           WebkitOverflowScrolling: "touch",
           overscrollBehaviorX: "contain",
-          scrollSnapType: "x proximity",
-        }}
-        onPointerDown={() => {
-          const el = trackRef.current;
-          if (!el) return;
-          const cardStride = getCardStride(el);
-          gestureRef.current = {
-            left: el.scrollLeft,
-            time: performance.now(),
-            index: Math.max(0, Math.min(cards.length - 1, Math.round(el.scrollLeft / cardStride))),
-          };
-        }}
-        onPointerUp={settleToCard}
-        onPointerCancel={() => {
-          gestureRef.current = null;
-          settleToCard();
+          scrollSnapType: "x mandatory",
         }}
       >
         {cards.map((card, index) => (
@@ -354,28 +307,59 @@ interface SheetProps {
 const MobileCardSheet = ({ card, onClose }: SheetProps) => {
   const openedAtRef = useRef(performance.now());
   const close = useCallback(() => onClose(), [onClose]);
+  // Always call the latest close from the one-shot lock effect below without
+  // making the effect re-run (which would corrupt the saved scroll position).
+  const closeRef = useRef(close);
+  closeRef.current = close;
 
-  useEffect(() => {
+  // iOS-safe background scroll lock. Plain `overflow: hidden` does NOT stop
+  // touch scroll / rubber-banding behind a fixed overlay on iOS Safari, so we
+  // pin the body with `position: fixed` and offset it by the current scroll
+  // position, then restore on close. useLayoutEffect applies it before paint so
+  // the background can never move. Runs exactly once per open (empty deps).
+  useLayoutEffect(() => {
     const html = document.documentElement;
     const body = document.body;
-    const previousHtmlOverflow = html.style.overflow;
-    const previousBodyOverflow = body.style.overflow;
-    const previousOverscroll = body.style.overscrollBehavior;
+    const scrollY = window.scrollY || window.pageYOffset || 0;
+    const prev = {
+      htmlOverflow: html.style.overflow,
+      bodyOverflow: body.style.overflow,
+      bodyPosition: body.style.position,
+      bodyTop: body.style.top,
+      bodyLeft: body.style.left,
+      bodyRight: body.style.right,
+      bodyWidth: body.style.width,
+      bodyOverscroll: body.style.overscrollBehavior,
+    };
+
     html.style.overflow = "hidden";
     body.style.overflow = "hidden";
+    body.style.position = "fixed";
+    body.style.top = `-${scrollY}px`;
+    body.style.left = "0";
+    body.style.right = "0";
+    body.style.width = "100%";
     body.style.overscrollBehavior = "contain";
 
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") close();
+      if (e.key === "Escape") closeRef.current();
     };
     window.addEventListener("keydown", onKey);
+
     return () => {
-      html.style.overflow = previousHtmlOverflow;
-      body.style.overflow = previousBodyOverflow;
-      body.style.overscrollBehavior = previousOverscroll;
+      html.style.overflow = prev.htmlOverflow;
+      body.style.overflow = prev.bodyOverflow;
+      body.style.position = prev.bodyPosition;
+      body.style.top = prev.bodyTop;
+      body.style.left = prev.bodyLeft;
+      body.style.right = prev.bodyRight;
+      body.style.width = prev.bodyWidth;
+      body.style.overscrollBehavior = prev.bodyOverscroll;
       window.removeEventListener("keydown", onKey);
+      // Restore the exact scroll position the body was pinned at.
+      window.scrollTo(0, scrollY);
     };
-  }, [close]);
+  }, []);
 
   const closeFromBackdrop = useCallback(() => {
     if (performance.now() - openedAtRef.current < 450) return;
@@ -406,7 +390,17 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
         initial={{ y: "100%" }}
         animate={{ y: 0 }}
         exit={{ y: "100%" }}
-        transition={{ type: "spring", stiffness: 620, damping: 48, mass: 0.52 }}
+        // Time-sampled tween (not a spring): on a phone that drops a frame the
+        // sheet skips ahead smoothly instead of a spring "catching up" with a
+        // visible jump. willChange/backface-visibility promote it to its own
+        // compositor layer so the large blurred box-shadow rasterizes once and
+        // just composites during the slide instead of re-rasterizing per frame.
+        transition={{ type: "tween", duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+        style={{
+          willChange: "transform",
+          backfaceVisibility: "hidden",
+          WebkitBackfaceVisibility: "hidden",
+        }}
         onClick={(event) => event.stopPropagation()}
       >
         {/* Drag handle */}
@@ -449,9 +443,12 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
               src={card.imageSrc}
               alt={`${card.label} detail`}
               className="zoom-safe h-full w-full object-cover"
-              initial={{ opacity: 0, scale: 1.04 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
+              // Pure opacity fade (no scale) revealed just after the slide
+              // begins settling — keeps the image paint from competing with the
+              // sheet's first frames, where the stutter was most visible.
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3, ease: "easeOut", delay: 0.12 }}
               loading="eager"
               decoding="async"
               fetchpriority="high"

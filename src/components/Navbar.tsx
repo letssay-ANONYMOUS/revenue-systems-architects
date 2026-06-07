@@ -44,7 +44,7 @@ const Navbar = () => {
           height={512}
           loading="eager"
           decoding="sync"
-          fetchPriority="high"
+          fetchpriority="high"
           className="h-9 w-9 rounded-[0.7rem] object-cover shadow-[0_12px_34px_rgba(20,32,50,0.14)] md:h-10 md:w-10"
         />
         <span className="font-display text-[1.08rem] font-semibold tracking-[-0.035em] text-[#101831]">
@@ -162,7 +162,7 @@ const Navbar = () => {
                   height={512}
                   loading="eager"
                   decoding="sync"
-                  fetchPriority="high"
+                  fetchpriority="high"
                   className="h-9 w-9 rounded-[0.7rem] object-cover shadow-[0_12px_34px_rgba(20,32,50,0.14)]"
                 />
                 <span className="font-display text-[1.08rem] font-semibold tracking-[-0.035em] text-[#101831]">

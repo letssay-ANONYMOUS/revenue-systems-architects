@@ -263,7 +263,7 @@ const SeamlessCTAVideo = () => {
         muted
         loop={useSingleLayer}
         playsInline
-        preload="metadata"
+        preload="auto"
         disablePictureInPicture
         controlsList="nodownload noplaybackrate noremoteplayback"
       >
@@ -277,7 +277,7 @@ const SeamlessCTAVideo = () => {
           style={videoStyle}
           muted
           playsInline
-          preload="metadata"
+          preload="auto"
           disablePictureInPicture
           controlsList="nodownload noplaybackrate noremoteplayback"
         >

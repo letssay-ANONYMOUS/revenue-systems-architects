@@ -16,7 +16,7 @@ import LazySection from "@/components/LazySection";
 import MobileQuietLayer from "@/components/mobile/MobileQuietLayer";
 import StickyMobileCTA from "@/components/mobile/StickyMobileCTA";
 import MobileHeroExtras from "@/components/mobile/MobileHeroExtras";
-import { HERO_VIDEO_MOBILE_SOURCES, HERO_VIDEO_SOURCES, SITE_IMAGES } from "@/lib/media";
+import { CTA_VIDEO_MOBILE_SOURCES, CTA_VIDEO_SOURCES, HERO_VIDEO_MOBILE_SOURCES, HERO_VIDEO_SOURCES, SITE_IMAGES } from "@/lib/media";
 
 const CTASection = lazy(() => import("@/components/CTASection"));
 const Footer = lazy(() => import("@/components/Footer"));
@@ -417,7 +417,7 @@ const ReliableHeroVideo = () => {
         playsInline
         preload="auto"
         crossOrigin="anonymous"
-        fetchPriority="high"
+        fetchpriority="high"
         disablePictureInPicture
         controlsList="nodownload noplaybackrate noremoteplayback"
       />
@@ -1352,6 +1352,53 @@ const HeroScrollTransition = () => {
 
 const Index = () => {
   const heroRef = useRef<HTMLDivElement>(null);
+
+  // Warm the final CTA-section video into cache long before the user scrolls to
+  // it, so it plays instantly instead of buffering/stuttering on arrival. We
+  // wait until the hero is ready (so this never competes with the hero load),
+  // then prefetch during idle time at low priority.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    let started = false;
+
+    const warmCtaVideo = () => {
+      if (started) return;
+      started = true;
+      const isMobile = window.matchMedia("(max-width: 767px)").matches;
+      const src = (isMobile ? CTA_VIDEO_MOBILE_SOURCES[0] : CTA_VIDEO_SOURCES[0]);
+      if (!src || document.querySelector("link[data-cta-video-prefetch]")) return;
+      const link = document.createElement("link");
+      link.rel = "prefetch";
+      link.as = "video";
+      link.href = src;
+      link.setAttribute("data-cta-video-prefetch", "true");
+      document.head.appendChild(link);
+    };
+
+    const schedule = () => {
+      const ric = (window as typeof window & {
+        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      }).requestIdleCallback;
+      if (ric) ric(warmCtaVideo, { timeout: 2500 });
+      else window.setTimeout(warmCtaVideo, 1200);
+    };
+
+    const heroReady = (window as typeof window & { __STERK_HERO_VIDEO_READY__?: boolean })
+      .__STERK_HERO_VIDEO_READY__;
+    if (heroReady) {
+      schedule();
+      return;
+    }
+
+    const onHeroReady = () => schedule();
+    window.addEventListener("sterk:hero-video-ready", onHeroReady, { once: true });
+    // Fallback: warm anyway after a few seconds even if the ready event never fires.
+    const fallbackTimer = window.setTimeout(schedule, 4000);
+    return () => {
+      window.removeEventListener("sterk:hero-video-ready", onHeroReady);
+      window.clearTimeout(fallbackTimer);
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-background relative">

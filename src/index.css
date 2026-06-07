@@ -61,6 +61,10 @@
 
 @layer base {
   html {
+    /* position: relative makes the document scrolling element a non-static
+       containing block, which lets Framer Motion's useScroll({ target }) measure
+       scroll offsets correctly (otherwise it warns about a static container). */
+    position: relative;
     scroll-behavior: smooth;
     overflow-x: hidden;
     overflow-y: auto;
@@ -794,8 +798,8 @@
   scroll-behavior: smooth;
 }
 
-.is-android .android-snap-proximity {
-  scroll-snap-type: x proximity;
+.is-android .android-snap-mandatory {
+  scroll-snap-type: x mandatory;
 }
 
 .is-android .mobile-performance-surface {
@@ -816,6 +820,29 @@
 
 .is-android .film-grain {
   display: none;
+}
+
+/* ── Zoom stabiliser ──────────────────────────────────────────────────────────
+   Applied (by ZoomStabilizer.tsx) only while the user is actively pinch-/zoom-
+   gesturing. It strips the GPU-heavy effects that all re-rasterise at once on a
+   scale change — backdrop-filter blur, will-change hints and paint containment —
+   which is what causes the brief flicker / jump / blur-pop. At natural scale the
+   `zoom-active` class is absent, so the normal experience is untouched. */
+.zoom-active *,
+.zoom-active *::before,
+.zoom-active *::after {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  will-change: auto !important;
+  contain: none !important;
+  /* Pause CSS keyframe loops (shimmer, pulses) so they don't jerk mid-zoom. */
+  animation-play-state: paused !important;
+  /* Kill scroll/opacity transitions so nothing visibly re-settles during zoom. */
+  transition: none !important;
+}
+
+.zoom-active .film-grain {
+  display: none !important;
 }
 
 .modal-focus-overlay {

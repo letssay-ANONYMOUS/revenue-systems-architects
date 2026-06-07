@@ -7,6 +7,7 @@ import { useEffect, lazy, Suspense, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import PageTransition from "@/components/PageTransition";
 import SmoothScroll from "@/components/SmoothScroll";
+import ZoomStabilizer from "@/components/ZoomStabilizer";
 import FilmGrain from "@/components/FilmGrain";
 import Index from "./pages/Index";
 import { SITE_IMAGES } from "@/lib/media";
@@ -46,7 +47,7 @@ const BrandLoadingScreen = () => (
           height={512}
           loading="eager"
           decoding="sync"
-          fetchPriority="high"
+          fetchpriority="high"
           className="h-full w-full rounded-[1.25rem] object-cover"
         />
         <motion.span
@@ -186,6 +187,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <SmoothScroll />
+      <ZoomStabilizer />
       <FilmGrain />
       <BrowserRouter>
         <InitialLoader />
