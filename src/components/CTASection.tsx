@@ -3,7 +3,7 @@ import { motion, useScroll, useSpring, useTransform, type MotionValue } from "fr
 import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import SectionReveal from "./SectionReveal";
-import { CTA_VIDEO_MOBILE_SOURCES, CTA_VIDEO_SOURCES } from "@/lib/media";
+import { CTA_VIDEO_MOBILE_SOURCES, CTA_VIDEO_SOURCES, VIDEO_POSTERS } from "@/lib/media";
 
 interface CTASectionProps {
   headline?: string;
@@ -264,6 +264,7 @@ const SeamlessCTAVideo = () => {
         loop={useSingleLayer}
         playsInline
         preload="auto"
+        poster={sources === CTA_VIDEO_MOBILE_SOURCES ? VIDEO_POSTERS.ctaMobile : VIDEO_POSTERS.cta}
         disablePictureInPicture
         controlsList="nodownload noplaybackrate noremoteplayback"
       >
@@ -277,7 +278,8 @@ const SeamlessCTAVideo = () => {
           style={videoStyle}
           muted
           playsInline
-          preload="auto"
+          preload="metadata"
+          poster={sources === CTA_VIDEO_MOBILE_SOURCES ? VIDEO_POSTERS.ctaMobile : VIDEO_POSTERS.cta}
           disablePictureInPicture
           controlsList="nodownload noplaybackrate noremoteplayback"
         >

@@ -26,6 +26,14 @@ export const CTA_VIDEO_MOBILE_SOURCES = [
   ...CTA_VIDEO_SOURCES,
 ];
 
+// First-frame posters served from /public so videos paint immediately.
+export const VIDEO_POSTERS = {
+  hero: "/posters/hero-poster.jpg",
+  heroMobile: "/posters/hero-poster-mobile.jpg",
+  cta: "/posters/cta-poster.jpg",
+  ctaMobile: "/posters/cta-poster-mobile.jpg",
+} as const;
+
 export const SITE_IMAGES = {
   logo: imageUrl("sterk-logo.jpg"),
   callsCaptured: imageUrl("calls-captured-card.jpg"),

@@ -1,7 +1,3 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useEffect, lazy, Suspense, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -16,8 +12,6 @@ import { applyRouteSeo } from "@/lib/seo";
 const About = lazy(() => import("./pages/About"));
 const BookACall = lazy(() => import("./pages/BookACall"));
 const NotFound = lazy(() => import("./pages/NotFound"));
-
-const queryClient = new QueryClient();
 
 const BrandLoadingScreen = () => (
   <motion.div
@@ -191,21 +185,17 @@ const PageRouteFallback = () => (
 );
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <SmoothScroll />
-      <ZoomStabilizer />
-      <FilmGrain />
-      <BrowserRouter>
-        <InitialLoader />
-        <RouteSeo />
-        <ScrollToTop />
-        <AnimatedRoutes />
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <>
+    <SmoothScroll />
+    <ZoomStabilizer />
+    <FilmGrain />
+    <BrowserRouter>
+      <InitialLoader />
+      <RouteSeo />
+      <ScrollToTop />
+      <AnimatedRoutes />
+    </BrowserRouter>
+  </>
 );
 
 export default App;

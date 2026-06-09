@@ -16,7 +16,7 @@ import LazySection from "@/components/LazySection";
 import MobileQuietLayer from "@/components/mobile/MobileQuietLayer";
 import StickyMobileCTA from "@/components/mobile/StickyMobileCTA";
 import MobileHeroExtras from "@/components/mobile/MobileHeroExtras";
-import { CTA_VIDEO_MOBILE_SOURCES, CTA_VIDEO_SOURCES, HERO_VIDEO_MOBILE_SOURCES, HERO_VIDEO_SOURCES, SITE_IMAGES } from "@/lib/media";
+import { CTA_VIDEO_MOBILE_SOURCES, CTA_VIDEO_SOURCES, HERO_VIDEO_MOBILE_SOURCES, HERO_VIDEO_SOURCES, SITE_IMAGES, VIDEO_POSTERS } from "@/lib/media";
 
 const CTASection = lazy(() => import("@/components/CTASection"));
 const Footer = lazy(() => import("@/components/Footer"));
@@ -416,6 +416,7 @@ const ReliableHeroVideo = () => {
         loop
         playsInline
         preload="auto"
+        poster={sources === HERO_VIDEO_MOBILE_SOURCES ? VIDEO_POSTERS.heroMobile : VIDEO_POSTERS.hero}
         crossOrigin="anonymous"
         fetchpriority="high"
         disablePictureInPicture

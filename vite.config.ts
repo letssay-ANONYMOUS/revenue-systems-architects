@@ -1,6 +1,7 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import legacy from "@vitejs/plugin-legacy";
+import { visualizer } from "rollup-plugin-visualizer";
 import path from "path";
 
 // https://vitejs.dev/config/
@@ -20,6 +21,8 @@ export default defineConfig(({ mode }) => ({
         modernPolyfills: true,
         renderLegacyChunks: true,
       }),
+    process.env.ANALYZE &&
+      visualizer({ filename: "bundle-stats.html", gzipSize: true, template: "treemap" }),
   ].filter(Boolean),
   resolve: {
     alias: {

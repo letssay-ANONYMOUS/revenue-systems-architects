@@ -84,6 +84,7 @@
     "jsdom": "^20.0.3",
     "postcss": "^8.5.6",
     "puppeteer": "^25.1.0",
+    "rollup-plugin-visualizer": "^7.0.1",
     "tailwindcss": "^3.4.17",
     "terser": "^5.47.1",
     "typescript": "^5.8.3",
