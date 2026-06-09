@@ -1,24 +1,24 @@
 {
   "name": "STERK.systems",
   "short_name": "STERK",
-  "description": "AI automation studio for business.",
+  "description": "AI automation agency in the UAE — calling agents, chatbots, automation systems, and websites.",
   "icons": [
     {
-      "src": "https://nqxbucqfvofuhipafqrh.supabase.co/storage/v1/object/public/Website%20images%20bucket/sterk-logo.jpg",
-      "sizes": "512x512",
-      "type": "image/jpeg",
+      "src": "/favicon-32.png",
+      "sizes": "32x32",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "https://nqxbucqfvofuhipafqrh.supabase.co/storage/v1/object/public/Website%20images%20bucket/sterk-logo.jpg",
-      "sizes": "512x512",
-      "type": "image/jpeg",
-      "purpose": "any maskable"
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
-      "src": "https://nqxbucqfvofuhipafqrh.supabase.co/storage/v1/object/public/Website%20images%20bucket/sterk-logo.jpg",
+      "src": "/icon-512.png",
       "sizes": "512x512",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ],

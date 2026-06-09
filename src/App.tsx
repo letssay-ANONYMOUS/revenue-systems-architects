@@ -11,6 +11,7 @@ import ZoomStabilizer from "@/components/ZoomStabilizer";
 import FilmGrain from "@/components/FilmGrain";
 import Index from "./pages/Index";
 import { SITE_IMAGES } from "@/lib/media";
+import { applyRouteSeo } from "@/lib/seo";
 
 const About = lazy(() => import("./pages/About"));
 const BookACall = lazy(() => import("./pages/BookACall"));
@@ -141,6 +142,14 @@ function ScrollToTop() {
   return null;
 }
 
+function RouteSeo() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    applyRouteSeo(pathname);
+  }, [pathname]);
+  return null;
+}
+
 function AnimatedRoutes() {
   const location = useLocation();
   return (
@@ -191,6 +200,7 @@ const App = () => (
       <FilmGrain />
       <BrowserRouter>
         <InitialLoader />
+        <RouteSeo />
         <ScrollToTop />
         <AnimatedRoutes />
       </BrowserRouter>
