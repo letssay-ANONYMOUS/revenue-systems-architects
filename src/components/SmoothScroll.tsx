@@ -19,6 +19,9 @@ const SmoothScroll = () => {
       easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       touchMultiplier: 1.5,
     });
+    // Expose for scroll-synced consumers (e.g. ScrollTrigger pinning in the
+    // lazily-loaded 3D section) without importing gsap into the main bundle.
+    (window as typeof window & { __sterkLenis?: Lenis }).__sterkLenis = lenis;
 
     function raf(time: number) {
       lenis.raf(time);
@@ -26,7 +29,10 @@ const SmoothScroll = () => {
     }
     requestAnimationFrame(raf);
 
-    return () => lenis.destroy();
+    return () => {
+      delete (window as typeof window & { __sterkLenis?: Lenis }).__sterkLenis;
+      lenis.destroy();
+    };
   }, []);
 
   return null;

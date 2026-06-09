@@ -13,6 +13,7 @@ import Navbar from "@/components/Navbar";
 import SectionReveal from "@/components/SectionReveal";
 import TiltCard from "@/components/TiltCard";
 import LazySection from "@/components/LazySection";
+import NatureSection from "@/components/nature/NatureSection";
 import MobileQuietLayer from "@/components/mobile/MobileQuietLayer";
 import StickyMobileCTA from "@/components/mobile/StickyMobileCTA";
 import MobileHeroExtras from "@/components/mobile/MobileHeroExtras";
@@ -1808,6 +1809,9 @@ const Index = () => {
           </div>
         </section>
       </LazySection>
+
+      {/* 3D "Touch Grass" section — self-gating (IO + capability checks) */}
+      <NatureSection />
 
       {/* CTA & Footer — lazy loaded */}
       <LazySection rootMargin="300px" minHeight="200px">
