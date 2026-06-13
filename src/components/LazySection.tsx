@@ -14,7 +14,13 @@ const LazySection = ({
   fallback,
 }: LazySectionProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const [shouldRender, setShouldRender] = useState(false);
+  // During static prerendering, render every section up-front so all content
+  // lands in the crawlable HTML regardless of scroll/IntersectionObserver timing.
+  const [shouldRender, setShouldRender] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      Boolean((window as typeof window & { __STERK_PRERENDER__?: boolean }).__STERK_PRERENDER__),
+  );
 
   useEffect(() => {
     const node = containerRef.current;

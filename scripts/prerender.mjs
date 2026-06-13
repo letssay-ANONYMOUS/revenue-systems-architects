@@ -11,12 +11,18 @@ const DIST = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../dist
 const SITE_URL = "https://www.sterk.systems";
 const PORT = 4173;
 
-// Route → output file + a text marker that must exist in the capture,
-// so a silent render failure fails the build instead of shipping empty HTML.
+// Route → output file + text markers that must ALL exist in the capture,
+// so a silent or partial render fails the build instead of shipping thin HTML.
+// Home markers span top, middle, and bottom of the page to catch lazy
+// sections that failed to mount during the scroll passes.
 const ROUTES = [
-  { path: "/", out: "index.html", marker: "Your Business" },
-  { path: "/about", out: "about/index.html", marker: "STERK" },
-  { path: "/book-a-call", out: "book-a-call/index.html", marker: "call" },
+  {
+    path: "/",
+    out: "index.html",
+    markers: ["Your Business", "Built to Convert", "Strategy to System", "Real Systems", "All rights reserved"],
+  },
+  { path: "/about", out: "about/index.html", markers: ["STERK"] },
+  { path: "/book-a-call", out: "book-a-call/index.html", markers: ["call"] },
 ];
 
 const MIME = {
@@ -45,10 +51,22 @@ const server = http.createServer((req, res) => {
 await new Promise((resolve) => server.listen(PORT, resolve));
 console.log(`Serving dist/ on :${PORT}`);
 
-const browser = await puppeteer.launch({
-  headless: true,
-  args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
-});
+let browser;
+try {
+  browser = await puppeteer.launch({
+    headless: true,
+    args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
+  });
+} catch (err) {
+  // Headless Chrome couldn't start (e.g. missing libs on a CI build image).
+  // Don't brick the deploy — ship the plain SPA build and warn loudly so this
+  // gets fixed. Content bugs still fail hard once Chrome is running (below).
+  console.warn("\n⚠️  PRERENDER SKIPPED — could not launch headless Chrome:");
+  console.warn(`    ${err.message}`);
+  console.warn("    Shipping client-rendered SPA without prerendered HTML/sitemap.\n");
+  server.close();
+  process.exit(0);
+}
 
 const renderRoute = async (route) => {
   const page = await browser.newPage();
@@ -89,21 +107,28 @@ const renderRoute = async (route) => {
 
     // Scroll through the page so IntersectionObserver-gated sections mount.
     // Sections extend the page as they load, so repeat until height stabilizes.
-    await page.evaluate(async () => {
-      const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-      let prevHeight = 0;
-      for (let pass = 0; pass < 6 && document.body.scrollHeight !== prevHeight; pass++) {
-        prevHeight = document.body.scrollHeight;
-        for (let y = 0; y <= prevHeight; y += window.innerHeight) {
-          window.scrollTo(0, y);
-          await sleep(140);
+    // behavior:"instant" defeats the CSS smooth-scroll animation, which would
+    // otherwise lag behind the pass loop and skip IO windows.
+    const scrollAllSections = () =>
+      page.evaluate(async () => {
+        const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+        let prevHeight = 0;
+        for (let pass = 0; pass < 10 && document.body.scrollHeight !== prevHeight; pass++) {
+          prevHeight = document.body.scrollHeight;
+          for (let y = 0; y <= prevHeight; y += Math.round(window.innerHeight * 0.8)) {
+            window.scrollTo({ top: y, behavior: "instant" });
+            await sleep(180);
+          }
+          window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" });
+          await sleep(600);
         }
-        window.scrollTo(0, document.body.scrollHeight);
-        await sleep(500);
-      }
-    });
-    await page.waitForNetworkIdle({ idleTime: 600, timeout: 10000 }).catch(() => {});
-    await new Promise((r) => setTimeout(r, 600));
+      });
+
+    await scrollAllSections();
+    await page.waitForNetworkIdle({ idleTime: 800, timeout: 20000 }).catch(() => {});
+    // chunks that arrived during the idle wait may have grown the page again
+    await scrollAllSections();
+    await new Promise((r) => setTimeout(r, 1000));
 
     const html = await page.evaluate(() => {
       window.scrollTo(0, 0);
@@ -111,8 +136,15 @@ const renderRoute = async (route) => {
       return "<!doctype html>" + document.documentElement.outerHTML;
     });
 
-    if (!html.includes(route.marker)) {
-      throw new Error(`Prerender of ${route.path} missing expected content "${route.marker}"`);
+    // A marker counts if it appears either in the raw HTML (covers text inside
+    // attributes like aria-label, and per-character span headlines) or in the
+    // tag-stripped text (covers phrases split by inline markup, e.g.
+    // "Built to <span>Convert</span>" → "Built to Convert").
+    const textContent = html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+    for (const marker of route.markers) {
+      if (!html.includes(marker) && !textContent.includes(marker)) {
+        throw new Error(`Prerender of ${route.path} missing expected content "${marker}"`);
+      }
     }
     if (html.length < 20000) {
       throw new Error(`Prerender of ${route.path} suspiciously small (${html.length} bytes)`);

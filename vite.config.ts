@@ -29,4 +29,9 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  optimizeDeps: {
+    // pre-bundle so the first visit to a lazy 3D section doesn't trigger a
+    // dev-server re-optimization + full page reload
+    include: ["three/examples/jsm/utils/BufferGeometryUtils.js"],
+  },
 }));

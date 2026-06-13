@@ -13,7 +13,11 @@ import Navbar from "@/components/Navbar";
 import SectionReveal from "@/components/SectionReveal";
 import TiltCard from "@/components/TiltCard";
 import LazySection from "@/components/LazySection";
-import NatureSection from "@/components/nature/NatureSection";
+// Heavy 3D sections — preserved in src/components/nature & src/components/lightriver
+// but DISABLED for now (too heavy on phones/low-end devices). Re-enable by
+// uncommenting these imports and their usage below.
+// import NatureSection from "@/components/nature/NatureSection";
+// import LightRiverSection from "@/components/lightriver/LightRiverSection";
 import MobileQuietLayer from "@/components/mobile/MobileQuietLayer";
 import StickyMobileCTA from "@/components/mobile/StickyMobileCTA";
 import MobileHeroExtras from "@/components/mobile/MobileHeroExtras";
@@ -1733,6 +1737,9 @@ const Index = () => {
         </div>
       </section>
 
+      {/* 3D "Light River" section — DISABLED (code kept in src/components/lightriver) */}
+      {/* <LightRiverSection /> */}
+
       {/* PROCESS — lazy loaded */}
       <LazySection rootMargin="300px" minHeight="300px">
         <Suspense fallback={null}>
@@ -1810,8 +1817,8 @@ const Index = () => {
         </section>
       </LazySection>
 
-      {/* 3D "Touch Grass" section — self-gating (IO + capability checks) */}
-      <NatureSection />
+      {/* 3D "Touch Grass" section — DISABLED (code kept in src/components/nature) */}
+      {/* <NatureSection /> */}
 
       {/* CTA & Footer — lazy loaded */}
       <LazySection rootMargin="300px" minHeight="200px">
