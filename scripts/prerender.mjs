@@ -53,10 +53,23 @@ console.log(`Serving dist/ on :${PORT}`);
 
 let browser;
 try {
-  browser = await puppeteer.launch({
-    headless: true,
-    args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
-  });
+  if (process.env.VERCEL) {
+    // Vercel's build image lacks the system libraries the bundled Chrome needs.
+    // @sparticuz/chromium ships a self-contained Chromium built for this exact
+    // Amazon-Linux/serverless environment; drive it with puppeteer-core.
+    const chromium = (await import("@sparticuz/chromium")).default;
+    const puppeteerCore = (await import("puppeteer-core")).default;
+    browser = await puppeteerCore.launch({
+      args: [...chromium.args, "--no-sandbox", "--disable-setuid-sandbox"],
+      executablePath: await chromium.executablePath(),
+      headless: true,
+    });
+  } else {
+    browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-gpu"],
+    });
+  }
 } catch (err) {
   // Headless Chrome couldn't start (e.g. missing libs on a CI build image).
   // Don't brick the deploy — ship the plain SPA build and warn loudly so this
