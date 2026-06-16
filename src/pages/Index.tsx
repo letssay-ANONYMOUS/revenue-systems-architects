@@ -348,6 +348,9 @@ const ReliableHeroVideo = () => {
 
     readyFallbackTimerRef.current = window.setTimeout(() => {
       setIsReady(true);
+      // Also release the loading screen — otherwise it sits until its 4.3s
+      // hard cap while the hero (poster or video) is already painted behind it.
+      announceHeroReady();
       playVideo();
     }, 2200);
 
@@ -657,6 +660,7 @@ const WebsiteShowcaseCarousel = () => {
   const [selectedWebsiteIndex, setSelectedWebsiteIndex] = useState<number | null>(null);
   const [selectedWebsiteDevice, setSelectedWebsiteDevice] = useState<"desktop" | "phone">("desktop");
   const [deviceView, setDeviceView] = useState<"desktop" | "phone">("desktop");
+  const rootRef = useRef<HTMLDivElement>(null);
   const active = websiteShowcases[activeIndex];
   const selectedWebsite = selectedWebsiteIndex === null ? null : websiteShowcases[selectedWebsiteIndex];
   const selectedWebsiteImageSrc = selectedWebsiteDevice === "phone" ? selectedWebsite?.phoneImageSrc : selectedWebsite?.imageSrc;
@@ -695,29 +699,45 @@ const WebsiteShowcaseCarousel = () => {
     };
   }, [selectedWebsiteIndex]);
 
+  // Warm ALL showcase images (desktop + phone) once the section is ~one
+  // viewport away — far enough that it doesn't compete with the hero video at
+  // page load, close enough that every slide is decoded before the user arrives
+  // or taps "expand". Fires a single time, then disconnects.
   useEffect(() => {
-    const preloadLinks: HTMLLinkElement[] = [];
-    const adjacentIndex = (activeIndex + 1) % websiteShowcases.length;
-    [websiteShowcases[activeIndex], websiteShowcases[adjacentIndex]]
-      .flatMap(({ imageSrc, phoneImageSrc }) => [imageSrc, phoneImageSrc])
-      .forEach((imageSrc) => {
-      if (!imageSrc) return;
-      const img = new Image();
-      img.decoding = "async";
-      img.src = imageSrc;
+    const node = rootRef.current;
+    if (!node || typeof window === "undefined") return;
 
-      const link = document.createElement("link");
-      link.rel = "preload";
-      link.as = "image";
-      link.href = imageSrc;
-      document.head.appendChild(link);
-      preloadLinks.push(link);
-    });
-
-    return () => {
-      preloadLinks.forEach((link) => link.remove());
+    let done = false;
+    const warm = () => {
+      if (done) return;
+      done = true;
+      websiteShowcases
+        .flatMap(({ imageSrc, phoneImageSrc }) => [imageSrc, phoneImageSrc])
+        .forEach((src) => {
+          if (!src) return;
+          const img = new Image();
+          img.decoding = "async";
+          img.src = src;
+          // Pre-decode so the first paint / expand is instant, not janky.
+          if (typeof img.decode === "function") void img.decode().catch(() => undefined);
+        });
     };
-  }, [activeIndex]);
+
+    if (!("IntersectionObserver" in window)) {
+      warm();
+      return;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        warm();
+        observer.disconnect();
+      },
+      { rootMargin: "1200px 0px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!selectedWebsite) return;
@@ -829,7 +849,7 @@ const WebsiteShowcaseCarousel = () => {
 
   return (
     <>
-      <div className="zoom-safe mb-10 flex justify-center overflow-visible py-2 md:mb-18">
+      <div ref={rootRef} className="zoom-safe mb-10 flex justify-center overflow-visible py-2 md:mb-18">
         <div className="relative w-full max-w-[1240px]">
           <div className="android-no-filter pointer-events-none absolute -inset-10 rounded-[3.5rem] bg-[radial-gradient(ellipse_at_50%_12%,rgba(255,255,255,0.96),transparent_44%),radial-gradient(ellipse_at_78%_46%,rgba(20,71,212,0.08),transparent_42%),radial-gradient(ellipse_at_18%_70%,rgba(213,170,90,0.08),transparent_38%)] blur-2xl" />
 

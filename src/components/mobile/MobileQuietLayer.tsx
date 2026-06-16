@@ -70,7 +70,7 @@ const PressableCard = ({ card, index, onOpen }: PressableCardProps) => {
   return (
     <motion.article
       ref={articleRef as React.RefObject<HTMLElement>}
-      className="mobile-performance-surface android-lite-glass group relative w-[86vw] shrink-0 snap-start cursor-pointer overflow-hidden rounded-[1.55rem] border border-white/55 bg-white/40 p-2.5 text-left shadow-[0_30px_70px_rgba(20,29,38,0.18),inset_0_1px_0_rgba(255,255,255,0.78)] backdrop-blur-2xl"
+      className="mobile-performance-surface android-lite-glass group relative w-[86vw] shrink-0 snap-start cursor-pointer overflow-hidden rounded-[1.55rem] border border-white/55 bg-white/40 p-2.5 text-left shadow-[0_30px_70px_rgba(20,29,38,0.18),inset_0_1px_0_rgba(255,255,255,0.78)] backdrop-blur-2xl [scroll-snap-stop:always]"
       initial={{ opacity: 0, y: 60, scale: 0.92 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-15% 0px" }}
@@ -356,8 +356,14 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
       body.style.width = prev.bodyWidth;
       body.style.overscrollBehavior = prev.bodyOverscroll;
       window.removeEventListener("keydown", onKey);
-      // Restore the exact scroll position the body was pinned at.
+      // Restore the exact scroll position the body was pinned at — INSTANTLY.
+      // The global `scroll-behavior: smooth` on <html> would otherwise animate
+      // this jump, teleporting the user to the hero and visibly scrolling them
+      // back down. Disable smooth scrolling just for the restore.
+      const prevScrollBehavior = html.style.scrollBehavior;
+      html.style.scrollBehavior = "auto";
       window.scrollTo(0, scrollY);
+      html.style.scrollBehavior = prevScrollBehavior;
     };
   }, []);
 
@@ -395,7 +401,7 @@ const MobileCardSheet = ({ card, onClose }: SheetProps) => {
         // visible jump. willChange/backface-visibility promote it to its own
         // compositor layer so the large blurred box-shadow rasterizes once and
         // just composites during the slide instead of re-rasterizing per frame.
-        transition={{ type: "tween", duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ type: "tween", duration: 0.52, ease: [0.32, 0.72, 0, 1] }}
         style={{
           willChange: "transform",
           backfaceVisibility: "hidden",
