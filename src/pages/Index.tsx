@@ -21,6 +21,7 @@ import LazySection from "@/components/LazySection";
 import MobileQuietLayer from "@/components/mobile/MobileQuietLayer";
 import StickyMobileCTA from "@/components/mobile/StickyMobileCTA";
 import MobileHeroExtras from "@/components/mobile/MobileHeroExtras";
+import PanZoomImage from "@/components/PanZoomImage";
 import { CTA_VIDEO_MOBILE_SOURCES, CTA_VIDEO_SOURCES, HERO_VIDEO_MOBILE_SOURCES, HERO_VIDEO_SOURCES, SITE_IMAGES, VIDEO_POSTERS } from "@/lib/media";
 
 const CTASection = lazy(() => import("@/components/CTASection"));
@@ -1225,18 +1226,11 @@ const WebsiteShowcaseCarousel = () => {
                     <X className="h-4 w-4" />
                   </button>
                 </div>
-                <div
-                  className="zoom-safe max-h-[calc(100svh-4.25rem)] overflow-auto overscroll-contain rounded-b-[1.45rem] bg-[#07101f] md:rounded-b-[1.85rem]"
-                  style={{ touchAction: "pan-x pan-y pinch-zoom" }}
-                >
-                  <img
+                <div className="overflow-hidden rounded-b-[1.45rem] bg-[#07101f] md:rounded-b-[1.85rem]">
+                  <PanZoomImage
                     src={selectedWebsiteImageSrc}
                     alt={`${selectedWebsite.title} full website design`}
-                    className="zoom-safe h-auto w-full max-w-none origin-top"
-                    style={{ touchAction: "pan-x pan-y pinch-zoom" }}
-                    loading="eager"
-                    decoding="async"
-                    fetchpriority="high"
+                    className="h-auto w-full max-w-none"
                   />
                 </div>
               </motion.div>
