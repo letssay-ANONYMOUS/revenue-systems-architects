@@ -668,7 +668,9 @@ const WebsiteShowcaseCarousel = () => {
   const activePhoneImageSrc = active.phoneImageSrc ?? active.imageSrc;
   const isAndroidMotion =
     typeof document !== "undefined" && document.documentElement.classList.contains("is-android");
-  const androidSafeFilter = (filter: string) => (isAndroidMotion ? "none" : filter);
+  const isTouchDevice =
+    typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+  const androidSafeFilter = (filter: string) => (isAndroidMotion || isTouchDevice ? "none" : filter);
   const showPrevious = () => setActiveSlide(([current]) => [(current - 1 + websiteShowcases.length) % websiteShowcases.length, -1]);
   const showNext = () => setActiveSlide(([current]) => [(current + 1) % websiteShowcases.length, 1]);
   const showSlide = (index: number) => {
@@ -852,7 +854,7 @@ const WebsiteShowcaseCarousel = () => {
     <>
       <div ref={rootRef} className="zoom-safe mb-10 flex justify-center overflow-visible py-2 md:mb-18">
         <div className="relative w-full max-w-[1240px]">
-          <div className="android-no-filter pointer-events-none absolute -inset-10 rounded-[3.5rem] bg-[radial-gradient(ellipse_at_50%_12%,rgba(255,255,255,0.96),transparent_44%),radial-gradient(ellipse_at_78%_46%,rgba(20,71,212,0.08),transparent_42%),radial-gradient(ellipse_at_18%_70%,rgba(213,170,90,0.08),transparent_38%)] blur-2xl" />
+          <div className="android-no-filter pointer-events-none absolute -inset-10 hidden rounded-[3.5rem] bg-[radial-gradient(ellipse_at_50%_12%,rgba(255,255,255,0.96),transparent_44%),radial-gradient(ellipse_at_78%_46%,rgba(20,71,212,0.08),transparent_42%),radial-gradient(ellipse_at_18%_70%,rgba(213,170,90,0.08),transparent_38%)] blur-2xl md:block" />
 
           <div className="relative z-20 mb-6 flex justify-center">
             <div className="android-lite-glass relative inline-flex rounded-full border border-white/78 bg-white/48 p-1 shadow-[0_18px_48px_rgba(20,32,50,0.13),inset_0_1px_0_rgba(255,255,255,0.96),inset_0_-10px_24px_rgba(17,24,39,0.05)] backdrop-blur-2xl backdrop-saturate-150">
@@ -885,10 +887,10 @@ const WebsiteShowcaseCarousel = () => {
             <motion.div
               key="desktop-website-preview"
               className="relative"
-              initial={{ opacity: 0, y: 18, scale: 0.985, filter: androidSafeFilter("blur(10px)") }}
-              animate={{ opacity: 1, y: 0, scale: 1, filter: androidSafeFilter("blur(0px)") }}
-              exit={{ opacity: 0, y: -16, scale: 0.985, filter: androidSafeFilter("blur(10px)") }}
-              transition={{ duration: isAndroidMotion ? 0.34 : 0.46, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ opacity: 0, y: 18, scale: 0.985 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -16, scale: 0.985 }}
+              transition={{ duration: isAndroidMotion || isTouchDevice ? 0.34 : 0.46, ease: [0.16, 1, 0.3, 1] }}
             >
               <motion.div
                 className="relative [perspective:1600px]"
@@ -907,7 +909,7 @@ const WebsiteShowcaseCarousel = () => {
                       animate="center"
                       exit="exit"
                       style={{
-                        willChange: "transform, opacity, filter",
+                        willChange: isTouchDevice ? "transform, opacity" : "transform, opacity, filter",
                         backfaceVisibility: "hidden",
                       }}
                       className="android-lite-glass pointer-events-none absolute inset-0 overflow-hidden rounded-[1.65rem] border border-white/76 bg-white/58 p-2.5 text-left shadow-[0_38px_105px_rgba(24,38,60,0.15),inset_0_1px_0_rgba(255,255,255,0.94),inset_0_-1px_0_rgba(17,24,39,0.05)] backdrop-blur-2xl [transform-style:preserve-3d] md:rounded-[2rem] md:p-3"
@@ -1018,10 +1020,10 @@ const WebsiteShowcaseCarousel = () => {
             <motion.div
               key="phone-website-preview"
               className="relative mx-auto flex w-full max-w-[390px] flex-col items-center justify-center px-3 pb-2 pt-1 sm:max-w-[430px] md:max-w-[470px] md:px-8"
-              initial={{ opacity: 0, y: 22, scale: 0.96, rotateY: -8, filter: androidSafeFilter("blur(12px)") }}
-              animate={{ opacity: 1, y: 0, scale: 1, rotateY: 0, filter: androidSafeFilter("blur(0px)") }}
-              exit={{ opacity: 0, y: -18, scale: 0.965, rotateY: 7, filter: androidSafeFilter("blur(12px)") }}
-              transition={{ duration: isAndroidMotion ? 0.38 : 0.54, ease: [0.16, 1, 0.3, 1] }}
+              initial={{ opacity: 0, y: 22, scale: 0.96, rotateY: -8 }}
+              animate={{ opacity: 1, y: 0, scale: 1, rotateY: 0 }}
+              exit={{ opacity: 0, y: -18, scale: 0.965, rotateY: 7 }}
+              transition={{ duration: isAndroidMotion || isTouchDevice ? 0.38 : 0.54, ease: [0.16, 1, 0.3, 1] }}
             >
               <motion.div
                 role="button"

@@ -53,11 +53,10 @@ const PanZoomImage = ({ src, alt, className }: PanZoomImageProps) => {
       const scaledH = displayH * s;
 
       const maxTx = Math.max(0, (scaledW - cw) / 2);
-      const maxTy = Math.max(0, (scaledH - ch) / 2);
 
       return {
         x: clamp(tx, -maxTx, maxTx),
-        y: clamp(ty, -maxTy, maxTy),
+        y: clamp(ty, Math.min(0, ch - scaledH), 0),
       };
     },
     [],
