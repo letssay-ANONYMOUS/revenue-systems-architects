@@ -1458,7 +1458,7 @@ const Index = () => {
               <AnimatedHeroHeadline />
 
               <p className="hero-floating-body-edge mt-4 hidden max-w-[34rem] text-xs leading-relaxed text-muted-foreground sm:text-sm md:mt-5 md:block md:text-[0.95rem] xl:mt-6 xl:text-base">
-                AI agents, chatbots, websites and automation that capture leads, book appointments, and run your operations.
+                STERK.systems is an AI automation agency serving the UAE and GCC — building AI calling agents, chatbots, websites and automation that capture leads, book appointments, and run your operations.
               </p>
 
               <div className="mt-4 hidden flex-wrap gap-2 xl:flex">

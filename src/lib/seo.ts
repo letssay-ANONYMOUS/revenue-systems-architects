@@ -12,21 +12,21 @@ export interface RouteSeo {
 export const ROUTE_SEO: RouteSeo[] = [
   {
     path: "/",
-    title: "AI Automation Agency in UAE | STERK.systems",
+    title: "AI Automation Agency in UAE & GCC — AI Calling Agents & Chatbots | STERK.systems",
     description:
-      "STERK.systems builds AI calling agents, chatbots, automation systems and websites that win UAE businesses more leads and bookings.",
+      "STERK.systems is an AI automation agency serving the UAE and GCC. We build AI calling agents, chatbots, lead-capture websites and business automation systems for companies in Dubai, Abu Dhabi, Riyadh, Doha, Kuwait and across the Gulf.",
   },
   {
     path: "/about",
-    title: "About STERK.systems — AI Automation Studio in UAE",
+    title: "About STERK.systems — AI Automation Agency | UAE & GCC",
     description:
-      "Meet STERK.systems, the Al Ain–based studio building AI calling agents, chatbots and automation systems for businesses across the UAE.",
+      "STERK.systems is an AI automation agency based in Al Ain, UAE, serving businesses across the GCC. We build AI calling agents, chatbots, automated booking systems and high-converting websites.",
   },
   {
     path: "/book-a-call",
-    title: "Book a Free AI Strategy Call | STERK.systems",
+    title: "Book a Free AI Automation Strategy Call | STERK.systems",
     description:
-      "Book a free strategy call with STERK.systems. Map where AI calling agents, chatbots and automation can save time and win more customers.",
+      "Book a free strategy call with STERK.systems, an AI automation agency in the UAE & GCC. Discover how AI calling agents, chatbots and workflow automation can grow your business.",
   },
 ];
 
@@ -50,9 +50,34 @@ export const STRUCTURED_DATA = {
       "@type": "Organization",
       "@id": `${SITE_URL}/#organization`,
       name: SITE_NAME,
+      alternateName: "STERK Systems",
       url: `${SITE_URL}/`,
       logo: `${SITE_URL}/icon-512.png`,
+      description:
+        "STERK.systems is an AI automation agency based in Al Ain, UAE, serving businesses across the GCC. We build AI calling agents, chatbots, lead-capture websites and business automation systems.",
+      foundingLocation: {
+        "@type": "Place",
+        name: "Al Ain, Abu Dhabi, UAE",
+      },
+      knowsAbout: [
+        "AI automation",
+        "AI calling agents",
+        "AI chatbots",
+        "Business process automation",
+        "Lead generation",
+        "Appointment booking automation",
+        "Web development",
+        "Conversational AI",
+      ],
       sameAs: ["https://x.com/STERKsystems"],
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      url: `${SITE_URL}/`,
+      name: SITE_NAME,
+      publisher: { "@id": `${SITE_URL}/#organization` },
+      inLanguage: "en",
     },
     {
       "@type": "ProfessionalService",
@@ -60,20 +85,85 @@ export const STRUCTURED_DATA = {
       name: SITE_NAME,
       url: `${SITE_URL}/`,
       image: OG_IMAGE_URL,
+      description:
+        "AI automation agency offering AI calling agents, chatbots, automated booking systems and high-converting websites for businesses across the UAE and GCC.",
       parentOrganization: { "@id": `${SITE_URL}/#organization` },
-      areaServed: { "@type": "Country", name: "AE" },
+      areaServed: [
+        { "@type": "City", name: "Al Ain" },
+        { "@type": "City", name: "Abu Dhabi" },
+        { "@type": "City", name: "Dubai" },
+        { "@type": "Country", name: "AE" },
+        { "@type": "City", name: "Riyadh" },
+        { "@type": "City", name: "Jeddah" },
+        { "@type": "Country", name: "SA" },
+        { "@type": "Country", name: "QA" },
+        { "@type": "Country", name: "KW" },
+        { "@type": "Country", name: "BH" },
+        { "@type": "Country", name: "OM" },
+      ],
       address: {
         "@type": "PostalAddress",
         addressLocality: "Al Ain",
         addressRegion: "Abu Dhabi",
         addressCountry: "AE",
       },
+      geo: {
+        "@type": "GeoCoordinates",
+        latitude: 24.1917,
+        longitude: 55.7606,
+      },
       serviceType: [
-        "AI calling agents",
-        "AI chatbots",
-        "Business process automation",
-        "Web development",
+        "AI Automation Agency",
+        "AI Calling Agents",
+        "AI Chatbot Development",
+        "Business Process Automation",
+        "Lead Generation Automation",
+        "Appointment Booking Systems",
+        "Web Design and Development",
       ],
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "AI Automation Services",
+        itemListElement: [
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "AI Calling Agents",
+              description:
+                "Inbound and outbound AI voice agents that answer calls, qualify leads and book appointments 24/7.",
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "AI Chatbots",
+              description:
+                "Conversational AI chatbots for websites and messaging platforms that capture leads and answer customer questions.",
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "Business Automation Systems",
+              description:
+                "End-to-end workflow automation connecting CRMs, calendars, payments and communication channels.",
+            },
+          },
+          {
+            "@type": "Offer",
+            itemOffered: {
+              "@type": "Service",
+              name: "High-Converting Websites",
+              description:
+                "Lead-capture websites and web applications designed to convert visitors into booked appointments.",
+            },
+          },
+        ],
+      },
+      priceRange: "$$",
     },
   ],
 } as const;
