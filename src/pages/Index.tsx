@@ -19,7 +19,6 @@ import LazySection from "@/components/LazySection";
 // import NatureSection from "@/components/nature/NatureSection";
 // import LightRiverSection from "@/components/lightriver/LightRiverSection";
 import MobileQuietLayer from "@/components/mobile/MobileQuietLayer";
-import StickyMobileCTA from "@/components/mobile/StickyMobileCTA";
 import MobileHeroExtras from "@/components/mobile/MobileHeroExtras";
 import PanZoomImage from "@/components/PanZoomImage";
 import { CTA_VIDEO_MOBILE_SOURCES, CTA_VIDEO_SOURCES, HERO_VIDEO_MOBILE_SOURCES, HERO_VIDEO_SOURCES, SITE_IMAGES, VIDEO_POSTERS } from "@/lib/media";
@@ -1844,7 +1843,6 @@ const Index = () => {
         </Suspense>
       </LazySection>
 
-      <StickyMobileCTA />
     </div>
   );
 };

@@ -1,50 +1,26 @@
-import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, X, Phone } from "lucide-react";
 
+const STORAGE_KEY = "sterk-mobile-cta-dismissed";
+
 const StickyMobileCTA = () => {
-  const location = useLocation();
-  const [dismissed, setDismissed] = useState(false);
-  const [pastHero, setPastHero] = useState(location.pathname !== "/");
+  const [dismissed, setDismissed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem(STORAGE_KEY) === "true";
+  });
 
-  useEffect(() => {
-    setDismissed(false);
-  }, [location.pathname]);
-
-  useEffect(() => {
-    if (location.pathname !== "/") {
-      setPastHero(true);
-      return;
+  const dismiss = () => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(STORAGE_KEY, "true");
     }
-
-    let raf = 0;
-    const updateVisibility = () => {
-      raf = 0;
-      const threshold = Math.max(420, window.innerHeight * 0.82);
-      setPastHero(window.scrollY > threshold);
-    };
-    const scheduleUpdate = () => {
-      if (raf) return;
-      raf = window.requestAnimationFrame(updateVisibility);
-    };
-
-    updateVisibility();
-    window.addEventListener("scroll", scheduleUpdate, { passive: true });
-    window.addEventListener("resize", scheduleUpdate);
-
-    return () => {
-      window.removeEventListener("scroll", scheduleUpdate);
-      window.removeEventListener("resize", scheduleUpdate);
-      if (raf) window.cancelAnimationFrame(raf);
-    };
-  }, [location.pathname]);
-
-  if (location.pathname === "/book-a-call") return null;
+    setDismissed(true);
+  };
 
   return (
     <AnimatePresence>
-      {!dismissed && pastHero && (
+      {!dismissed && (
         <motion.div
           className="phone-only-cta mobile-performance-surface pointer-events-none fixed inset-x-0 bottom-0 z-[1350] justify-center px-4 pb-[calc(0.9rem+env(safe-area-inset-bottom))]"
           initial={{ y: 120, opacity: 0 }}
@@ -114,7 +90,7 @@ const StickyMobileCTA = () => {
             <button
               type="button"
               aria-label="Dismiss"
-              onClick={() => setDismissed(true)}
+              onClick={dismiss}
               className="relative ml-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[#0f1730]/50 active:scale-90"
             >
               <X className="h-3.5 w-3.5" />

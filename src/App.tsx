@@ -5,6 +5,7 @@ import PageTransition from "@/components/PageTransition";
 import SmoothScroll from "@/components/SmoothScroll";
 import ZoomStabilizer from "@/components/ZoomStabilizer";
 import FilmGrain from "@/components/FilmGrain";
+import StickyMobileCTA from "@/components/mobile/StickyMobileCTA";
 import Index from "./pages/Index";
 import { SITE_IMAGES } from "@/lib/media";
 import { applyRouteSeo } from "@/lib/seo";
@@ -194,6 +195,7 @@ const App = () => (
       <RouteSeo />
       <ScrollToTop />
       <AnimatedRoutes />
+      <StickyMobileCTA />
     </BrowserRouter>
   </>
 );

@@ -9,7 +9,7 @@ const mediaUrl = (filename: string) => `${SUPABASE_MEDIA_BASE}/${filename}`;
 const imageUrl = (filename: string) => `${SUPABASE_IMAGE_BASE}/${filename}`;
 
 export const HERO_VIDEO_SOURCES = [
-  mediaUrl("hero-section-loop-edited-20260522-175107.mp4"),
+  "/hero-background-framed-pingpong-1440p.mp4",
 ];
 
 export const HERO_VIDEO_MOBILE_SOURCES = [
@@ -18,7 +18,7 @@ export const HERO_VIDEO_MOBILE_SOURCES = [
 ];
 
 export const CTA_VIDEO_SOURCES = [
-  mediaUrl("cta-section-loop-edited-20260522-175107.mp4"),
+  "/cta-section-loop-1440p.mp4",
 ];
 
 export const CTA_VIDEO_MOBILE_SOURCES = [
