@@ -1835,8 +1835,8 @@ const Index = () => {
       {/* 3D "Touch Grass" section — DISABLED (code kept in src/components/nature) */}
       {/* <NatureSection /> */}
 
-      {/* CTA & Footer — lazy loaded */}
-      <LazySection rootMargin="300px" minHeight="200px">
+      {/* CTA & Footer — mounted early so the CTA video is already loading by the timeline/results sections. */}
+      <LazySection rootMargin="3000px" minHeight="200px">
         <Suspense fallback={null}>
           <CTASection />
           <Footer />
