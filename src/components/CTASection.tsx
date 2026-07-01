@@ -292,7 +292,7 @@ const SeamlessCTAVideo = () => {
   const videoStyle = {
     transitionDuration: `${CTA_VIDEO_FADE_SECONDS * 1000}ms`,
     transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-    filter: "brightness(1.25)",
+    filter: "brightness(1.05)",
   };
 
   return (

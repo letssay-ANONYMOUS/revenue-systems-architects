@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, X, Phone } from "lucide-react";
 
-const STORAGE_KEY = "sterk-mobile-cta-dismissed";
+const STORAGE_KEY = "sterk-mobile-cta-dismissed-v2";
 
 const StickyMobileCTA = () => {
   const [dismissed, setDismissed] = useState(false);
