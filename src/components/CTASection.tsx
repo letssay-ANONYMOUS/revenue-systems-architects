@@ -89,6 +89,34 @@ const shouldUseMobileVideo = () =>
   typeof window !== "undefined" &&
   window.matchMedia("(max-width: 767px)").matches;
 
+const warmVideoSources = (sources: string[]) => {
+  if (typeof document === "undefined") return () => undefined;
+  const links: HTMLLinkElement[] = [];
+  const hasWarmLink = (src: string) => {
+    const absoluteSrc = new URL(src, document.baseURI).href;
+    return [...document.querySelectorAll<HTMLLinkElement>('link[as="video"]')]
+      .some((link) => link.href === absoluteSrc);
+  };
+
+  sources.forEach((src, index) => {
+    if (!src || hasWarmLink(src)) return;
+    const link = document.createElement("link");
+    link.rel = index === 0 ? "preload" : "prefetch";
+    link.as = "video";
+    link.href = src;
+    link.setAttribute("data-cta-section-video", src);
+    if (index === 0) {
+      link.setAttribute("fetchpriority", "high");
+    }
+    document.head.appendChild(link);
+    links.push(link);
+  });
+
+  return () => {
+    links.forEach((link) => link.remove());
+  };
+};
+
 const SeamlessCTAVideo = () => {
   const primaryRef = useRef<HTMLVideoElement>(null);
   const secondaryRef = useRef<HTMLVideoElement>(null);
@@ -114,6 +142,8 @@ const SeamlessCTAVideo = () => {
     return () => mediaQuery.removeEventListener("change", updateSources);
   }, []);
 
+  useEffect(() => warmVideoSources(sources), [sources]);
+
   useEffect(() => {
     if (window.navigator.userAgent.toLowerCase().includes("jsdom")) return;
 
@@ -123,12 +153,16 @@ const SeamlessCTAVideo = () => {
 
     let switchTimer = 0;
     let stopPreviousTimer = 0;
+    let sourceFallbackTimer = 0;
     let metadataHandler: (() => void) | null = null;
 
     const fadeMs = CTA_VIDEO_FADE_SECONDS * 1000;
     const play = (video: HTMLVideoElement) => {
       video.muted = true;
       video.playsInline = true;
+      if (video.readyState < 2 && video.networkState !== HTMLMediaElement.NETWORK_LOADING) {
+        video.load();
+      }
       const playback = video.play();
       if (playback && typeof playback.catch === "function") {
         void playback.catch(() => undefined);
@@ -146,6 +180,10 @@ const SeamlessCTAVideo = () => {
         }
         play(current);
       }
+    };
+    const fallbackToNextSource = () => {
+      if (document.hidden || sourceIndex >= sources.length - 1 || current.readyState >= 2) return;
+      setSourceIndex((index) => Math.min(index + 1, sources.length - 1));
     };
     const scheduleNextLayer = () => {
       const duration = Number.isFinite(current.duration) && current.duration > CTA_VIDEO_FADE_SECONDS
@@ -175,6 +213,7 @@ const SeamlessCTAVideo = () => {
     if (useSingleLayer) {
       current.loop = true;
       play(current);
+      sourceFallbackTimer = window.setTimeout(fallbackToNextSource, 4500);
       const heartbeat = window.setInterval(recover, 3000);
       const handleVisibility = () => recover();
       const handleWake = () => recover();
@@ -189,6 +228,7 @@ const SeamlessCTAVideo = () => {
 
       return () => {
         window.clearInterval(heartbeat);
+        window.clearTimeout(sourceFallbackTimer);
         current.removeEventListener("stalled", recover);
         current.removeEventListener("waiting", recover);
         current.removeEventListener("error", recover);
@@ -201,6 +241,7 @@ const SeamlessCTAVideo = () => {
     }
 
     play(current);
+    sourceFallbackTimer = window.setTimeout(fallbackToNextSource, 4500);
 
     if (previous) {
       stopPreviousTimer = window.setTimeout(() => {
@@ -232,6 +273,7 @@ const SeamlessCTAVideo = () => {
     return () => {
       window.clearTimeout(switchTimer);
       window.clearTimeout(stopPreviousTimer);
+      window.clearTimeout(sourceFallbackTimer);
       window.clearInterval(heartbeat);
       if (metadataHandler) current.removeEventListener("loadedmetadata", metadataHandler);
       current.removeEventListener("ended", switchImmediately);
@@ -279,7 +321,7 @@ const SeamlessCTAVideo = () => {
           style={videoStyle}
           muted
           playsInline
-          preload="metadata"
+          preload="auto"
           poster={sources === CTA_VIDEO_MOBILE_SOURCES ? VIDEO_POSTERS.ctaMobile : VIDEO_POSTERS.cta}
           disablePictureInPicture
           controlsList="nodownload noplaybackrate noremoteplayback"

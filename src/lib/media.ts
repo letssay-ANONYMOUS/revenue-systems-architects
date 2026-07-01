@@ -17,14 +17,22 @@ export const HERO_VIDEO_MOBILE_SOURCES = [
   ...HERO_VIDEO_SOURCES,
 ];
 
+const CTA_VIDEO_1440P_SOURCE = "/cta-section-loop-1440p.mp4";
+const CTA_VIDEO_MOBILE_BACKEND_SOURCE = mediaUrl("cta-section-loop-mobile-h264-960w-20260523.mp4");
+
 export const CTA_VIDEO_SOURCES = [
-  "/cta-section-loop-1440p.mp4",
+  CTA_VIDEO_1440P_SOURCE,
+  CTA_VIDEO_MOBILE_BACKEND_SOURCE,
 ];
 
 export const CTA_VIDEO_MOBILE_SOURCES = [
-  mediaUrl("cta-section-loop-mobile-h264-960w-20260523.mp4"),
-  ...CTA_VIDEO_SOURCES,
+  CTA_VIDEO_MOBILE_BACKEND_SOURCE,
+  CTA_VIDEO_1440P_SOURCE,
 ];
+
+export const CTA_VIDEO_PRELOAD_SOURCES = Array.from(
+  new Set([...CTA_VIDEO_SOURCES, ...CTA_VIDEO_MOBILE_SOURCES]),
+);
 
 // First-frame posters served from /public so videos paint immediately.
 export const VIDEO_POSTERS = {

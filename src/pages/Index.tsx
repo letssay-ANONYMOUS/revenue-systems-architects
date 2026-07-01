@@ -21,7 +21,7 @@ import LazySection from "@/components/LazySection";
 import MobileQuietLayer from "@/components/mobile/MobileQuietLayer";
 import MobileHeroExtras from "@/components/mobile/MobileHeroExtras";
 import PanZoomImage from "@/components/PanZoomImage";
-import { CTA_VIDEO_MOBILE_SOURCES, CTA_VIDEO_SOURCES, HERO_VIDEO_MOBILE_SOURCES, HERO_VIDEO_SOURCES, SITE_IMAGES, VIDEO_POSTERS } from "@/lib/media";
+import { CTA_VIDEO_MOBILE_SOURCES, CTA_VIDEO_PRELOAD_SOURCES, CTA_VIDEO_SOURCES, HERO_VIDEO_MOBILE_SOURCES, HERO_VIDEO_SOURCES, SITE_IMAGES, VIDEO_POSTERS } from "@/lib/media";
 
 const CTASection = lazy(() => import("@/components/CTASection"));
 const Footer = lazy(() => import("@/components/Footer"));
@@ -1375,33 +1375,48 @@ const Index = () => {
   const heroRef = useRef<HTMLDivElement>(null);
 
   // Warm the final CTA-section video into cache long before the user scrolls to
-  // it, so it plays instantly instead of buffering/stuttering on arrival. We
-  // wait until the hero is ready (so this never competes with the hero load),
-  // then prefetch during idle time at low priority.
+  // it, so demos do not land on a poster frame while the video starts loading.
   useEffect(() => {
     if (typeof window === "undefined") return;
     let started = false;
+    const warmLinks: HTMLLinkElement[] = [];
+    const hasVideoWarmLink = (src: string) => {
+      const absoluteSrc = new URL(src, document.baseURI).href;
+      return [...document.querySelectorAll<HTMLLinkElement>('link[as="video"]')]
+        .some((link) => link.href === absoluteSrc);
+    };
+
+    const appendVideoLink = (src: string, rel: "preload" | "prefetch") => {
+      if (!src || hasVideoWarmLink(src)) return;
+      const link = document.createElement("link");
+      link.rel = rel;
+      link.as = "video";
+      link.href = src;
+      link.setAttribute("data-cta-video-warm", `${rel}:${src}`);
+      if (rel === "preload") {
+        link.setAttribute("fetchpriority", "high");
+      }
+      document.head.appendChild(link);
+      warmLinks.push(link);
+    };
 
     const warmCtaVideo = () => {
       if (started) return;
       started = true;
       const isMobile = window.matchMedia("(max-width: 767px)").matches;
-      const src = (isMobile ? CTA_VIDEO_MOBILE_SOURCES[0] : CTA_VIDEO_SOURCES[0]);
-      if (!src || document.querySelector("link[data-cta-video-prefetch]")) return;
-      const link = document.createElement("link");
-      link.rel = "prefetch";
-      link.as = "video";
-      link.href = src;
-      link.setAttribute("data-cta-video-prefetch", "true");
-      document.head.appendChild(link);
+      const orderedSources = isMobile ? CTA_VIDEO_MOBILE_SOURCES : CTA_VIDEO_SOURCES;
+      appendVideoLink(orderedSources[0], "preload");
+      CTA_VIDEO_PRELOAD_SOURCES
+        .filter((src) => src !== orderedSources[0])
+        .forEach((src) => appendVideoLink(src, "prefetch"));
     };
 
     const schedule = () => {
       const ric = (window as typeof window & {
         requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
       }).requestIdleCallback;
-      if (ric) ric(warmCtaVideo, { timeout: 2500 });
-      else window.setTimeout(warmCtaVideo, 1200);
+      if (ric) ric(warmCtaVideo, { timeout: 900 });
+      else window.setTimeout(warmCtaVideo, 600);
     };
 
     const heroReady = (window as typeof window & { __STERK_HERO_VIDEO_READY__?: boolean })
@@ -1418,6 +1433,7 @@ const Index = () => {
     return () => {
       window.removeEventListener("sterk:hero-video-ready", onHeroReady);
       window.clearTimeout(fallbackTimer);
+      warmLinks.forEach((link) => link.remove());
     };
   }, []);
 
@@ -1835,8 +1851,8 @@ const Index = () => {
       {/* 3D "Touch Grass" section — DISABLED (code kept in src/components/nature) */}
       {/* <NatureSection /> */}
 
-      {/* CTA & Footer — mounted early so the CTA video is already loading by the timeline/results sections. */}
-      <LazySection rootMargin="3000px" minHeight="200px">
+      {/* CTA & Footer — mounted very early so the CTA video is already buffered before the demo reaches it. */}
+      <LazySection rootMargin="9000px" minHeight="200px">
         <Suspense fallback={null}>
           <CTASection />
           <Footer />
